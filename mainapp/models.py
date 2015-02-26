@@ -18,12 +18,14 @@ class MaterialWidget(MultiWidget):
 
 class MaterialField(MultiValueField):
     def __init__(self, *args, **kwargs):
-        list_fields = [fields.CharField(),
-                       fields.CharField()]
+        list_fields = [fields.CharField(max_length=30),
+                       fields.CharField(max_length=30)]
         super(MaterialField, self).__init__(list_fields, widget=MaterialWidget(), *args, **kwargs)
     def compress(self, values):
-        return values[0] + ':' + values[1] + ';'
-        #return values
+        if values:
+            return values[0] + ':' + values[1] + ';'
+        else:
+            return ''
 
 class MultiMaterialWidget(MultiWidget):
     def __init__(self, number=5):
@@ -54,9 +56,8 @@ class MultiMaterialField(MultiValueField):
             result += value
         return result
 
-class Test_Form(forms.Form):
-    #material = MultiMaterialField()
-    qwe = forms.CharField()
+class MaterialForm(forms.Form):
+    your_name = MultiMaterialField()
 
 
 class Object(models.Model):
