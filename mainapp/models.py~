@@ -79,7 +79,7 @@ class Object(models.Model):
     description_type = models.CharField(max_length=200)
     identifier = models.CharField(max_length=50)
     image = models.ImageField()
-    image_type = models.Charfield(max_length=50)
+    image_type = models.CharField(max_length=50)
     author = models.CharField(max_length=100)
     author_type = models.CharField(max_length=50)
     price = models.IntegerField(default=0)
