@@ -1,4 +1,3 @@
-#asdhgash
 from django import forms
 from django.db import models
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select
@@ -54,9 +53,10 @@ class MultiMaterialField(MultiValueField):
             result += value
         return result
 
-class Test_Form(forms.Form):
-    #material = MultiMaterialField()
-    qwe = forms.CharField()
+
+class MaterialForm(forms.Form):
+    your_name = forms.CharField(label='Your name', max_length=100)
+    your_name = MultiMaterialField()
 
 
 class Object(models.Model):
@@ -79,7 +79,7 @@ class Object(models.Model):
     description_type = models.CharField(max_length=200)
     identifier = models.CharField(max_length=50)
     image = models.ImageField()
-    image_type = models.Charfield(max_length=50)
+    image_type = models.CharField(max_length=50)
     author = models.CharField(max_length=100)
     author_type = models.CharField(max_length=50)
     price = models.IntegerField(default=0)
