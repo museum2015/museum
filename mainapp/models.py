@@ -3,60 +3,60 @@ from django.db import models
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select
 # Create your models here.
 
-
-class MaterialWidget(MultiWidget):
-    def __init__(self):
-        widgets = [TextInput(attrs={'size': 30, 'maxlength': 30}),
-                   TextInput(attrs={'size': 10, 'maxlength': 10})]
-        super(MaterialWidget, self).__init__(widgets)
-    def decompress(self, value):
-        if value:
-            return value.split(':')
-        return [None, None]
-
-
-class MaterialField(MultiValueField):
-    def __init__(self, *args, **kwargs):
-        list_fields = [fields.CharField(max_length=30),
-                       fields.CharField(max_length=30)]
-        super(MaterialField, self).__init__(list_fields, widget=MaterialWidget(), *args, **kwargs)
-    def compress(self, values):
-        if values:
-            return values[0] + ':' + values[1] + ';'
-        else:
-            return ''
-
-class MultiMaterialWidget(MultiWidget):
-    def __init__(self, number=5):
-        widgets = []
-        for i in range(number):
-            widgets.append(MaterialWidget())
-        super(MultiMaterialWidget, self).__init__(widgets)
-    def decompress(self, value):
-        res=[]
-        if value:
-            return value.split(';')
-        else:
-            return []
+class Material:
+    class MaterialWidget(MultiWidget):
+        def __init__(self):
+            widgets = [TextInput(attrs={'size': 30, 'maxlength': 30}),
+                       TextInput(attrs={'size': 10, 'maxlength': 10})]
+            super(Material.MaterialWidget, self).__init__(widgets)
+        def decompress(self, value):
+            if value:
+                return value.split(':')
+            return [None, None]
 
 
+    class MaterialField(MultiValueField):
+        def __init__(self, *args, **kwargs):
+            list_fields = [fields.CharField(max_length=30),
+                           fields.CharField(max_length=30)]
+            super(Material.MaterialField, self).__init__(list_fields, widget=Material.MaterialWidget(), *args, **kwargs)
+        def compress(self, values):
+            if values:
+                return values[0] + ':' + values[1] + ';'
+            else:
+                return ''
+
+    class MultiMaterialWidget(MultiWidget):
+        def __init__(self, number=5):
+            widgets = []
+            for i in range(number):
+                widgets.append(Material.MaterialWidget())
+            super(Material.MultiMaterialWidget, self).__init__(widgets)
+        def decompress(self, value):
+            res=[]
+            if value:
+                return value.split(';')
+            else:
+                return []
 
 
-class MultiMaterialField(MultiValueField):
-    def __init__(self, number=5, *args, **kwargs):
-        list_fields = []
-        for i in range(number):
-            list_fields.append(MaterialField())
-        super(MultiMaterialField, self).__init__(list_fields, widget=MultiMaterialWidget(number), *args, **kwargs)
 
-    def compress(self, values):
-        result = ''
-        for value in values:
-            result += value
-        return result
+
+    class MultiMaterialField(MultiValueField):
+        def __init__(self, number=5, *args, **kwargs):
+            list_fields = []
+            for i in range(number):
+                list_fields.append(Material.MaterialField())
+            super(Material.MultiMaterialField, self).__init__(list_fields, widget=Material.MultiMaterialWidget(number), *args, **kwargs)
+
+        def compress(self, values):
+            result = ''
+            for value in values:
+                result += value
+            return result
 
 class MaterialForm(forms.Form):
-    your_name = MultiMaterialField()
+    your_name = Material.MultiMaterialField()
 
 
 class Object(models.Model):

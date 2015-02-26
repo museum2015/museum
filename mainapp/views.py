@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse
-from models import MaterialForm, Object,MultiMaterialField
+from models import MaterialForm, Object, Material
 # Create your views here.
 
 def get_material(request):
