@@ -27,7 +27,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 TEMPLATE_DIRS = (
-    '~/museum/museum/templates',
+    '/home/coldsnap/museum/museum/templates',
 
 
 )
