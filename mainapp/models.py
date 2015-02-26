@@ -17,12 +17,14 @@ class MaterialWidget(MultiWidget):
 
 class MaterialField(MultiValueField):
     def __init__(self, *args, **kwargs):
-        list_fields = [fields.CharField(),
-                       fields.CharField()]
+        list_fields = [fields.CharField(max_length=30),
+                       fields.CharField(max_length=30)]
         super(MaterialField, self).__init__(list_fields, widget=MaterialWidget(), *args, **kwargs)
     def compress(self, values):
-        return values[0] + ':' + values[1] + ';'
-        #return values
+        if values:
+            return values[0] + ':' + values[1] + ';'
+        else:
+            return ''
 
 class MultiMaterialWidget(MultiWidget):
     def __init__(self, number=5):
@@ -53,9 +55,13 @@ class MultiMaterialField(MultiValueField):
             result += value
         return result
 
+<<<<<<< HEAD
 
 class MaterialForm(forms.Form):
     your_name = forms.CharField(label='Your name', max_length=100)
+=======
+class MaterialForm(forms.Form):
+>>>>>>> 1660c142bd8488f17328f542407d0a5d0739fea1
     your_name = MultiMaterialField()
 
 
@@ -83,31 +89,31 @@ class Object(models.Model):
     author = models.CharField(max_length=100)
     author_type = models.CharField(max_length=50)
     price = models.IntegerField(default=0)
-    price_type = models.CharField(max_lenght=50)
-    mark_on_object = models.CharField(max_lenght=200)
-    mark_type = models.CharField(max_lenght=50)
-    note = models.CharField(max_lenght=200)
-    note_type = models.CharField(max_lenght=50)
-    mark_note_lang=models.CharField(max_lenght=30)
-    condition_descr=models.CharField(max_lenght=500)
-    condition_saved=models.CharField(max_lenght=100)
+    price_type = models.CharField(max_length=50)
+    mark_on_object = models.CharField(max_length=200)
+    mark_type = models.CharField(max_length=50)
+    note = models.CharField(max_length=200)
+    note_type = models.CharField(max_length=50)
+    mark_note_lang=models.CharField(max_length=30)
+    condition_descr=models.CharField(max_length=500)
+    condition_saved=models.CharField(max_length=100)
     transport_possibility=models.BooleanField(default=False)
-    recomm_for_restauration=models.CharField(max_lenght=100)
-    restauration_notes = models.CharField(max_lenght=200)
-    place=models.CharField(max_lenght=200)
-    place_appellation = models.CharField(max_lenght=200)
-    is_there = models.CharField(max_lenght=200)
-    #documented_in = models.CharField(max_lenght=200)
-    #documented_type = models.CharField(max_lenght=50)
-    way_of_found = models.CharField(max_lenght=200)
-    #link_on_doc = models.CharField(max_lenght=200)
-    #doc_type = models.CharField(max_lenght=50)
-    transfered_from = models.CharField(max_lenght=200)
-    transfered_to = models.CharField(max_lenght=200)
-    term_back=models.DateTimeField(max_lenght=200)
-    aim_of_receiving_gen = models.CharField(max_lenght=200)
+    recomm_for_restauration=models.CharField(max_length=100)
+    restauration_notes = models.CharField(max_length=200)
+    place=models.CharField(max_length=200)
+    place_appellation = models.CharField(max_length=200)
+    is_there = models.CharField(max_length=200)
+    #documented_in = models.CharField(max_length=200)
+    #documented_type = models.CharField(max_length=50)
+    way_of_found = models.CharField(max_length=200)
+    #link_on_doc = models.CharField(max_length=200)
+    #doc_type = models.CharField(max_length=50)
+    transfered_from = models.CharField(max_length=200)
+    transfered_to = models.CharField(max_length=200)
+    term_back=models.DateTimeField(max_length=200)
+    aim_of_receiving_gen = models.CharField(max_length=200)
     #aim_of_receiving = models.ForeignKey(Events)
-    circumst_write_off = models.CharField(max_lenght=200)
+    circumst_write_off = models.CharField(max_length=200)
 
 
 
