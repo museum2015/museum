@@ -27,7 +27,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 TEMPLATE_DIRS = (
-    '/home/denis/museum/museum/templates',
+    '/home/coldsnap/museum/museum/templates',
 
 
 )
@@ -88,8 +88,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    ('static', '/home/denis/museum/museum/static/img/'),
+    ('static', '/home/coldsnap/museum/museum/static/img/'),
 )
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/denis/museum/museum/'
+MEDIA_ROOT = '/home/coldsnap/museum/museum/'
