@@ -27,7 +27,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 TEMPLATE_DIRS = (
-    '/home/coldsnap/museum/museum/templates',
+    os.path.join(BASE_DIR, 'museum/templates/'),
 
 
 )
