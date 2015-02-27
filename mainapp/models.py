@@ -46,9 +46,6 @@ class Material:
             else:
                 return []
 
-
-
-
     class MultiMaterialField(MultiValueField):
         def __init__(self, number=5, *args, **kwargs):
             list_fields = []
@@ -63,9 +60,11 @@ class Material:
             return result
 
 
-class MaterialForm(forms.Form):
-    your_name = forms.CharField(label='Your name', max_length=100)
+#class MaterialForm(forms.Form):
+  #  your_name = forms.CharField(label='Your name', max_length=100)
 
+class MaterialForm(forms.Form):
+    your_name = Material.MultiMaterialField()
 
 class Object(models.Model):
     collection = models.CharField(max_length=200, default='')
