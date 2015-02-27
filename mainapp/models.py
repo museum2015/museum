@@ -4,6 +4,11 @@ from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiW
 # Create your models here.
 
 
+def get_image_path(self, filename):
+        path = ''.join(["/",filename])
+        return path
+
+
 class MaterialWidget(MultiWidget):
     def __init__(self):
         widgets = [TextInput(attrs={'size': 30, 'maxlength': 30}),
@@ -55,14 +60,16 @@ class MultiMaterialField(MultiValueField):
             result += value
         return result
 
-<<<<<<< HEAD
+#<<<<<<< HEAD
 
 class MaterialForm(forms.Form):
     your_name = forms.CharField(label='Your name', max_length=100)
-=======
-class MaterialForm(forms.Form):
->>>>>>> 1660c142bd8488f17328f542407d0a5d0739fea1
-    your_name = MultiMaterialField()
+#=======
+
+
+#class MaterialForm(forms.Form):
+#>>>>>>> 1660c142bd8488f17328f542407d0a5d0739fea1
+  #  your_name = MultiMaterialField()
 
 
 class Object(models.Model):
