@@ -3,13 +3,14 @@ import datetime
 from django import forms
 from django.db import models
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 # Create your models here. test
 
 
 def get_image_path(self, filename):
         path = ''.join(["/",filename])
         return path
-
 
 class Material:
     class MaterialWidget(MultiWidget):
@@ -111,6 +112,27 @@ class Object(models.Model):
     aim_of_receiving_gen = models.CharField(max_length=200, default='')
     #aim_of_receiving = models.ForeignKey(Events)
     circumst_write_off = models.CharField(max_length=200, default='')
+
+class Activity(models.Model):
+    time_stamp = models.DateTimeField(default='2000-02-12 00:00')
+    type = models.CharField(max_length=30)
+    actor = models.ForeignKey(User)
+
+
+class AttributeAssignment(models.Model):
+    attr_name = models.CharField(max_length=40)
+    attr_value = models.CharField(max_length=200)
+    aim = models.ForeignKey(Object)
+    event_initiator = models.ForeignKey(Activity)
+
+
+
+
+
+
+
+
+
 
 
 
