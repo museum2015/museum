@@ -1,8 +1,15 @@
+
 import datetime
 from django import forms
 from django.db import models
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select
 # Create your models here. test
+
+
+def get_image_path(self, filename):
+        path = ''.join(["/",filename])
+        return path
+
 
 class Material:
     class MaterialWidget(MultiWidget):
@@ -14,7 +21,6 @@ class Material:
             if value:
                 return value.split(':')
             return [None, None]
-
 
     class MaterialField(MultiValueField):
         def __init__(self, *args, **kwargs):
@@ -40,9 +46,6 @@ class Material:
             else:
                 return []
 
-
-
-
     class MultiMaterialField(MultiValueField):
         def __init__(self, number=5, *args, **kwargs):
             list_fields = []
@@ -56,9 +59,12 @@ class Material:
                 result += value
             return result
 
+
+#class MaterialForm(forms.Form):
+  #  your_name = forms.CharField(label='Your name', max_length=100)
+
 class MaterialForm(forms.Form):
     your_name = Material.MultiMaterialField()
-
 
 class Object(models.Model):
     collection = models.CharField(max_length=200, default='')
@@ -79,7 +85,7 @@ class Object(models.Model):
     description_lang = models.CharField(max_length=50, default='')
     description_type = models.CharField(max_length=200, default='')
     identifier = models.CharField(max_length=50, default='')
-    image = models.ImageField()
+    image = models.ImageField(upload_to=get_image_path)
     image_type = models.CharField(max_length=50, default='')
     author = models.CharField(max_length=100, default='')
     author_type = models.CharField(max_length=50, default='')
