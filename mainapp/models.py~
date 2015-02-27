@@ -1,68 +1,16 @@
-<<<<<<< HEAD
-=======
+
 import datetime
->>>>>>> 0a83344fe78d8ff51a64118147e5657733988eb7
 from django import forms
 from django.db import models
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select
-# Create your models here.
-
-<<<<<<< HEAD
-
-class MaterialWidget(MultiWidget):
-    def __init__(self):
-        widgets = [TextInput(attrs={'size': 30, 'maxlength': 30}),
-                   TextInput(attrs={'size': 10, 'maxlength': 10})]
-        super(MaterialWidget, self).__init__(widgets)
-    def decompress(self, value):
-        if value:
-            return value.split(':')
-        return [None, None]
+# Create your models here. test
 
 
-class MaterialField(MultiValueField):
-    def __init__(self, *args, **kwargs):
-        list_fields = [fields.CharField(),
-                       fields.CharField()]
-        super(MaterialField, self).__init__(list_fields, widget=MaterialWidget(), *args, **kwargs)
-    def compress(self, values):
-        return values[0] + ':' + values[1] + ';'
-        #return values
-
-class MultiMaterialWidget(MultiWidget):
-    def __init__(self, number=5):
-        widgets = []
-        for i in range(number):
-            widgets.append(MaterialWidget())
-        super(MultiMaterialWidget, self).__init__(widgets)
-    def decompress(self, value):
-        res=[]
-        if value:
-            return value.split(';')
-        else:
-            return []
+def get_image_path(self, filename):
+        path = ''.join(["/",filename])
+        return path
 
 
-
-
-class MultiMaterialField(MultiValueField):
-    def __init__(self, number=5, *args, **kwargs):
-        list_fields = []
-        for i in range(number):
-            list_fields.append(MaterialField())
-        super(MultiMaterialField, self).__init__(list_fields, widget=MultiMaterialWidget(number), *args, **kwargs)
-
-    def compress(self, values):
-        result = ''
-        for value in values:
-            result += value
-        return result
-
-
-class MaterialForm(forms.Form):
-    your_name = forms.CharField(label='Your name', max_length=100)
-    your_name = MultiMaterialField()
-=======
 class Material:
     class MaterialWidget(MultiWidget):
         def __init__(self):
@@ -73,7 +21,6 @@ class Material:
             if value:
                 return value.split(':')
             return [None, None]
-
 
     class MaterialField(MultiValueField):
         def __init__(self, *args, **kwargs):
@@ -93,14 +40,10 @@ class Material:
                 widgets.append(Material.MaterialWidget())
             super(Material.MultiMaterialWidget, self).__init__(widgets)
         def decompress(self, value):
-            res=[]
             if value:
                 return value.split(';')
             else:
                 return []
-
-
-
 
     class MultiMaterialField(MultiValueField):
         def __init__(self, number=5, *args, **kwargs):
@@ -115,10 +58,12 @@ class Material:
                 result += value
             return result
 
+
+#class MaterialForm(forms.Form):
+  #  your_name = forms.CharField(label='Your name', max_length=100)
+
 class MaterialForm(forms.Form):
     your_name = Material.MultiMaterialField()
->>>>>>> 0a83344fe78d8ff51a64118147e5657733988eb7
-
 
 class Object(models.Model):
     collection = models.CharField(max_length=200, default='')
@@ -139,7 +84,7 @@ class Object(models.Model):
     description_lang = models.CharField(max_length=50, default='')
     description_type = models.CharField(max_length=200, default='')
     identifier = models.CharField(max_length=50, default='')
-    image = models.ImageField()
+    image = models.ImageField(upload_to=get_image_path)
     image_type = models.CharField(max_length=50, default='')
     author = models.CharField(max_length=100, default='')
     author_type = models.CharField(max_length=50, default='')

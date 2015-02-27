@@ -40,7 +40,6 @@ class Material:
                 widgets.append(Material.MaterialWidget())
             super(Material.MultiMaterialWidget, self).__init__(widgets)
         def decompress(self, value):
-            res=[]
             if value:
                 return value.split(';')
             else:
@@ -59,9 +58,6 @@ class Material:
                 result += value
             return result
 
-
-#class MaterialForm(forms.Form):
-  #  your_name = forms.CharField(label='Your name', max_length=100)
 
 class MaterialForm(forms.Form):
     your_name = Material.MultiMaterialField()
