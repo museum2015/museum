@@ -1,71 +1,15 @@
-<<<<<<< HEAD
+
+import datetime
 from django import forms
 from django.db import models
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select
-# Create your models here.
+# Create your models here. test
 
 
 def get_image_path(self, filename):
         path = ''.join(["/",filename])
         return path
 
-
-class MaterialWidget(MultiWidget):
-    def __init__(self):
-        widgets = [TextInput(attrs={'size': 30, 'maxlength': 30}),
-                   TextInput(attrs={'size': 10, 'maxlength': 10})]
-        super(MaterialWidget, self).__init__(widgets)
-    def decompress(self, value):
-        if value:
-            return value.split(':')
-        return [None, None]
-
-
-class MaterialField(MultiValueField):
-    def __init__(self, *args, **kwargs):
-        list_fields = [fields.CharField(max_length=30),
-                       fields.CharField(max_length=30)]
-        super(MaterialField, self).__init__(list_fields, widget=MaterialWidget(), *args, **kwargs)
-    def compress(self, values):
-        if values:
-            return values[0] + ':' + values[1] + ';'
-        else:
-            return ''
-
-class MultiMaterialWidget(MultiWidget):
-    def __init__(self, number=5):
-        widgets = []
-        for i in range(number):
-            widgets.append(MaterialWidget())
-        super(MultiMaterialWidget, self).__init__(widgets)
-    def decompress(self, value):
-        res=[]
-        if value:
-            return value.split(';')
-        else:
-            return []
-
-
-
-
-class MultiMaterialField(MultiValueField):
-    def __init__(self, number=5, *args, **kwargs):
-        list_fields = []
-        for i in range(number):
-            list_fields.append(MaterialField())
-        super(MultiMaterialField, self).__init__(list_fields, widget=MultiMaterialWidget(number), *args, **kwargs)
-
-    def compress(self, values):
-        result = ''
-        for value in values:
-            result += value
-        return result
-=======
-import datetime
-from django import forms
-from django.db import models
-from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select
-# Create your models here. test
 
 class Material:
     class MaterialWidget(MultiWidget):
@@ -77,7 +21,6 @@ class Material:
             if value:
                 return value.split(':')
             return [None, None]
-
 
     class MaterialField(MultiValueField):
         def __init__(self, *args, **kwargs):
@@ -118,22 +61,10 @@ class Material:
             for value in values:
                 result += value
             return result
->>>>>>> 0a83344fe78d8ff51a64118147e5657733988eb7
 
-#<<<<<<< HEAD
 
 class MaterialForm(forms.Form):
-<<<<<<< HEAD
     your_name = forms.CharField(label='Your name', max_length=100)
-#=======
-
-
-#class MaterialForm(forms.Form):
-#>>>>>>> 1660c142bd8488f17328f542407d0a5d0739fea1
-  #  your_name = MultiMaterialField()
-=======
-    your_name = Material.MultiMaterialField()
->>>>>>> 0a83344fe78d8ff51a64118147e5657733988eb7
 
 
 class Object(models.Model):
@@ -155,7 +86,7 @@ class Object(models.Model):
     description_lang = models.CharField(max_length=50, default='')
     description_type = models.CharField(max_length=200, default='')
     identifier = models.CharField(max_length=50, default='')
-    image = models.ImageField()
+    image = models.ImageField(upload_to=get_image_path)
     image_type = models.CharField(max_length=50, default='')
     author = models.CharField(max_length=100, default='')
     author_type = models.CharField(max_length=50, default='')
