@@ -88,8 +88,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    ('static', '/home/coldsnap/museum/museum/static/img/'),
+    ('static', os.path.join(BASE_DIR, 'museum/static/img/')),
 )
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/coldsnap/museum/museum/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'museum')

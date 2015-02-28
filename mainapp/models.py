@@ -66,6 +66,10 @@ class Material:
 class MaterialForm(forms.Form):
     your_name = Material.MultiMaterialField()
 
+
+class AttributeAssignment(models.Model):
+    operator = models.CharField(max_length=200)
+
 class Object(models.Model):
     collection = models.CharField(max_length=200, default='')
     name_title = models.CharField(max_length=200, default='')
