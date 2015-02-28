@@ -1,8 +1,9 @@
-
 import datetime
 from django import forms
 from django.db import models
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 # Create your models here. test
 
 
@@ -40,7 +41,6 @@ class Material:
                 widgets.append(Material.MaterialWidget())
             super(Material.MultiMaterialWidget, self).__init__(widgets)
         def decompress(self, value):
-            res=[]
             if value:
                 return value.split(';')
             else:
@@ -60,15 +60,9 @@ class Material:
             return result
 
 
-#class MaterialForm(forms.Form):
-  #  your_name = forms.CharField(label='Your name', max_length=100)
-
 class MaterialForm(forms.Form):
     your_name = Material.MultiMaterialField()
 
-
-class AttributeAssignment(models.Model):
-    operator = models.CharField(max_length=200)
 
 class Object(models.Model):
     collection = models.CharField(max_length=200, default='')
@@ -83,7 +77,7 @@ class Object(models.Model):
     _class = models.CharField(max_length=200, default='')
     type = models.CharField(max_length=200, default='')
     material = models.CharField(max_length=200, default='')
-    #measurement = models.CharField(default=False)
+    measurement = models.CharField(max_length=400)
     technique = models.CharField(max_length=200, default='')
     description = models.TextField(max_length=1000, default='')
     description_lang = models.CharField(max_length=50, default='')
@@ -117,8 +111,64 @@ class Object(models.Model):
     transfered_to = models.CharField(max_length=200, default='')
     term_back=models.DateTimeField(max_length=200, default='2000-02-12 00:00')
     aim_of_receiving_gen = models.CharField(max_length=200, default='')
-    #aim_of_receiving = models.ForeignKey(Events)
+    aim_of_receiving = models.ForeignKey(Activity)
     circumst_write_off = models.CharField(max_length=200, default='')
+    reason = models.CharField(max_length=200, default='')
+    source = models.CharField(max_length=200, default='')
+
+    def __unicode__(self):
+        return self.name_title
+
+
+class Activity(models.Model):
+    time_stamp = models.DateTimeField(default='2000-02-12 00:00')
+    type = models.CharField(max_length=30)
+    actor = models.ForeignKey(User)
+
+
+class AttributeAssignment(models.Model):
+    attr_name = models.CharField(max_length=40)
+    attr_value = models.CharField(max_length=200)
+    aim = models.ForeignKey(Object)
+    event_initiator = models.ForeignKey(Activity)
+
+
+class TempSaveForm(forms.Form):
+    name = forms.CharField(max_length=200, label='Name')
+    is_fragment = forms.BooleanField(label='Is it fragment?')
+    amount = forms.IntegerField(max_value=None, label='Amount')
+    author = forms.CharField(max_length=200, label='Author')
+    technique = forms.CharField(max_length=200, label='Technique')
+    material = MaterialForm()
+    size_type = forms.CharField(max_length=200, label='Type of size')
+    size_number = forms.IntegerField(max_value=None)
+    size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
+    measurement = MaterialForm()
+    condition_descr = forms.CharField(max_length=200, label='Description of condition')
+    description = forms.CharField(max_length=500, label='Description')
+    price = forms.CharField(max_length=200, label='Price + type')
+    note = forms.CharField(max_length=200, label='Note')
+    transfered_from = forms.CharField(max_length=200, label='Object transfered from')
+    transfered_to = forms.CharField(max_length=200, label='Object transfered to')
+    aim_of_receiving = forms.CharField(max_length=200, label='Aim of receiving')
+    way_of_found = forms.CharField(max_length=200, label='Way of found')
+    reason = forms.CharField(max_length=200, label='reason')
+    source = forms.CharField(max_length=200, label='Source')
+    collection = forms.CharField(max_length=200, label='Collection')
+    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Term of get back')
+    code = forms.CharField(max_length=50, label='Code of TS')
+    date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
+    mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
+    place_of_saving = forms.CharField(max_length=200, label='Place of saving')
+    writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
+    return_mark = forms.BooleanField(label='Is it returned?')
+
+
+
+
+
+
+
 
 
 
