@@ -6,10 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 
-
 # Create your views here.
-#test branch 2 attempt
-
 @csrf_protect
 #@login_required
 def TempSave(request):
