@@ -8,16 +8,16 @@ from django.contrib.auth.models import User
 
 
 def get_image_path(self, filename):
-        path = ''.join(["/",filename])
+        path = ''.join(["/", filename])
         return path
 
 
-class Material:
+class Custom:
     class MaterialWidget(MultiWidget):
-        def __init__(self, size1=10, size2=30):
+        def __init__(self, size1=10, size2=10):
             widgets = [TextInput(attrs={'size': size1, 'maxlength': 30}),
                        TextInput(attrs={'size': size2, 'maxlength': 10})]
-            super(Material.MaterialWidget, self).__init__(widgets)
+            super(Custom.MaterialWidget, self).__init__(widgets)
         def decompress(self, value):
             if value:
                 return value.split(':')
@@ -31,7 +31,7 @@ class Material:
         def __init__(self, size1=10, size2=30, *args, **kwargs):
             list_fields = [fields.CharField(max_length=30),
                            fields.CharField(max_length=30)]
-            super(Material.MaterialField, self).__init__(list_fields, widget=Material.MaterialWidget(size1, size2), *args, **kwargs)
+            super(Custom.MaterialField, self).__init__(list_fields, widget=Custom.MaterialWidget(size1, size2), *args, **kwargs)
         def compress(self, values):
             if values:
                 return values[0] + ':' + values[1] + ';'
@@ -43,8 +43,8 @@ class Material:
         def __init__(self, number=5):
             widgets = []
             for i in range(number):
-                widgets.append(Material.MaterialWidget())
-            super(Material.MultiMaterialWidget, self).__init__(widgets)
+                widgets.append(Custom.MaterialWidget())
+            super(Custom.MultiMaterialWidget, self).__init__(widgets)
         def decompress(self, value):
             if value:
                 return value.split(';')
@@ -57,8 +57,8 @@ class Material:
         def __init__(self, number=5, *args, **kwargs):
             list_fields = []
             for i in range(number):
-                list_fields.append(Material.MaterialField())
-            super(Material.MultiMaterialField, self).__init__(list_fields, widget=Material.MultiMaterialWidget(number), *args, **kwargs)
+                list_fields.append(Custom.MaterialField())
+            super(Custom.MultiMaterialField, self).__init__(list_fields, widget=Custom.MultiMaterialWidget(number), *args, **kwargs)
 
         def compress(self, values):
             result = ''
@@ -120,7 +120,7 @@ class Object(models.Model):
     source = models.CharField(max_length=200, default='')
 
     def __unicode__(self):
-        return self.name_title
+        return self.name_title + ' (' + self.identifier + ')'
 
 
 class Activity(models.Model):
@@ -142,9 +142,9 @@ class TempSaveForm(forms.Form):
     amount = forms.IntegerField(max_value=None, label='Amount')
     author = forms.CharField(max_length=200, label='Author')
     technique = forms.CharField(max_length=200, label='Technique')
-    material = Material.MultiMaterialField()
+    material = Custom.MultiMaterialField()
     size_type = forms.CharField(max_length=200, label='Type of size')
-    size = Material.MaterialField(size1=2, size2=3)
+    size = Custom.MaterialField(size1=2, size2=3)
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
     condition_descr = forms.CharField(max_length=200, label='Description of condition')
