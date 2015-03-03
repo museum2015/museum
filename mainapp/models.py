@@ -14,25 +14,30 @@ def get_image_path(self, filename):
 
 class Material:
     class MaterialWidget(MultiWidget):
-        def __init__(self):
-            widgets = [TextInput(attrs={'size': 30, 'maxlength': 30}),
-                       TextInput(attrs={'size': 10, 'maxlength': 10})]
+        def __init__(self, size1=10, size2=30):
+            widgets = [TextInput(attrs={'size': size1, 'maxlength': 30}),
+                       TextInput(attrs={'size': size2, 'maxlength': 10})]
             super(Material.MaterialWidget, self).__init__(widgets)
         def decompress(self, value):
             if value:
                 return value.split(':')
             return [None, None]
+        def format_output(self, rendered_widgets):
+            res = u''.join(rendered_widgets)
+            res += '<br>'
+            return res
 
     class MaterialField(MultiValueField):
-        def __init__(self, *args, **kwargs):
+        def __init__(self, size1=10, size2=30, *args, **kwargs):
             list_fields = [fields.CharField(max_length=30),
                            fields.CharField(max_length=30)]
-            super(Material.MaterialField, self).__init__(list_fields, widget=Material.MaterialWidget(), *args, **kwargs)
+            super(Material.MaterialField, self).__init__(list_fields, widget=Material.MaterialWidget(size1, size2), *args, **kwargs)
         def compress(self, values):
             if values:
                 return values[0] + ':' + values[1] + ';'
             else:
                 return ''
+
 
     class MultiMaterialWidget(MultiWidget):
         def __init__(self, number=5):
@@ -45,6 +50,8 @@ class Material:
                 return value.split(';')
             else:
                 return []
+        #def format_output(self, rendered_widgets):
+
 
     class MultiMaterialField(MultiValueField):
         def __init__(self, number=5, *args, **kwargs):
@@ -60,10 +67,6 @@ class Material:
             return result
 
 
-class MaterialForm(forms.Form):
-    your_name = Material.MultiMaterialField()
-
-
 class Object(models.Model):
     collection = models.CharField(max_length=200, default='')
     name_title = models.CharField(max_length=200, default='')
@@ -77,13 +80,13 @@ class Object(models.Model):
     _class = models.CharField(max_length=200, default='')
     type = models.CharField(max_length=200, default='')
     material = models.CharField(max_length=200, default='')
-    measurement = models.CharField(max_length=400)
+    measurement = models.CharField(max_length=400, default='')
     technique = models.CharField(max_length=200, default='')
     description = models.TextField(max_length=1000, default='')
     description_lang = models.CharField(max_length=50, default='')
     description_type = models.CharField(max_length=200, default='')
     identifier = models.CharField(max_length=50, default='')
-    image = models.ImageField(upload_to=get_image_path)
+    image = models.ImageField(upload_to=get_image_path, default='default.jpg')
     image_type = models.CharField(max_length=50, default='')
     author = models.CharField(max_length=100, default='')
     author_type = models.CharField(max_length=50, default='')
@@ -111,7 +114,7 @@ class Object(models.Model):
     transfered_to = models.CharField(max_length=200, default='')
     term_back=models.DateTimeField(max_length=200, default='2000-02-12 00:00')
     aim_of_receiving_gen = models.CharField(max_length=200, default='')
-    aim_of_receiving = models.ForeignKey(Activity)
+    #aim_of_receiving = models.ForeignKey(Activity)
     circumst_write_off = models.CharField(max_length=200, default='')
     reason = models.CharField(max_length=200, default='')
     source = models.CharField(max_length=200, default='')
@@ -139,11 +142,11 @@ class TempSaveForm(forms.Form):
     amount = forms.IntegerField(max_value=None, label='Amount')
     author = forms.CharField(max_length=200, label='Author')
     technique = forms.CharField(max_length=200, label='Technique')
-    material = MaterialForm()
+    material = Material.MultiMaterialField()
     size_type = forms.CharField(max_length=200, label='Type of size')
-    size_number = forms.IntegerField(max_value=None)
-    size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
-    measurement = MaterialForm()
+    size = Material.MaterialField(size1=2, size2=3)
+    #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
+    #measurement =
     condition_descr = forms.CharField(max_length=200, label='Description of condition')
     description = forms.CharField(max_length=500, label='Description')
     price = forms.CharField(max_length=200, label='Price + type')
