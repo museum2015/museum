@@ -77,7 +77,7 @@ class Object(models.Model):
     amount = models.IntegerField(default=0) #
     size_type = models.CharField(max_length=200, default='') #
     size_number = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
-    size_measurement_unit = models.CharField(max_length=200, default='') №
+    size_measurement_unit = models.CharField(max_length=200, default='') #
     _class = models.CharField(max_length=200, default='')
     type = models.CharField(max_length=200, default='')
     material = models.CharField(max_length=200, default='')
