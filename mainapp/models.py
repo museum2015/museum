@@ -20,7 +20,8 @@ class Custom:
             super(Custom.MaterialWidget, self).__init__(widgets)
         def decompress(self, value):
             if value:
-                return value.split(':')
+                res = value.split(':')
+                res[1]=res[1][0:-1]
             return [None, None]
         def format_output(self, rendered_widgets):
             res = u''.join(rendered_widgets)
@@ -68,15 +69,15 @@ class Custom:
 
 
 class Object(models.Model):
-    collection = models.CharField(max_length=200, default='')
-    name_title = models.CharField(max_length=200, default='')
-    name_lang = models.CharField(max_length=200, default='')
-    name_type = models.CharField(max_length=200, default='')
-    is_fragment = models.BooleanField(default=False)
-    amount = models.IntegerField(default=0)
-    size_type = models.CharField(max_length=200, default='')
-    size_number = models.IntegerField(default=0)
-    size_measurement_unit = models.CharField(max_length=200, default='')
+    collection = models.CharField(max_length=200, default='') #
+    name_title = models.CharField(max_length=200, default='') #
+    name_lang = models.CharField(max_length=200, default='') ##
+    name_type = models.CharField(max_length=200, default='') ##
+    is_fragment = models.BooleanField(default=False) #
+    amount = models.IntegerField(default=0) #
+    size_type = models.CharField(max_length=200, default='') #
+    size_number = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
+    size_measurement_unit = models.CharField(max_length=200, default='') №
     _class = models.CharField(max_length=200, default='')
     type = models.CharField(max_length=200, default='')
     material = models.CharField(max_length=200, default='')
@@ -88,7 +89,7 @@ class Object(models.Model):
     identifier = models.CharField(max_length=50, default='')
     image = models.ImageField(upload_to=get_image_path, default='default.jpg')
     image_type = models.CharField(max_length=50, default='')
-    author = models.CharField(max_length=100, default='')
+    author = models.CharField(max_length=100, default='') #
     author_type = models.CharField(max_length=50, default='')
     price = models.IntegerField(default=0)
     price_type = models.CharField(max_length=50, default='')
