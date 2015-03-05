@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+{% load staticfiles %}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+    <title>Повернення об'єкта з тимчасового зберігання</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+  <div class="row">
+    <div class="col-md-8">
+         <form method="post">
+             {% csrf_token %}
+              {{form.as_p}}
+              <input type="submit">
+         </form>
+    </div>
+  </div>
+</body>
+</html>
