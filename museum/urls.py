@@ -14,4 +14,5 @@ urlpatterns = patterns('',
     url(r'^form/ret_from_ts$', views.TempRet),
     url(r'^projects/$', views.GetProject),
     url(r'^projects/approve(?P<offset>[0-9]+)/$', views.ApproveProject),
+    url(r'^projects/approved/$', views.GetApprovedProjects),
 )

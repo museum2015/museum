@@ -43,3 +43,10 @@ def GetProject(request):
 def ApproveProject(request, offset):
     Activity.objects.get(id=int(offset)).approve()
     return HttpResponse('Succesfully approved')
+
+def GetApprovedProjects(request):
+    act_list = Object.objects.exclude(name='')
+    for a in act_list:
+        print a.attributeassignment_set.filter(approval=True)[0].event_initiator
+    return render(request, 'projects_approved.html', {'acts': act_list,
+                                                      'activity': list})
