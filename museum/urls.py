@@ -1,5 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from mainapp import views
+admin.autodiscover()
 
 
 urlpatterns = patterns('',
@@ -8,5 +10,5 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include('mainapp.urls')),
+    url(r'^form/', views.TempSave),
 )
