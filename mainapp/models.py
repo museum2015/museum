@@ -20,7 +20,7 @@ class Custom:
             super(Custom.MaterialWidget, self).__init__(widgets)
         def decompress(self, value):
             if value:
-                res = value[0].split(':')
+                res = value.split(':')
                 res[1]=res[1][0:-1]
             return [None, None]
         def format_output(self, rendered_widgets):
@@ -30,8 +30,8 @@ class Custom:
 
     class MaterialField(MultiValueField):
         def __init__(self, size1=10, size2=30, *args, **kwargs):
-            list_fields = [fields.CharField(max_length=30),
-                           fields.CharField(max_length=30)]
+            list_fields = [forms.CharField(max_length=30, required=False),
+                           forms.CharField(max_length=30, required=False)]
             super(Custom.MaterialField, self).__init__(list_fields, widget=Custom.MaterialWidget(size1, size2), *args, **kwargs)
         def compress(self, values):
             if values:
@@ -150,7 +150,7 @@ class AttributeAssignment(models.Model):
 class TempSaveForm(forms.Form):
     name = forms.CharField(max_length=200, label='Name') #
     is_fragment = forms.BooleanField(label='Is it fragment?') #
-    amount = forms.IntegerField(max_value=None, label='Amount')#
+    amount = forms.CharField(max_length=20, label='Amount')#
     author = forms.CharField(max_length=200, label='Author')#
     technique = forms.CharField(max_length=200, label='Technique')#
     material = Custom.MultiMaterialField()#
@@ -177,6 +177,7 @@ class TempSaveForm(forms.Form):
     storage = forms.CharField(max_length=200, label='Storage')#
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
+    
 
 class InitialTempSaveForm(forms.Form):
     obj = forms.ModelChoiceField(queryset=Object.objects.all())

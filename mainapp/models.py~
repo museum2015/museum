@@ -14,8 +14,8 @@ def get_image_path(self, filename):
 
 class Custom:
     class MaterialWidget(MultiWidget):
-        def __init__(self, inits='', size1=10, size2=10):
-            widgets = [TextInput(attrs={'size': size1, 'maxlength': 30, 'initial': inits}),
+        def __init__(self, size1=10, size2=10):
+            widgets = [TextInput(attrs={'size': size1, 'maxlength': 30}),
                        TextInput(attrs={'size': size2, 'maxlength': 10})]
             super(Custom.MaterialWidget, self).__init__(widgets)
         def decompress(self, value):
@@ -29,10 +29,10 @@ class Custom:
             return res
 
     class MaterialField(MultiValueField):
-        def __init__(self, size1=10, size2=30, init='', *args, **kwargs):
-            list_fields = [forms.CharField(max_length=30, initial = init),
-                           forms.CharField(max_length=30)]
-            super(Custom.MaterialField, self).__init__(list_fields, widget=Custom.MaterialWidget(init, size1, size2), *args, **kwargs)
+        def __init__(self, size1=10, size2=30, *args, **kwargs):
+            list_fields = [forms.CharField(max_length=30, required=False),
+                           forms.CharField(max_length=30, required=False)]
+            super(Custom.MaterialField, self).__init__(list_fields, widget=Custom.MaterialWidget(size1, size2), *args, **kwargs)
         def compress(self, values):
             if values:
                 return values[0] + ':' + values[1] + ';'
@@ -55,10 +55,10 @@ class Custom:
 
 
     class MultiMaterialField(MultiValueField):
-        def __init__(self, number=5, myinit='', *args, **kwargs):
-	    list_fields = []
+        def __init__(self, number=5, *args, **kwargs):
+            list_fields = []
             for i in range(number):
-                list_fields.append(Custom.MaterialField(init=myinit))
+                list_fields.append(Custom.MaterialField())
             super(Custom.MultiMaterialField, self).__init__(list_fields, widget=Custom.MultiMaterialWidget(number), *args, **kwargs)
 
         def compress(self, values):
@@ -66,6 +66,7 @@ class Custom:
             for value in values:
                 result += value
             return result
+
 
 class Object(models.Model):
     collection = models.CharField(max_length=200, default='') #
@@ -149,7 +150,7 @@ class AttributeAssignment(models.Model):
 class TempSaveForm(forms.Form):
     name = forms.CharField(max_length=200, label='Name') #
     is_fragment = forms.BooleanField(label='Is it fragment?') #
-    amount = forms.IntegerField(max_value=None, label='Amount')#
+    amount = forms.CharField(max_length=20, label='Amount')#
     author = forms.CharField(max_length=200, label='Author')#
     technique = forms.CharField(max_length=200, label='Technique')#
     material = Custom.MultiMaterialField()#
@@ -176,6 +177,8 @@ class TempSaveForm(forms.Form):
     storage = forms.CharField(max_length=200, label='Storage')#
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
+    def __init__(self, init):
+	self.name = forms.CharField(max_length=200, label='Name', initial = init['name'])
 
 class InitialTempSaveForm(forms.Form):
     obj = forms.ModelChoiceField(queryset=Object.objects.all())
