@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse
-from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment
+from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, TempRetForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 import ast
@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 @csrf_protect
-@login_required
+#@login_required
 def TempSave(request):
     form = TempSaveForm()
     if request.method == 'POST':
@@ -53,3 +53,6 @@ def TempSave(request):
     return render(request, 'form.html', {'form': form})
 
 
+def TempRet(request):
+    form = TempRetForm()
+    return render(request, 'ReturnFromTS.html', {'form': form})

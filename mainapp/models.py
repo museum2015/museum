@@ -178,8 +178,31 @@ class TempSaveForm(forms.Form):
     #return_mark = forms.BooleanField(label='Is it returned?')
 
 
-
-
+class TempRetForm(forms.Form):
+    choices = (
+        ('returned', 'returned from TS'),
+        ('add on PS', 'Adding the object on a persistent storage')
+    )
+    name = forms.CharField(max_length=200, label='Name') #
+    is_fragment = forms.BooleanField(label='Is it fragment?') #
+    amount = forms.IntegerField(max_value=None, label='Amount')#
+    date_creation = forms.CharField(max_length=20, label='Date of creation')
+    place_of_creation = forms.CharField(max_length=200, label='Place of creation')
+    author = forms.CharField(max_length=200, label='Author')#
+    technique = forms.CharField(max_length=200, label='Technique')#
+    material = Custom.MultiMaterialField()#
+    size_type = forms.CharField(max_length=200, label='Type of size')#
+    size = Custom.MaterialField(size1=2, size2=3)#
+    condition = forms.CharField(max_length=200, label='Condition')#
+    condition_descr = forms.CharField(max_length=200, label='Description of condition')
+    description = forms.CharField(max_length=500, label='Description')#
+    price = forms.CharField(max_length=200, label='Price')#
+    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Term of get back')
+    note = forms.CharField(max_length=200, label='Note')#
+    side_1 = forms.CharField(max_length=100, label='First side')
+    side_2 = forms.CharField(max_length=100, label='Second side')
+    return_mark = forms.ChoiceField(choices=choices)
+    save_place = forms.CharField(max_length=200, label='Place of saving')
 
 
 

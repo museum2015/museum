@@ -89,6 +89,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     ('static', os.path.join(BASE_DIR, 'museum/static/img/')),
+    ('static', os.path.join(BASE_DIR, 'museum/static/'))
 )
 
 MEDIA_URL = '/media/'
