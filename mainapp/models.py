@@ -15,8 +15,8 @@ def get_image_path(self, filename):
 class Custom:
     class MaterialWidget(MultiWidget):
         def __init__(self, size1=10, size2=10):
-            widgets = [TextInput(attrs={'size': size1, 'maxlength': 30}),
-                       TextInput(attrs={'size': size2, 'maxlength': 10})]
+            widgets = [TextInput(attrs={'size': size1, 'max_length': 30}),
+                       TextInput(attrs={'size': size2, 'max_length': 10})]
             super(Custom.MaterialWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -32,8 +32,8 @@ class Custom:
 
     class MaterialField(MultiValueField):
         def __init__(self, size1=10, size2=30, *args, **kwargs):
-            list_fields = [forms.CharField(max_length=30, required=False),
-                           forms.CharField(max_length=30, required=False)]
+            list_fields = [fields.CharField(max_length=30),
+                           fields.CharField(max_length=30)]
             super(Custom.MaterialField, self).__init__(list_fields, widget=Custom.MaterialWidget(size1, size2), *args,
                                                        **kwargs)
 
@@ -128,13 +128,14 @@ class Object(models.Model):
     approval = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.name_title + ' (' + self.identifier + ')'
+        return self.name + ' (' + self.identifier + ')'
 
 
 class Activity(models.Model):
     time_stamp = models.DateTimeField(default='2000-02-12 00:00')
     type = models.CharField(max_length=30)
     actor = models.ForeignKey(User)
+    approval = models.BooleanField(default=False)
 
     def __unicode__(self):
         try:
@@ -145,6 +146,8 @@ class Activity(models.Model):
     def approve(self):
         for attrib in self.attributeassignment_set.all():
             attrib.approve()
+        self.approval = True
+        self.save()
 
 
 
@@ -156,19 +159,19 @@ class AttributeAssignment(models.Model):
     approval = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.aim.__unicode__() + ' ' + self.attr_name + ' ' + self.attr_value
+        return self.attr_name + ' : ' + self.attr_value
 
     def approve(self):
-        try:
-            self.aim.__setattr__(self.attr_name, self.attr_value)
-        except AttributeError:
-            pass
+        setattr(self.aim, self.attr_name, self.attr_value)
+        self.aim.save()
+        self.approval = True
+        self.save()
 
 
 class TempSaveForm(forms.Form):
     name = forms.CharField(max_length=200, label='Name')  #
     is_fragment = forms.BooleanField(label='Is it fragment?')  #
-    amount = forms.CharField(max_length=20, label='Amount')  #
+    amount = forms.IntegerField(max_value=1000, label='Amount')  #
     author = forms.CharField(max_length=200, label='Author')  #
     technique = forms.CharField(max_length=200, label='Technique')  #
     material = Custom.MultiMaterialField()  #

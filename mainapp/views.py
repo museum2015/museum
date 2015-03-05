@@ -27,7 +27,6 @@ def TempSave(request):
         return HttpResponse('ne ok')
     else:
         form = TempSaveForm()
-    #form = TempSaveForm(initial = initial
     return render(request, 'AddOnTs.html', {'form': form})
 
 
@@ -35,3 +34,12 @@ def TempSave(request):
 def TempRet(request):
     form = TempRetForm()
     return request(request, 'ReturnFromTS.html', {'form': form})
+
+def GetProject(request):
+    act_list = Activity.objects.filter(approval=False)
+    qs_list = []
+    return render(request, 'projects.html', {'acts': act_list})
+
+def ApproveProject(request, offset):
+    Activity.objects.get(id=int(offset)).approve()
+    return HttpResponse('Succesfully approved')
