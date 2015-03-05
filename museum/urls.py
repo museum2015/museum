@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^form/addts', views.TempSave),
-    url(r'^form/retts', views.TempRet),
+    url(r'^form/addts/$', views.TempSave),
+    url(r'^form/retts/$', views.TempRet),
+
 )
