@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
-from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm
+from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm ,TempRetForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 import ast
@@ -26,8 +26,12 @@ def TempSave(request):
             return HttpResponse('ok')
         return HttpResponse('ne ok')
     else:
-	#form = TempSaveForm(initial = initial)
-	form = TempSaveForm()
-    	return render(request, 'form.html', {'form': form})
+        form = TempSaveForm()
+    #form = TempSaveForm(initial = initial
+    return render(request, 'AddOnTs.html', {'form': form})
 
 
+@csrf_protect
+def TempRet(request):
+    form = TempRetForm()
+    return request(request, 'ReturnFromTS.html', {'form': form})
