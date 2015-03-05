@@ -1,5 +1,3 @@
-from django.shortcuts import render, HttpResponse
-from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, TempRetForm
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm
 from django.views.decorators.csrf import csrf_protect
@@ -13,10 +11,6 @@ from django.contrib.auth.decorators import login_required
 objct = []
 
 @csrf_protect
-#@login_required
-def TempSave(request):
-    form = TempSaveForm()
-
 @login_required
 #def InitialTempSave(request, objct=objct):
  #  if request.method == 'POST':
@@ -75,9 +69,6 @@ def TempSave(request, objct=objct):
     else:
 	#form = TempSaveForm(initial = initial)
 	form = TempSaveForm()
-        return render(request, 'form.html', {'form': form})
+    	return render(request, 'form.html', {'form': form})
 
 
-def TempRet(request):
-    form = TempRetForm()
-    return render(request, 'ReturnFromTS.html', {'form': form})

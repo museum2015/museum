@@ -5,12 +5,11 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
-    # Examples:
+    # Examples
     # url(r'^$', 'museum.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^form/addts/$', views.TempSave),
-    url(r'^form/retts/$', views.TempRet),
-
+    url(r'^form/$', views.TempSave),
+    url(r'^projects/$', views.GetProjects)
 )

@@ -8,8 +8,8 @@ from django.contrib.auth.models import User
 
 
 def get_image_path(self, filename):
-        path = ''.join(["/", filename])
-        return path
+    path = ''.join(["/", filename])
+    return path
 
 
 class Custom:
@@ -18,11 +18,13 @@ class Custom:
             widgets = [TextInput(attrs={'size': size1, 'maxlength': 30}),
                        TextInput(attrs={'size': size2, 'maxlength': 10})]
             super(Custom.MaterialWidget, self).__init__(widgets)
+
         def decompress(self, value):
             if value:
                 res = value.split(':')
-                res[1]=res[1][0:-1]
+                res[1] = res[1][0:-1]
             return [None, None]
+
         def format_output(self, rendered_widgets):
             res = u''.join(rendered_widgets)
             res += '<br>'
@@ -32,7 +34,9 @@ class Custom:
         def __init__(self, size1=10, size2=30, *args, **kwargs):
             list_fields = [forms.CharField(max_length=30, required=False),
                            forms.CharField(max_length=30, required=False)]
-            super(Custom.MaterialField, self).__init__(list_fields, widget=Custom.MaterialWidget(size1, size2), *args, **kwargs)
+            super(Custom.MaterialField, self).__init__(list_fields, widget=Custom.MaterialWidget(size1, size2), *args,
+                                                       **kwargs)
+
         def compress(self, values):
             if values:
                 return values[0] + ':' + values[1] + ';'
@@ -46,12 +50,13 @@ class Custom:
             for i in range(number):
                 widgets.append(Custom.MaterialWidget())
             super(Custom.MultiMaterialWidget, self).__init__(widgets)
+
         def decompress(self, value):
             if value:
                 return value.split(';')
             else:
                 return []
-        #def format_output(self, rendered_widgets):
+                # def format_output(self, rendered_widgets):
 
 
     class MultiMaterialField(MultiValueField):
@@ -59,7 +64,8 @@ class Custom:
             list_fields = []
             for i in range(number):
                 list_fields.append(Custom.MaterialField())
-            super(Custom.MultiMaterialField, self).__init__(list_fields, widget=Custom.MultiMaterialWidget(number), *args, **kwargs)
+            super(Custom.MultiMaterialField, self).__init__(list_fields, widget=Custom.MultiMaterialWidget(number),
+                                                            *args, **kwargs)
 
         def compress(self, values):
             result = ''
@@ -69,56 +75,56 @@ class Custom:
 
 
 class Object(models.Model):
-    collection = models.CharField(max_length=200, default='') #
-    name_title = models.CharField(max_length=200, default='') #
-    name_lang = models.CharField(max_length=200, default='') ##
-    name_type = models.CharField(max_length=200, default='') ##
-    is_fragment = models.BooleanField(default=False) #
-    amount = models.IntegerField(default=0) #
-    #size_type = models.CharField(max_length=200, default='') #
-    size_number = models.CharField(max_length=40, default='') #
+    collection = models.CharField(max_length=200, default='')  #
+    name = models.CharField(max_length=200, default='')  #
+    name_lang = models.CharField(max_length=200, default='')  ##
+    name_type = models.CharField(max_length=200, default='')  ##
+    is_fragment = models.BooleanField(default=False)  #
+    amount = models.IntegerField(default=0)  #
+    # size_type = models.CharField(max_length=200, default='') #
+    size = models.CharField(max_length=40, default='')  #
     #size_measurement_unit = models.CharField(max_length=200, default='') #
-    _class = models.CharField(max_length=200, default='') ##
-    type = models.CharField(max_length=200, default='') ##
-    material = models.CharField(max_length=200, default='') #
+    _class = models.CharField(max_length=200, default='')  ##
+    type = models.CharField(max_length=200, default='')  ##
+    material = models.CharField(max_length=200, default='')  #
     #measurement = models.CharField(max_length=400, default='')
-    technique = models.CharField(max_length=200, default='') #
-    description = models.TextField(max_length=1000, default='')#
-    description_lang = models.CharField(max_length=50, default='') ##
-    description_type = models.CharField(max_length=200, default='') ##
+    technique = models.CharField(max_length=200, default='')  #
+    description = models.TextField(max_length=1000, default='')  #
+    description_lang = models.CharField(max_length=50, default='')  ##
+    description_type = models.CharField(max_length=200, default='')  ##
     identifier = models.CharField(max_length=50, default='')
     image = models.ImageField(upload_to=get_image_path, default='default.jpg')
     image_type = models.CharField(max_length=50, default='')
-    author = models.CharField(max_length=100, default='') #
-    author_type = models.CharField(max_length=50, default='') ##
-    price = models.CharField(max_length=10, default='') #
-    price_type = models.CharField(max_length=50, default='') ##
-    mark_on_object = models.CharField(max_length=200, default='') ##
-    mark_type = models.CharField(max_length=50, default='') ##
-    note = models.CharField(max_length=200, default='') #
-    note_type = models.CharField(max_length=50, default='') ##
-    mark_note_lang=models.CharField(max_length=30, default='') ##
+    author = models.CharField(max_length=100, default='')  #
+    author_type = models.CharField(max_length=50, default='')  ##
+    price = models.CharField(max_length=10, default='')  #
+    price_type = models.CharField(max_length=50, default='')  ##
+    mark_on_object = models.CharField(max_length=200, default='')  ##
+    mark_type = models.CharField(max_length=50, default='')  ##
+    note = models.CharField(max_length=200, default='')  #
+    note_type = models.CharField(max_length=50, default='')  ##
+    mark_note_lang = models.CharField(max_length=30, default='')  ##
     #condition_descr=models.CharField(max_length=500, default='')#
-    condition=models.CharField(max_length=100, default='') #
-    transport_possibility=models.BooleanField(default=False) ##
-    recomm_for_restauration=models.CharField(max_length=100, default='') ##
-    restauration_notes = models.CharField(max_length=200, default='') ##
-    place=models.CharField(max_length=200, default='')#
-    place_appellation = models.CharField(max_length=200, default='') ##
-    is_there = models.CharField(max_length=200, default='') ##
+    condition = models.CharField(max_length=100, default='')  #
+    transport_possibility = models.BooleanField(default=False)  ##
+    recomm_for_restauration = models.CharField(max_length=100, default='')  ##
+    restauration_notes = models.CharField(max_length=200, default='')  ##
+    storage = models.CharField(max_length=200, default='')  #
+    place_appellation = models.CharField(max_length=200, default='')  ##
+    is_there = models.CharField(max_length=200, default='')  ##
     #documented_in = models.CharField(max_length=200)
     #documented_type = models.CharField(max_length=50)
-    way_of_found = models.CharField(max_length=200, default='') #
+    way_of_found = models.CharField(max_length=200, default='')  #
     #link_on_doc = models.CharField(max_length=200)
     #doc_type = models.CharField(max_length=50)
-    transferred_from = models.CharField(max_length=200, default='') #
-    transferred_to = models.CharField(max_length=200, default='') #
-    term_back=models.DateTimeField(max_length=200, default='2000-02-12 00:00') #
-    aim_of_receiving_gen = models.CharField(max_length=200, default='') #
+    transferred_from = models.CharField(max_length=200, default='')  #
+    transferred_to = models.CharField(max_length=200, default='')  #
+    term_back = models.DateTimeField(max_length=200, default='2000-02-12 00:00')  #
+    aim_of_receiving_gen = models.CharField(max_length=200, default='')  #
     #aim_of_receiving = models.ForeignKey(Activity)
-    circumst_write_off = models.CharField(max_length=200, default='') ##
-    reason = models.CharField(max_length=200, default='') #
-    source = models.CharField(max_length=200, default='') #
+    circumst_write_off = models.CharField(max_length=200, default='')  ##
+    reason = models.CharField(max_length=200, default='')  #
+    source = models.CharField(max_length=200, default='')  #
     approval = models.BooleanField(default=False)
 
     def __unicode__(self):
@@ -129,55 +135,67 @@ class Activity(models.Model):
     time_stamp = models.DateTimeField(default='2000-02-12 00:00')
     type = models.CharField(max_length=30)
     actor = models.ForeignKey(User)
+
     def __unicode__(self):
         try:
             return ((self.attributeassignment_set.all())[0]).aim.__unicode__() + ' ' + self.type
         except IndexError:
             return 'UndefinedActivity'
+
     def approve(self):
-	((self.attributeassignment_set.all())[0]).aim.approval = True
+        for attrib in self.attributeassignment_set.all():
+            attrib.approve()
+
+
 
 class AttributeAssignment(models.Model):
     attr_name = models.CharField(max_length=40)
     attr_value = models.CharField(max_length=200)
     aim = models.ForeignKey(Object)
     event_initiator = models.ForeignKey(Activity)
+    approval = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.aim.__unicode__() + ' ' + self.attr_name + ' ' + self.attr_value
 
+    def approve(self):
+        try:
+            self.aim.__setattr__(self.attr_name, self.attr_value)
+        except AttributeError:
+            pass
+
 
 class TempSaveForm(forms.Form):
-    name = forms.CharField(max_length=200, label='Name') #
-    is_fragment = forms.BooleanField(label='Is it fragment?') #
-    amount = forms.CharField(max_length=20, label='Amount')#
-    author = forms.CharField(max_length=200, label='Author')#
-    technique = forms.CharField(max_length=200, label='Technique')#
-    material = Custom.MultiMaterialField()#
-    #size_type = forms.CharField(max_length=200, label='Type of size')#
-    size = Custom.MultiMaterialField(number=3)#
+    name = forms.CharField(max_length=200, label='Name')  #
+    is_fragment = forms.BooleanField(label='Is it fragment?')  #
+    amount = forms.CharField(max_length=20, label='Amount')  #
+    author = forms.CharField(max_length=200, label='Author')  #
+    technique = forms.CharField(max_length=200, label='Technique')  #
+    material = Custom.MultiMaterialField()  #
+    # size_type = forms.CharField(max_length=200, label='Type of size')#
+    size = Custom.MultiMaterialField(number=3)  #
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
     #condition_descr = forms.CharField(max_length=200, label='Description of condition')#
-    condition = forms.CharField(max_length=200, label='Condition')#
-    description = forms.CharField(max_length=500, label='Description')#
-    price = forms.CharField(max_length=200, label='Price')#
-    note = forms.CharField(max_length=200, label='Note')#
-    transferred_from = forms.CharField(max_length=200, label='Object transfered from') #
-    transferred_to = forms.CharField(max_length=200, label='Object transfered to') #
-    aim_of_receiving = forms.CharField(max_length=200, label='Aim of receiving') #
-    way_of_found = forms.CharField(max_length=200, label='Way of found') #
-    reason = forms.CharField(max_length=200, label='reason') #
-    source = forms.CharField(max_length=200, label='Source') #
-    collection = forms.CharField(max_length=200, label='Collection')#
-    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Term of get back')#
-    code = forms.CharField(max_length=50, label='Code of TS')#
+    condition = forms.CharField(max_length=200, label='Condition')  #
+    description = forms.CharField(max_length=500, label='Description')  #
+    price = forms.CharField(max_length=200, label='Price')  #
+    note = forms.CharField(max_length=200, label='Note')  #
+    transferred_from = forms.CharField(max_length=200, label='Object transfered from')  #
+    transferred_to = forms.CharField(max_length=200, label='Object transfered to')  #
+    aim_of_receiving_gen = forms.CharField(max_length=200, label='Aim of receiving')  #
+    way_of_found = forms.CharField(max_length=200, label='Way of found')  #
+    reason = forms.CharField(max_length=200, label='reason')  #
+    source = forms.CharField(max_length=200, label='Source')  #
+    collection = forms.CharField(max_length=200, label='Collection')  #
+    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back')  #
+    identifier = forms.CharField(max_length=50, label='Code of TS')  #
     #date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
     #mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
-    storage = forms.CharField(max_length=200, label='Storage')#
+    storage = forms.CharField(max_length=200, label='Storage')  #
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
-    
+
 
 class InitialTempSaveForm(forms.Form):
     obj = forms.ModelChoiceField(queryset=Object.objects.all())
@@ -188,22 +206,22 @@ class TempRetForm(forms.Form):
         ('returned', 'returned from TS'),
         ('add on PS', 'Adding the object on a persistent storage')
     )
-    name = forms.CharField(max_length=200, label='Name') #
-    is_fragment = forms.BooleanField(label='Is it fragment?') #
-    amount = forms.IntegerField(max_value=None, label='Amount')#
+    name = forms.CharField(max_length=200, label='Name')  #
+    is_fragment = forms.BooleanField(label='Is it fragment?')  #
+    amount = forms.IntegerField(max_value=None, label='Amount')  #
     date_creation = forms.CharField(max_length=20, label='Date of creation')
     place_of_creation = forms.CharField(max_length=200, label='Place of creation')
-    author = forms.CharField(max_length=200, label='Author')#
-    technique = forms.CharField(max_length=200, label='Technique')#
-    material = Custom.MultiMaterialField()#
-    size_type = forms.CharField(max_length=200, label='Type of size')#
-    size = Custom.MaterialField(size1=2, size2=3)#
-    condition = forms.CharField(max_length=200, label='Condition')#
+    author = forms.CharField(max_length=200, label='Author')  #
+    technique = forms.CharField(max_length=200, label='Technique')  #
+    material = Custom.MultiMaterialField()  #
+    size_type = forms.CharField(max_length=200, label='Type of size')  #
+    size = Custom.MaterialField(size1=2, size2=3)  #
+    condition = forms.CharField(max_length=200, label='Condition')  #
     condition_descr = forms.CharField(max_length=200, label='Description of condition')
-    description = forms.CharField(max_length=500, label='Description')#
-    price = forms.CharField(max_length=200, label='Price')#
-    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Term of get back')
-    note = forms.CharField(max_length=200, label='Note')#
+    description = forms.CharField(max_length=500, label='Description')  #
+    price = forms.CharField(max_length=200, label='Price')  #
+    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back')
+    note = forms.CharField(max_length=200, label='Note')  #
     side_1 = forms.CharField(max_length=100, label='First side')
     side_2 = forms.CharField(max_length=100, label='Second side')
     return_mark = forms.ChoiceField(choices=choices)
