@@ -20,7 +20,7 @@ class Custom:
             super(Custom.MaterialWidget, self).__init__(widgets)
         def decompress(self, value):
             if value:
-                res = value.split(':')
+                res = value[0].split(':')
                 res[1]=res[1][0:-1]
             return [None, None]
         def format_output(self, rendered_widgets):
@@ -75,7 +75,7 @@ class Object(models.Model):
     name_type = models.CharField(max_length=200, default='') ##
     is_fragment = models.BooleanField(default=False) #
     amount = models.IntegerField(default=0) #
-    size_type = models.CharField(max_length=200, default='') #
+    #size_type = models.CharField(max_length=200, default='') #
     size_number = models.CharField(max_length=40, default='') #
     #size_measurement_unit = models.CharField(max_length=200, default='') #
     _class = models.CharField(max_length=200, default='') ##
@@ -119,6 +119,7 @@ class Object(models.Model):
     circumst_write_off = models.CharField(max_length=200, default='') ##
     reason = models.CharField(max_length=200, default='') #
     source = models.CharField(max_length=200, default='') #
+    approval = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name_title + ' (' + self.identifier + ')'
@@ -128,13 +129,13 @@ class Activity(models.Model):
     time_stamp = models.DateTimeField(default='2000-02-12 00:00')
     type = models.CharField(max_length=30)
     actor = models.ForeignKey(User)
-
     def __unicode__(self):
         try:
             return ((self.attributeassignment_set.all())[0]).aim.__unicode__() + ' ' + self.type
         except IndexError:
             return 'UndefinedActivity'
-
+    def approve(self):
+	((self.attributeassignment_set.all())[0]).aim.approval = True
 
 class AttributeAssignment(models.Model):
     attr_name = models.CharField(max_length=40)
@@ -153,8 +154,8 @@ class TempSaveForm(forms.Form):
     author = forms.CharField(max_length=200, label='Author')#
     technique = forms.CharField(max_length=200, label='Technique')#
     material = Custom.MultiMaterialField()#
-    size_type = forms.CharField(max_length=200, label='Type of size')#
-    size = Custom.MaterialField(size1=2, size2=3)#
+    #size_type = forms.CharField(max_length=200, label='Type of size')#
+    size = Custom.MultiMaterialField(number=3)#
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
     #condition_descr = forms.CharField(max_length=200, label='Description of condition')#
@@ -177,6 +178,8 @@ class TempSaveForm(forms.Form):
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
 
+class InitialTempSaveForm(forms.Form):
+    obj = forms.ModelChoiceField(queryset=Object.objects.all())
 
 
 
