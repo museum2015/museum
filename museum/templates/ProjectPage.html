@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h2>{{ project }}</h2>
+    <h3>{{ project.collection }}</h3>
+    <h3>{{ project.author }}</h3>
+    {% if return_from_tc %}
+        <form action='/ret_from_ts/{{project.id}}/'>
+            <input type = "submit" value="Return from TC">
+        </form>
+    {% endif %}
+    <hr>
+    <div>Работают только те кнопки, что находятся выше линии.</div>
+    {% if getting_on_pc %}
+        <form action='/'>
+            <input type = "submit" value="Getting on PC">
+        </form>
+    {% endif %}
+    {% if wire_off %}
+        <form action=''>
+            <input type = "submit" value="Wire-off">
+        </form>
+    {% endif %}
+    {% if editing %}
+        <form action=''>
+            <input type = "submit" value="Editing">
+        </form>
+    {% endif %}
+</body>
+</html>

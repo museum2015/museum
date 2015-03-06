@@ -139,7 +139,7 @@ class Activity(models.Model):
 
     def __unicode__(self):
         try:
-            return ((self.attributeassignment_set.all())[0]).aim.__unicode__() + ' ' + self.type
+            return self.type
         except IndexError:
             return 'UndefinedActivity'
 

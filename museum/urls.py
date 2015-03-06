@@ -5,14 +5,10 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
-    # Examples
-    # url(r'^$', 'museum.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-
     url(r'^admin/', include(admin.site.urls)),
     url(r'^form/add_on_ts$', views.TempSave),
-    url(r'^form/ret_from_ts$', views.TempRet),
+    url(r'^form/ret_from_ts/(?P<id_number>[0-9]+)/$', views.TempRet),
     url(r'^projects/$', views.GetProject),
     url(r'^projects/approve(?P<offset>[0-9]+)/$', views.ApproveProject),
-    url(r'^projects/approved/$', views.GetApprovedProjects),
+    url(r'^projects/(?P<id_number>[0-9]+)/$', views.ProjectPage),
 )

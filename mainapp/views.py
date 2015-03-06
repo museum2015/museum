@@ -1,4 +1,5 @@
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, redirect
+from django.core.exceptions import ObjectDoesNotExist
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm ,TempRetForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
@@ -31,22 +32,42 @@ def TempSave(request):
 
 
 @csrf_protect
-def TempRet(request):
+def TempRet(request, id_number):
     form = TempRetForm()
     return request(request, 'ReturnFromTS.html', {'form': form})
 
 def GetProject(request):
     act_list = Activity.objects.filter(approval=False)
-    qs_list = []
     return render(request, 'projects.html', {'acts': act_list})
 
 def ApproveProject(request, offset):
     Activity.objects.get(id=int(offset)).approve()
     return HttpResponse('Succesfully approved')
 
-def GetApprovedProjects(request):
-    act_list = Object.objects.exclude(name='')
-    for a in act_list:
-        print a.attributeassignment_set.filter(approval=True)[0].event_initiator
-    return render(request, 'projects_approved.html', {'acts': act_list,
-                                                      'activity': list})
+def ProjectPage(request, id_number):
+    try: project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist: return HttpResponse('Object does not exist.<br>Try with another id_number.')
+    return_from_tc = False
+    getting_on_pc = False
+    wire_off = False
+    editing = False
+
+    i = 0
+    while project.attributeassignment_set.filter(approval=True)[i].event_initiator == 'Editing':
+        i += 1
+    status = str(project.attributeassignment_set.filter(approval=True)[i].event_initiator)
+
+    if status == 'Getting on temporary storage':
+        return_from_tc = True
+        getting_on_pc = True
+        editing = True
+
+    if status == 'Getting on permanent storage':
+        wire_off = True
+        editing = True
+
+    return render(request, 'ProjectPage.html', {'project': project,
+                                                'return_from_tc': return_from_tc,
+                                                'getting_on_pc': getting_on_pc,
+                                                'wire_off': wire_off,
+                                                'editing': editing})
