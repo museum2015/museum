@@ -33,8 +33,18 @@ def TempSave(request):
 
 @csrf_protect
 def TempRet(request, id_number):
-    form = TempRetForm()
-    return request(request, 'ReturnFromTS.html', {'form': form})
+    try:
+        project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist:
+        return HttpResponse('Object does not exist.<br>Try with another id_number.')
+    act = Activity(time_stamp=dt.now(), type='Getting from temporary storage', actor=request.user)
+    act.save()
+    for temp in project.attributeassignment_set.filter(approval=True, aim=project):
+        if str(temp.event_initiator) == 'Getting on temporary storage':
+            attr_assign = AttributeAssignment(attr_name=temp.attr_name, event_initiator=act, aim=project)
+            attr_assign.save()
+    return redirect('/')
+
 
 def GetProject(request):
     act_list = Activity.objects.filter(approval=False)
@@ -45,8 +55,10 @@ def ApproveProject(request, offset):
     return HttpResponse('Succesfully approved')
 
 def ProjectPage(request, id_number):
-    try: project = Object.objects.get(id=int(id_number))
-    except ObjectDoesNotExist: return HttpResponse('Object does not exist.<br>Try with another id_number.')
+    try:
+        project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist:
+        return HttpResponse('Object does not exist.<br>Try with another id_number.')
     return_from_tc = False
     getting_on_pc = False
     wire_off = False

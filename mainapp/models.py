@@ -150,7 +150,6 @@ class Activity(models.Model):
         self.save()
 
 
-
 class AttributeAssignment(models.Model):
     attr_name = models.CharField(max_length=40)
     attr_value = models.CharField(max_length=200)
@@ -229,13 +228,3 @@ class TempRetForm(forms.Form):
     side_2 = forms.CharField(max_length=100, label='Second side')
     return_mark = forms.ChoiceField(choices=choices)
     save_place = forms.CharField(max_length=200, label='Place of saving')
-
-
-
-
-
-
-    
-
-
-

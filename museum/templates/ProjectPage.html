@@ -8,6 +8,7 @@
     <h2>{{ project }}</h2>
     <h3>{{ project.collection }}</h3>
     <h3>{{ project.author }}</h3>
+    <div>Все поля не вывожу так как в данный момент это не обязательно</div>
     {% if return_from_tc %}
         <form action='/ret_from_ts/{{project.id}}/'>
             <input type = "submit" value="Return from TC">
