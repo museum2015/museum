@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm ,TempRetForm , PersistentSaveForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
+from django.views.generic.edit import UpdateView
 import ast
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -136,50 +137,11 @@ def AddOnPS(request, id_number=0):
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
 
-def Edit(request, id_number):
-    try:
-        project = Object.objects.get(id=int(id_number))
-    except ObjectDoesNotExist:
-        return HttpResponse('Object does not exist.<br>Try with another id_number.')
+class ObjectUpdate(UpdateView):
+    model = Object
+    template_name_suffix = '_update_form'
 
-    i = 0
-    while project.attributeassignment_set.filter(approval=True)[i].event_initiator == 'Editing':
-        i += 1
-    status = str(project.attributeassignment_set.filter(approval=True)[i].event_initiator)
 
-    if status == 'Getting on temporary storage':
-        data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-            'author': project.author, 'technique': project.technique, 'material': project.material,
-            'size': project.size, 'description': project.description, 'condition': project.condition,
-            'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
-            'transport_possibility': project.transport_possibility, 'collection': project.collection}
-    else:
-        #A tut boroda >.< Nujen svoi slovar'
-        data = {'name': project.name}
 
-    if request.method == 'POST':
-        if status == 'Getting on temporary storage':
-            form = TempSaveForm(request.POST)
-        else:
-            form = PersistentSaveForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Editing', actor=request.user)
-            act.save()
-            for (k, v) in cd.items():
-                print 'a'
-                try:
-                    if data[k] != v:
-                        attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
-                        attr_assign.save()
-                except KeyError:
-                    pass
-            return HttpResponse('ok')
-        return HttpResponse(form.errors)
-    else:
-        if status == 'Getting on temporary storage':
-            form = TempSaveForm(request.POST)
-        else:
-            form = PersistentSaveForm(request.POST)
-    return render(request, 'AddOnPS.html', {'form': form})
+
 
