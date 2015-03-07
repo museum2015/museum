@@ -178,20 +178,20 @@ class TempSaveForm(forms.Form):
     size = Custom.MultiMaterialField(number=1, required=False)  #
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
-    condition_descr = forms.CharField(max_length=200, label='Description of condition', required=False)#
+    #condition_descr = forms.CharField(max_length=200, label='Description of condition', required=False)#
     condition = forms.CharField(max_length=200, label='Condition', required=False)  #
     description = forms.CharField(max_length=500, label='Description', required=False)  #
     price = forms.CharField(max_length=200, label='Price', required=False)  #
     note = forms.CharField(max_length=200, label='Note', required=False)  #
-    transferred_from = forms.CharField(max_length=200, label='Object transfered from', required=False)  #
-    transferred_to = forms.CharField(max_length=200, label='Object transfered to', required=False)  #
+    side_1 = forms.CharField(max_length=200, label='Object transferred from', required=False)  #
+    side_2 = forms.CharField(max_length=200, label='Object transferred to', required=False)  #
     aim_of_receiving_gen = forms.CharField(max_length=200, label='Aim of receiving', required=False)  #
     way_of_found = forms.CharField(max_length=200, label='Way of found', required=False)  #
     reason = forms.CharField(max_length=200, label='Reason', required=False)  #
     source = forms.CharField(max_length=200, label='Source', required=False)  #
     collection = forms.CharField(max_length=200, label='Collection', required=False)  #
     term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back', required=False)  #
-    identifier = forms.CharField(max_length=50, label='Code of TS', required=False)  #
+    code = forms.CharField(max_length=50, label='Code of TS', required=False)  #
     #date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
 
     mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge', required=False)
