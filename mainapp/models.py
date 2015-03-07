@@ -22,8 +22,9 @@ class Custom:
         def decompress(self, value):
             if value:
                 res = value.split(':')
-                res[1] = res[1][0:-1]
-            return [None, None]
+                return res
+            else:
+                return [None, None]
 
         def format_output(self, rendered_widgets):
             res = u''.join(rendered_widgets)
@@ -39,7 +40,7 @@ class Custom:
 
         def compress(self, values):
             if values:
-                return values[0] + ':' + values[1] + ';'
+                return values[0] + ':' + values[1]
             else:
                 return ''
 
@@ -68,10 +69,8 @@ class Custom:
                                                             *args, **kwargs)
 
         def compress(self, values):
-            result = ''
-            for value in values:
-                result += value
-            return result
+            result = ';'
+            return result.join(values)
 
 
 class Object(models.Model):
@@ -97,7 +96,7 @@ class Object(models.Model):
     image_type = models.CharField(max_length=50, default='')
     author = models.CharField(max_length=100, default='')  #
     author_type = models.CharField(max_length=50, default='')  ##
-    price = models.CharField(max_length=10, default='')  #
+    price = models.CharField(max_length=50, default='')  #
     price_type = models.CharField(max_length=50, default='')  ##
     mark_on_object = models.CharField(max_length=200, default='')  ##
     mark_type = models.CharField(max_length=50, default='')  ##
@@ -125,7 +124,6 @@ class Object(models.Model):
     circumst_write_off = models.CharField(max_length=200, default='')  ##
     reason = models.CharField(max_length=200, default='')  #
     source = models.CharField(max_length=200, default='')  #
-    approval = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name + ' (' + self.identifier + ')'
@@ -195,6 +193,7 @@ class TempSaveForm(forms.Form):
     term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back', required=False)  #
     identifier = forms.CharField(max_length=50, label='Code of TS', required=False)  #
     #date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
+
     mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge', required=False)
     storage = forms.CharField(max_length=200, label='Storage', required=False)  #
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
@@ -265,4 +264,6 @@ class PersistentSaveForm(forms.Form):
     old_registered_marks = forms.CharField(max_length=200, label='Old registered marks', required=False)
     inventory_number = forms.CharField(max_length=200, label='Inventory number', required=False)
     spec_inventory_numb = forms.CharField(max_length=200, label='Special inventory number', required=False)
+
+
 

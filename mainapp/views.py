@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 @csrf_protect
-@login_required
 def TempSave(request):
     if request.method == 'POST':
         form = TempSaveForm(request.POST)
@@ -105,7 +104,12 @@ def AddOnPS(request, id_number):
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponse('ok')
-        return HttpResponse('ne ok')
+        return HttpResponse(form.errors)
     else:
-        form = PersistentSaveForm()
+        data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'size': project.size, 'description': project.description, 'condition': project.condition,
+                'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
+                'transport_possibility': project.transport_possibility, 'collection': project.collection}
+        form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
