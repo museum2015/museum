@@ -10,17 +10,17 @@
     <h3>{{ project.author }}</h3>
     <div>Все поля не вывожу так как в данный момент это не обязательно</div>
     {% if return_from_tc %}
-        <form action='/ret_from_ts/{{project.id}}/'>
+        <form action='/staff/return/{{project.id}}/'>
             <input type = "submit" value="Return from TC">
         </form>
     {% endif %}
-    <hr>
-    <div>Работают только те кнопки, что находятся выше линии.</div>
     {% if getting_on_pc %}
-    <form action='/form/add_on_ps/{{project.id}}/'>
+    <form action='/staff/add_on_ps/{{project.id}}/'>
             <input type = "submit" value="Getting on PC">
     </form>
     {% endif %}
+    <hr>
+    <div>Работают только те кнопки, что находятся выше линии.</div>
     {% if wire_off %}
         <form action=''>
             <input type = "submit" value="Wire-off">
