@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 @csrf_protect
-@login_required
 def TempSave(request):
     if request.method == 'POST':
         form = TempSaveForm(request.POST)
