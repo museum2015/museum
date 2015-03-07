@@ -101,7 +101,6 @@ def AddOnPS(request, id_number):
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Getting on persistent storage', actor=request.user)
             act.save()
-            project.save()
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
