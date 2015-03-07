@@ -76,10 +76,10 @@ class Custom:
 
 class Object(models.Model):
     collection = models.CharField(max_length=200, default='')  #
+    is_fragment = models.BooleanField(default=False)
     name = models.CharField(max_length=200, default='')  #
     name_lang = models.CharField(max_length=200, default='')  ##
-    name_type = models.CharField(max_length=200, default='')  ##
-    is_fragment = models.BooleanField(default=False)  #
+    name_type = models.CharField(max_length=200, default='')
     amount = models.IntegerField(default=0)  #
     # size_type = models.CharField(max_length=200, default='') #
     size = models.CharField(max_length=40, default='')  #
@@ -168,35 +168,35 @@ class AttributeAssignment(models.Model):
 
 
 class TempSaveForm(forms.Form):
-    name = forms.CharField(max_length=200, label='Name')  #
-    is_fragment = forms.BooleanField(label='Is it fragment?')  #
-    amount = forms.IntegerField(max_value=1000, label='Amount')  #
-    #date_creation = forms.CharField(max_length=20, label='Date of creation')
-    #place_of_creation = forms.CharField(max_length=200, label='Place of creation')
-    author = forms.CharField(max_length=200, label='Author')  #
-    technique = forms.CharField(max_length=200, label='Technique')  #
-    material = Custom.MultiMaterialField()  #
-    # size_type = forms.CharField(max_length=200, label='Type of size')#
-    size = Custom.MultiMaterialField(number=1)  #
+    name = forms.CharField(max_length=200, label='Name', required=False)  #
+    is_fragment = forms.BooleanField(label='Is it fragment?', required=False)  #
+    amount = forms.IntegerField(max_value=1000, label='Amount', required=False)  #
+    #date_creation = forms.CharField(max_length=20, label='Date of creation', required=False)
+    #place_of_creation = forms.CharField(max_length=200, label='Place of creation', required=False)
+    author = forms.CharField(max_length=200, label='Author', required=False)  #
+    technique = forms.CharField(max_length=200, label='Technique', required=False)  #
+    material = Custom.MultiMaterialField(required=False)  #
+    # size_type = forms.CharField(max_length=200, label='Type of size', required=False)#
+    size = Custom.MultiMaterialField(number=1, required=False)  #
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
-    condition_descr = forms.CharField(max_length=200, label='Description of condition')#
-    condition = forms.CharField(max_length=200, label='Condition')  #
-    description = forms.CharField(max_length=500, label='Description')  #
-    price = forms.CharField(max_length=200, label='Price')  #
-    note = forms.CharField(max_length=200, label='Note')  #
-    transferred_from = forms.CharField(max_length=200, label='Object transfered from')  #
-    transferred_to = forms.CharField(max_length=200, label='Object transfered to')  #
-    aim_of_receiving_gen = forms.CharField(max_length=200, label='Aim of receiving')  #
-    way_of_found = forms.CharField(max_length=200, label='Way of found')  #
-    reason = forms.CharField(max_length=200, label='Reason')  #
-    source = forms.CharField(max_length=200, label='Source')  #
-    collection = forms.CharField(max_length=200, label='Collection')  #
-    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back')  #
-    identifier = forms.CharField(max_length=50, label='Code of TS')  #
+    condition_descr = forms.CharField(max_length=200, label='Description of condition', required=False)#
+    condition = forms.CharField(max_length=200, label='Condition', required=False)  #
+    description = forms.CharField(max_length=500, label='Description', required=False)  #
+    price = forms.CharField(max_length=200, label='Price', required=False)  #
+    note = forms.CharField(max_length=200, label='Note', required=False)  #
+    transferred_from = forms.CharField(max_length=200, label='Object transfered from', required=False)  #
+    transferred_to = forms.CharField(max_length=200, label='Object transfered to', required=False)  #
+    aim_of_receiving_gen = forms.CharField(max_length=200, label='Aim of receiving', required=False)  #
+    way_of_found = forms.CharField(max_length=200, label='Way of found', required=False)  #
+    reason = forms.CharField(max_length=200, label='Reason', required=False)  #
+    source = forms.CharField(max_length=200, label='Source', required=False)  #
+    collection = forms.CharField(max_length=200, label='Collection', required=False)  #
+    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back', required=False)  #
+    identifier = forms.CharField(max_length=50, label='Code of TS', required=False)  #
     #date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
-    mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
-    storage = forms.CharField(max_length=200, label='Storage')  #
+    mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge', required=False)
+    storage = forms.CharField(max_length=200, label='Storage', required=False)  #
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
 
@@ -210,26 +210,26 @@ class TempRetForm(forms.Form):
         ('returned', 'returned from TS'),
         ('add on PS', 'Adding the object on a persistent storage')
     )
-    name = forms.CharField(max_length=200, label='Name')  #
-    is_fragment = forms.BooleanField(label='Is it fragment?')  #
-    amount = forms.IntegerField(max_value=None, label='Amount')  #
-    #date_creation = forms.CharField(max_length=20, label='Date of creation')
-    #place_of_creation = forms.CharField(max_length=200, label='Place of creation')
-    author = forms.CharField(max_length=200, label='Author')  #
-    technique = forms.CharField(max_length=200, label='Technique')  #
-    material = Custom.MultiMaterialField()  #
-    size_type = forms.CharField(max_length=200, label='Type of size')  #
-    size = Custom.MaterialField(size1=2, size2=3)  #
-    condition = forms.CharField(max_length=200, label='Condition')  #
-    condition_descr = forms.CharField(max_length=200, label='Description of condition')
-    description = forms.CharField(max_length=500, label='Description')  #
-    price = forms.CharField(max_length=200, label='Price')  #
-    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back')
-    note = forms.CharField(max_length=200, label='Note')  #
-    side_1 = forms.CharField(max_length=100, label='First side')
-    side_2 = forms.CharField(max_length=100, label='Second side')
-    return_mark = forms.ChoiceField(choices=choices)
-    save_place = forms.CharField(max_length=200, label='Place of saving')
+    name = forms.CharField(max_length=200, label='Name', required=False)  #
+    is_fragment = forms.BooleanField(label='Is it fragment?', required=False)  #
+    amount = forms.IntegerField(max_value=None, label='Amount', required=False)  #
+    #date_creation = forms.CharField(max_length=20, label='Date of creation', required=False)
+    #place_of_creation = forms.CharField(max_length=200, label='Place of creation', required=False)
+    author = forms.CharField(max_length=200, label='Author', required=False)  #
+    technique = forms.CharField(max_length=200, label='Technique', required=False)  #
+    material = Custom.MultiMaterialField(required=False)  #
+    size_type = forms.CharField(max_length=200, label='Type of size', required=False)  #
+    size = Custom.MaterialField(size1=2, size2=3, required=False)  #
+    condition = forms.CharField(max_length=200, label='Condition', required=False)  #
+    condition_descr = forms.CharField(max_length=200, label='Description of condition', required=False)
+    description = forms.CharField(max_length=500, label='Description', required=False)  #
+    price = forms.CharField(max_length=200, label='Price', required=False)  #
+    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back', required=False)
+    note = forms.CharField(max_length=200, label='Note', required=False)  #
+    side_1 = forms.CharField(max_length=100, label='First side', required=False)
+    side_2 = forms.CharField(max_length=100, label='Second side', required=False)
+    return_mark = forms.ChoiceField(choices=choices, required=False)
+    save_place = forms.CharField(max_length=200, label='Place of saving', required=False)
 
 
 class PersistentSaveForm(forms.Form):
@@ -238,32 +238,31 @@ class PersistentSaveForm(forms.Form):
         ('conservation', 'Conservation'),
         ('preventive', 'Preventive view')
     )
-    name = forms.CharField(max_length=200, label='Name')
-    is_fragment = forms.BooleanField(label='Is it fragment?')
-    amount = forms.IntegerField(label='Amount')
-    #date_creation = forms.CharField(label='Date of creating')
-   # place_of_creating = forms.CharField(max_length=200, label='Place of creating')
-    author = forms.CharField(max_length=200, label='Author')
-    technique = forms.CharField(max_length=200, label='Technique')
-    material = Custom.MultiMaterialField()
-    size = Custom.MaterialField(size1=2, size2=3)
-    description = forms.CharField(max_length=200, label='Description')
-    condition = forms.CharField(max_length=200, label='Condition')
-    can_transport = forms.BooleanField(label='Can be transported?(y/n)')
-    recommandation_rest = forms.ChoiceField(choices=choices)
-    conservation_descr = forms.CharField(max_length=200,label='Description of conservation state')
-    price = forms.CharField(max_length=40, label='Price')
-    note = forms.CharField(max_length=200, label='Note')
-    PS_code = forms.CharField(max_length=200, label='Persistent save code')
-    way_of_found = forms.CharField(max_length=200, label='Way of found')
-    link_on_doc = forms.CharField(max_length=200, label='Link on document')
-    #mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
-    side_1 = forms.CharField(max_length=200, label='Side 1')
-    side_2 = forms.CharField(max_length=209, label='Side 2')
-    fond = forms.CharField(max_length=200, label='Fond(collection, department)')
-    mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
-    save_place = forms.CharField(max_length=200, label='Place of saving')
-    old_registered_marks = forms.CharField(max_length=200, label='Old registered marks')
-    inventory_number = forms.CharField(max_length=200, label='Inventory number')
-    spec_inventory_numb = forms.CharField(max_length=200, label='Special inventory number')
+    name = forms.CharField(max_length=200, label='Name', required=False)
+    is_fragment = forms.BooleanField(label='Is it fragment?', required=False)
+    amount = forms.IntegerField(label='Amount', required=False)
+    #date_creation = forms.CharField(label='Date of creating', required=False)
+   # place_of_creating = forms.CharField(max_length=200, label='Place of creating', required=False)
+    author = forms.CharField(max_length=200, label='Author', required=False)
+    technique = forms.CharField(max_length=200, label='Technique', required=False)
+    material = Custom.MultiMaterialField(required=False)
+    size = Custom.MaterialField(size1=2, size2=3, required=False)
+    description = forms.CharField(max_length=200, label='Description', required=False)
+    condition = forms.CharField(max_length=200, label='Condition', required=False)
+    can_transport = forms.BooleanField(label='Can be transported?(y/n)', required=False)
+    recommandation_rest = forms.ChoiceField(choices=choices, required=False)
+    conservation_descr = forms.CharField(max_length=200,label='Description of conservation state', required=False)
+    price = forms.CharField(max_length=40, label='Price', required=False)
+    note = forms.CharField(max_length=200, label='Note', required=False)
+    PS_code = forms.CharField(max_length=200, label='Persistent save code', required=False)
+    way_of_found = forms.CharField(max_length=200, label='Way of found', required=False)
+    link_on_doc = forms.CharField(max_length=200, label='Link on document', required=False)
+    mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge', required=False)
+    side_1 = forms.CharField(max_length=200, label='Side 1', required=False)
+    side_2 = forms.CharField(max_length=209, label='Side 2', required=False)
+    fond = forms.CharField(max_length=200, label='Fond(collection, department)', required=False)
+    save_place = forms.CharField(max_length=200, label='Place of saving', required=False)
+    old_registered_marks = forms.CharField(max_length=200, label='Old registered marks', required=False)
+    inventory_number = forms.CharField(max_length=200, label='Inventory number', required=False)
+    spec_inventory_numb = forms.CharField(max_length=200, label='Special inventory number', required=False)
 

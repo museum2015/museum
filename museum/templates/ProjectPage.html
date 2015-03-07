@@ -17,9 +17,9 @@
     <hr>
     <div>Работают только те кнопки, что находятся выше линии.</div>
     {% if getting_on_pc %}
-        <form action='/'>
+    <form action='/form/add_on_ps/{{project.id}}/'>
             <input type = "submit" value="Getting on PC">
-        </form>
+    </form>
     {% endif %}
     {% if wire_off %}
         <form action=''>
