@@ -96,7 +96,7 @@ class Object(models.Model):
     image_type = models.CharField(max_length=50, default='')
     author = models.CharField(max_length=100, default='')  #
     author_type = models.CharField(max_length=50, default='')  ##
-    price = models.CharField(max_length=10, default='')  #
+    price = models.CharField(max_length=50, default='')  #
     price_type = models.CharField(max_length=50, default='')  ##
     mark_on_object = models.CharField(max_length=200, default='')  ##
     mark_type = models.CharField(max_length=50, default='')  ##
