@@ -37,6 +37,8 @@ def TempRet(request, id_number):
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
         return HttpResponse('Object does not exist.<br>Try with another id_number.')
+    if str(project.attributeassignment_set.filter(approval=False, aim=project)[0]):
+        return HttpResponse('This object has not approved activity<br> Please, confirm they')
     act = Activity(time_stamp=dt.now(), type='Getting from temporary storage', actor=request.user)
     act.save()
     for temp in project.attributeassignment_set.filter(approval=True, aim=project):
