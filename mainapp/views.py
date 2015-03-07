@@ -45,7 +45,8 @@ def TempRet(request, id_number):
     act.save()
     for temp in project.attributeassignment_set.filter(approval=True, aim=project):
         if str(temp.event_initiator) == 'Getting on temporary storage':
-            attr_assign = AttributeAssignment(attr_name=temp.attr_name, event_initiator=act, aim=project)
+            attr_assign = AttributeAssignment(attr_name=temp.attr_name, attr_value=temp.attr_value,
+                                              event_initiator=act, aim=project)
             attr_assign.save()
     return redirect('/')
 
