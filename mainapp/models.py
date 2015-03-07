@@ -22,8 +22,9 @@ class Custom:
         def decompress(self, value):
             if value:
                 res = value.split(':')
-                res[1] = res[1][0:-1]
-            return [None, None]
+                return res
+            else:
+                return [None, None]
 
         def format_output(self, rendered_widgets):
             res = u''.join(rendered_widgets)
@@ -39,7 +40,7 @@ class Custom:
 
         def compress(self, values):
             if values:
-                return values[0] + ':' + values[1] + ';'
+                return values[0] + ':' + values[1]
             else:
                 return ''
 
@@ -68,10 +69,8 @@ class Custom:
                                                             *args, **kwargs)
 
         def compress(self, values):
-            result = ''
-            for value in values:
-                result += value
-            return result
+            result = ';'
+            return result.join(values)
 
 
 class Object(models.Model):
@@ -125,7 +124,6 @@ class Object(models.Model):
     circumst_write_off = models.CharField(max_length=200, default='')  ##
     reason = models.CharField(max_length=200, default='')  #
     source = models.CharField(max_length=200, default='')  #
-    approval = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name + ' (' + self.identifier + ')'
@@ -170,7 +168,9 @@ class AttributeAssignment(models.Model):
 class TempSaveForm(forms.Form):
     name = forms.CharField(max_length=200, label='Name')  #
     is_fragment = forms.BooleanField(label='Is it fragment?')  #
-    amount = forms.IntegerField(max_value=1000, label='Amount')  #
+    amount = forms.IntegerField(max_value=1000, label='Amount')
+    #date_creation = forms.CharField(label='Date of creating')
+    #place_of_creating = forms.CharField(max_length=200, label='Place of creating')
     author = forms.CharField(max_length=200, label='Author')  #
     technique = forms.CharField(max_length=200, label='Technique')  #
     material = Custom.MultiMaterialField()  #
@@ -193,7 +193,7 @@ class TempSaveForm(forms.Form):
     term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back')  #
     identifier = forms.CharField(max_length=50, label='Code of TS')  #
     #date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
-    #mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
+    mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
     storage = forms.CharField(max_length=200, label='Storage')  #
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
@@ -211,8 +211,8 @@ class TempRetForm(forms.Form):
     name = forms.CharField(max_length=200, label='Name')  #
     is_fragment = forms.BooleanField(label='Is it fragment?')  #
     amount = forms.IntegerField(max_value=None, label='Amount')  #
-    date_creation = forms.CharField(max_length=20, label='Date of creation')
-    place_of_creation = forms.CharField(max_length=200, label='Place of creation')
+    #date_creation = forms.CharField(max_length=20, label='Date of creation')
+    #place_of_creation = forms.CharField(max_length=200, label='Place of creation')
     author = forms.CharField(max_length=200, label='Author')  #
     technique = forms.CharField(max_length=200, label='Technique')  #
     material = Custom.MultiMaterialField()  #
@@ -239,27 +239,27 @@ class PersistentSaveForm(forms.Form):
     name = forms.CharField(max_length=200, label='Name')
     is_fragment = forms.BooleanField(label='Is it fragment?')
     amount = forms.IntegerField(label='Amount')
-    date_creation = forms.CharField(label='Date of creating')
-    place_of_creating = forms.CharField(max_length=200, label='Place of creating')
+    #date_creation = forms.CharField(label='Date of creating')
+    #place_of_creating = forms.CharField(max_length=200, label='Place of creating')
     author = forms.CharField(max_length=200, label='Author')
     technique = forms.CharField(max_length=200, label='Technique')
     material = Custom.MultiMaterialField()
     size = Custom.MaterialField(size1=2, size2=3)
     description = forms.CharField(max_length=200, label='Description')
     condition = forms.CharField(max_length=200, label='Condition')
-    can_transport = forms.BooleanField(label='Can be transported?(y/n)')
+    transport_possibility = forms.BooleanField(label='Can be transported?(y/n)')
     recommandation_rest = forms.ChoiceField(choices=choices)
     conservation_descr = forms.CharField(max_length=200,label='Description of conservation state')
     price = forms.CharField(max_length=40, label='Price')
     note = forms.CharField(max_length=200, label='Note')
     PS_code = forms.CharField(max_length=200, label='Persistent save code')
     way_of_found = forms.CharField(max_length=200, label='Way of found')
-    link_on_doc = forms.CharField(max_length=200, label='Link on document')
-    #mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
+    #link_on_doc = forms.CharField(max_length=200, label='Link on document')
+    mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
     side_1 = forms.CharField(max_length=200, label='Side 1')
     side_2 = forms.CharField(max_length=209, label='Side 2')
-    fond = forms.CharField(max_length=200, label='Fond(collection, department)')
-    save_place = forms.CharField(max_length=200, label='Place of saving')
+    collection = forms.CharField(max_length=200, label='Fond(collection, department)')
+    place_appellation = forms.CharField(max_length=200, label='Place of saving')
     old_registered_marks = forms.CharField(max_length=200, label='Old registered marks')
     inventory_number = forms.CharField(max_length=200, label='Inventory number')
     spec_inventory_numb = forms.CharField(max_length=200, label='Special inventory number')
