@@ -150,7 +150,7 @@ class Activity(models.Model):
 
 class AttributeAssignment(models.Model):
     attr_name = models.CharField(max_length=40)
-    attr_value = models.CharField(max_length=200)
+    attr_value = models.CharField(max_length=200, null=True)
     aim = models.ForeignKey(Object)
     event_initiator = models.ForeignKey(Activity)
     approval = models.BooleanField(default=False)
