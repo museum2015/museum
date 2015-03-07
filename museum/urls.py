@@ -7,7 +7,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^staff/add_on_ts$', views.TempSave),
-    url(r'^/staff/return/(?P<id_number>[0-9]+)/$', views.TempRet),
+    url(r'^staff/return/(?P<id_number>[0-9]+)/$', views.TempRet),
     url(r'^projects/$', views.GetProject),
     url(r'^projects/approve(?P<offset>[0-9]+)/$', views.ApproveProject),
     url(r'^projects/(?P<id_number>[0-9]+)/$', views.ProjectPage),
