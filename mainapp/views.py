@@ -11,31 +11,45 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 @csrf_protect
-def TempSave(request):
+def TempSave(request, id_number=0):
+    try:
+        project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist:
+        if id_number != 0:
+            return HttpResponse('Object does not exist.<br>Try with another id_number.')
+        else:
+            project = Object()
+            project.save()
     if request.method == 'POST':
         form = TempSaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Getting on temporary storage', actor=request.user)
             act.save()
-            obj = Object()
-            obj.save()
             for (k, v) in cd.items():
-                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=obj)
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponse('ok')
         return HttpResponse('ne ok')
     else:
-        form = TempSaveForm()
+        data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'size': project.size, 'condition': project.condition, 'description': project.description,
+                'price': project.price}
+        form = TempSaveForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
 
 
 @csrf_protect
-def TempRet(request, id_number):
+def TempRet(request, id_number=0):
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
-        return HttpResponse('Object does not exist.<br>Try with another id_number.')
+        if id_number != 0:
+            return HttpResponse('Object does not exist.<br>Try with another id_number.')
+        else:
+            project = Object()
+            project.save()
     try:
          if str(project.attributeassignment_set.filter(approval=False, aim=project)[0]):
              return HttpResponse('This object has not approved activity<br> Please, confirm they')
@@ -93,11 +107,15 @@ def ProjectPage(request, id_number):
                                                 'editing': editing})
 
 @csrf_protect
-def AddOnPS(request, id_number):
+def AddOnPS(request, id_number=0):
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
-        return HttpResponse('Object does not exist.<br>Try with another id_number.')
+        if id_number != 0:
+            return HttpResponse('Object does not exist.<br>Try with another id_number.')
+        else:
+            project = Object()
+            project.save()
     if request.method == 'POST':
         form = PersistentSaveForm(request.POST)
         if form.is_valid():
