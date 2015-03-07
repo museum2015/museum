@@ -139,7 +139,7 @@ class Activity(models.Model):
 
     def __unicode__(self):
         try:
-            return ((self.attributeassignment_set.all())[0]).aim.__unicode__() + ' ' + self.type
+            return self.type
         except IndexError:
             return 'UndefinedActivity'
 
@@ -148,7 +148,6 @@ class Activity(models.Model):
             attrib.approve()
         self.approval = True
         self.save()
-
 
 
 class AttributeAssignment(models.Model):
@@ -176,7 +175,7 @@ class TempSaveForm(forms.Form):
     technique = forms.CharField(max_length=200, label='Technique')  #
     material = Custom.MultiMaterialField()  #
     # size_type = forms.CharField(max_length=200, label='Type of size')#
-    size = Custom.MultiMaterialField(number=3)  #
+    size = Custom.MultiMaterialField(number=1)  #
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
     #condition_descr = forms.CharField(max_length=200, label='Description of condition')#
@@ -188,7 +187,7 @@ class TempSaveForm(forms.Form):
     transferred_to = forms.CharField(max_length=200, label='Object transfered to')  #
     aim_of_receiving_gen = forms.CharField(max_length=200, label='Aim of receiving')  #
     way_of_found = forms.CharField(max_length=200, label='Way of found')  #
-    reason = forms.CharField(max_length=200, label='reason')  #
+    reason = forms.CharField(max_length=200, label='Reason')  #
     source = forms.CharField(max_length=200, label='Source')  #
     collection = forms.CharField(max_length=200, label='Collection')  #
     term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back')  #
@@ -231,13 +230,13 @@ class TempRetForm(forms.Form):
     save_place = forms.CharField(max_length=200, label='Place of saving')
 
 
-class PersistantSaveForm(forms.Form):
+class PersistentSaveForm(forms.Form):
     choices=(
-        ('immediately', 'Immediately restauration'),
-        ('conservation','Conservation'),
-        ('prophilactic', 'Prophilactic view')
+        ('immediately', 'Immediately restoration'),
+        ('conservation', 'Conservation'),
+        ('preventive', 'Preventive view')
     )
-    name = forms.CharField(max_length=200,label='Name')
+    name = forms.CharField(max_length=200, label='Name')
     is_fragment = forms.BooleanField(label='Is it fragment?')
     amount = forms.IntegerField(label='Amount')
     date_creation = forms.CharField(label='Date of creating')
@@ -249,28 +248,19 @@ class PersistantSaveForm(forms.Form):
     description = forms.CharField(max_length=200, label='Description')
     condition = forms.CharField(max_length=200, label='Condition')
     can_transport = forms.BooleanField(label='Can be transported?(y/n)')
-    recommandation_rest = forms.ChoiceField(choices=choices, default='immediately')
+    recommandation_rest = forms.ChoiceField(choices=choices)
     conservation_descr = forms.CharField(max_length=200,label='Description of conservation state')
     price = forms.CharField(max_length=40, label='Price')
     note = forms.CharField(max_length=200, label='Note')
-    PS_code = forms.CharField(max_length=200, label='Persistant save code')
+    PS_code = forms.CharField(max_length=200, label='Persistent save code')
     way_of_found = forms.CharField(max_length=200, label='Way of found')
     link_on_doc = forms.CharField(max_length=200, label='Link on document')
     #mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge')
     side_1 = forms.CharField(max_length=200, label='Side 1')
     side_2 = forms.CharField(max_length=209, label='Side 2')
     fond = forms.CharField(max_length=200, label='Fond(collection, department)')
-    place_of_save = forms.CharField(max_length=200, label='Place of saving')
-    old_registered_marks = forms.CharField(max_length=200,label='Old registered marks')
+    save_place = forms.CharField(max_length=200, label='Place of saving')
+    old_registered_marks = forms.CharField(max_length=200, label='Old registered marks')
     inventory_number = forms.CharField(max_length=200, label='Inventory number')
     spec_inventory_numb = forms.CharField(max_length=200, label='Special inventory number')
-
-
-
-
-
-
-    
-
-
 
