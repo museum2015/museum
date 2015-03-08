@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm ,TempRetForm , PersistentSaveForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
+from django.views.generic.edit import UpdateView
 import ast
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -135,3 +136,12 @@ def AddOnPS(request, id_number=0):
                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
+
+class ObjectUpdate(UpdateView):
+    model = Object
+    template_name_suffix = '_update_form'
+
+
+
+
+
