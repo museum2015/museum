@@ -83,16 +83,26 @@ def ProjectPage(request, id_number):
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
         return HttpResponse('Object does not exist.<br>Try with another id_number.')
+    try:
+        project.attributeassignment_set.filter(approval=True)[0]
+    except IndexError:
+        return HttpResponse('This object is not approved')
+
     return_from_tc = False
     getting_on_pc = False
     wire_off = False
     editing = False
 
     i = 0
-    while project.attributeassignment_set.filter(approval=True)[i].event_initiator == 'Editing':
-        i += 1
-    status = str(project.attributeassignment_set.filter(approval=True)[i].event_initiator)
+    try:
+        while project.attributeassignment_set.filter(approval=True)[i+1]:
+            i += 1
+    except IndexError:pass
+    while str(project.attributeassignment_set.filter(approval=True)[i].event_initiator) == 'Editing':
+        i -= 1
 
+    status = str(project.attributeassignment_set.filter(approval=True)[i].event_initiator)
+    print status
     if status == 'Getting on temporary storage':
         return_from_tc = True
         getting_on_pc = True
