@@ -44,27 +44,35 @@ def TempSave(request, id_number=0):
 
 @csrf_protect
 def TempRet(request, id_number=0):
-    try:
+    if Object.objects.get(id=int(id_number)).exists():
         project = Object.objects.get(id=int(id_number))
-    except ObjectDoesNotExist:
+    else:
         if id_number != 0:
             return HttpResponse('Object does not exist.<br>Try with another id_number.')
         else:
             project = Object()
             project.save()
-    try:
-         if str(project.attributeassignment_set.filter(approval=False, aim=project)[0]):
+
+    if project.attributeassignment_set.filter(approval=False, aim=project).exists():
              return HttpResponse('This object has not approved activity<br> Please, confirm they')
-    except IndexError:
-        pass
-    act = Activity(time_stamp=dt.now(), type='Getting from temporary storage', actor=request.user)
-    act.save()
-    for temp in project.attributeassignment_set.filter(approval=True, aim=project):
-        if str(temp.event_initiator) == 'Getting on temporary storage':
-            attr_assign = AttributeAssignment(attr_name=temp.attr_name, attr_value=temp.attr_value,
-                                              event_initiator=act, aim=project)
-            attr_assign.save()
-    return redirect('/')
+    if request.method == 'POST':
+        form = TempSaveForm(request.POST)
+        if form.is_fragment():
+            cd = form.cleaned_data
+            act = Activity(time_stamp=dt.now(), type='Getting from temporary storage', actor=request.user)
+            act.save()
+            for (k, v) in cd.items():
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign.save()
+            return HttpResponse('ok')
+    else:
+        data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'size': project.size, 'description': project.description, 'condition': project.condition,
+                'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
+                'transport_possibility': project.transport_possibility, 'collection': project.collection}
+        form = TempSaveForm(initial=data)
+    return render(request, 'AddOnTS.html', {'form': form})
 
 
 def GetProject(request):
