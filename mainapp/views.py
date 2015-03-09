@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm ,TempRetForm , PersistentSaveForm
+from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
+    PersistentSaveForm, ObjectEditForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView
@@ -140,6 +141,7 @@ def AddOnPS(request, id_number=0):
 
 class ObjectUpdate(UpdateView):
     model = Object
+    form_class = ObjectEditForm
     template_name_suffix = '_update_form'
 
 
