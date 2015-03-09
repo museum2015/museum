@@ -17,7 +17,7 @@
         {% for qs in a.attributeassignment_set.all %}
             {{ qs }} <br>
         {% endfor %}
-        <form action='approve{{a.id}}' class="form-actions">
+        <form action='approve{{a.id}}/' class="form-actions">
          {% buttons %}
             <button type="submit" class="btn btn-success btn-block">
                 {% bootstrap_icon "star" %} Submit
