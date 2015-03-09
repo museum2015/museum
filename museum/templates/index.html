@@ -1,0 +1,93 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bootstrap In Practice - Landing Page Example</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<!-- Bootstrap -->
+	<link href="static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="font-awesome/css/font-awesome.css" rel="stylesheet" />
+
+	<link href="http://fonts.googleapis.com/css?family=Abel|Open+Sans:400,600" rel="stylesheet" />
+
+	<style>
+
+		html {
+			background: url(img/background.jpg) no-repeat center center fixed; 
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			-o-background-size: cover;
+			background-size: cover;
+		}
+
+		body {
+			padding-top: 20px;
+			font-size: 16px;
+			font-family: "Open Sans",serif;
+			background: transparent;
+		}
+
+		h1 {
+			font-family: "Abel", Arial, sans-serif;
+			font-weight: 400;
+			font-size: 40px;
+			text-align: center;
+		}
+
+		/* Override B3 .panel adding a subtly transparent background */
+		.panel {
+			background-color: rgba(255, 255, 255, 0.9);
+		}
+
+		.margin-base-vertical {
+			margin: 40px 0;
+		}
+
+	</style>
+
+</head>
+<body>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3 panel panel-default">
+
+				<h1 class="margin-base-vertical">Тустань - місто-фортеця</h1>
+
+				<p>
+					Автоматизоване робоче місце (АРМ) для співробітників музею v0.1
+				</p>
+				<p>
+					<span class="glyphicon glyphicon-book"></span>
+					Основні облікові сценарії:
+				</p>
+								
+				<ul class="list-group">
+					<li class="list-group-item"><a href='staff/add_on_ts/{{ project.id }}'>Приймання предметів на тимчасове зберігання ТЗ); <span class="badge">2.1</span></a></li>
+					<li class="list-group-item"><a href='staff/return/{{ project.id }}'>Повернення предметів з тимчасово зберігання(ТЗ); <span class="badge">2.2</span></a></li>
+					<li class="list-group-item"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання  (ПЗ). <span class="badge">2.3</span></a></li>
+				
+   				</ul>
+
+				<form class="margin-base-vertical">
+					<p class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+						<input type="text" class="form-control input-lg" name="email" placeholder="info@integration-plus.kiev.ua" />
+					</p>
+					<p class="help-block text-center"><small>Підписуйтесь на новини - Ваш email не буде використано для розсилення спаму!</small></p>
+					<p class="text-center">
+						<button type="submit" class="btn btn-success btn-lg">Підписатись</button>
+					</p>
+
+				</form>
+			
+				<div class="margin-base-vertical">
+					<small class="text-muted">Розробка та підтримка <a href="http://integration-plus.kiev.ua/?page_id=201">ТОВ "Інтеграція-плюс"</a>, 2015 р. </small>
+				</div>
+
+			</div><!-- //main content -->
+		</div><!-- //row -->
+	</div> <!-- //container -->
+
+</body>
+</html>

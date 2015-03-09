@@ -143,6 +143,8 @@ class ObjectUpdate(UpdateView):
     template_name_suffix = '_update_form'
 
 
+def MainPage(request):
+    return render(request, 'index.html', {})
 
 
 
