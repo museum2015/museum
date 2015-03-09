@@ -79,13 +79,12 @@ def ApproveProject(request, offset):
 
 @csrf_protect
 def ProjectPage(request, id_number):
-    try:
+    if Object.objects.filter(id=int(id_number)).exists():
         project = Object.objects.get(id=int(id_number))
-    except ObjectDoesNotExist:
+    else:
         return HttpResponse('Object does not exist.<br>Try with another id_number.')
-    try:
-        project.attributeassignment_set.filter(approval=True)[0]
-    except IndexError:
+
+    if not project.attributeassignment_set.filter(approval=True).exists():
         return HttpResponse('This object is not approved')
 
     return_from_tc = False
@@ -93,11 +92,8 @@ def ProjectPage(request, id_number):
     wire_off = False
     editing = False
 
-    i = 0
-    try:
-        while project.attributeassignment_set.filter(approval=True)[i+1]:
-            i += 1
-    except IndexError:pass
+    i = project.attributeassignment_set.filter(approval=True).count()-1
+
     while str(project.attributeassignment_set.filter(approval=True)[i].event_initiator) == 'Editing':
         i -= 1
 
