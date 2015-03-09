@@ -1,35 +1,61 @@
 <!DOCTYPE html>
 <html>
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
 </head>
 <body>
-    <h2>{{ project }}</h2>
-    <h3>{{ project.collection }}</h3>
-    <h3>{{ project.author }}</h3>
-    <div>Все поля не вывожу так как в данный момент это не обязательно</div>
-    {% if return_from_tc %}
-        <form action='/staff/return/{{project.id}}/'>
-            <input type = "submit" value="Return from TC">
+<div class="container">
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <h2>{{ project }}</h2>
+        <h3>{{ project.collection }}</h3>
+        <h3>{{ project.author }}</h3>
+        <div>Все поля не вывожу так как в данный момент это не обязательно</div>
+        {% if return_from_tc %}
+            <form action='/staff/return/{{project.id}}/' class="form">
+                 {% buttons %}
+            <button type="submit" class="btn btn-success btn-block"  value="Return from TC">
+                {% bootstrap_icon "star" %} Return from TC
+            </button>
+        {% endbuttons %}
+            </form>
+        {% endif %}
+        {% if getting_on_pc %}
+        <form action='/staff/add_on_ps/{{project.id}}/' class="form">
+                {% buttons %}
+            <button type="submit" class="btn btn-success btn-block"  value="Getting on PC">
+                {% bootstrap_icon "star" %} Getting on PC
+            </button>
+        {% endbuttons %}
         </form>
-    {% endif %}
-    {% if getting_on_pc %}
-    <form action='/staff/add_on_ps/{{project.id}}/'>
-            <input type = "submit" value="Getting on PC">
-    </form>
-    {% endif %}
-    <hr>
-    <div>Работают только те кнопки, что находятся выше линии.</div>
-    {% if wire_off %}
-        <form action=''>
-            <input type = "submit" value="Wire-off">
-        </form>
-    {% endif %}
-    {% if editing %}
-        <form action=''>
-            <input type = "submit" value="Editing">
-        </form>
-    {% endif %}
+        {% endif %}
+        <hr>
+        <hr>
+        <p class="system-message-title">Работают только те кнопки, что находятся выше линии.</p>
+        {% if wire_off %}
+            <form action='' class="form">
+              {% buttons %}
+            <button type="submit" class="btn btn-success btn-block" value="Wire-off">
+                {% bootstrap_icon "star" %} Wire-off
+            </button>
+        {% endbuttons %}
+            </form>
+        {% endif %}
+        {% if editing %}
+            <form action='' class="form">
+            {% buttons %}
+            <button type="submit" class="btn btn-success btn-block" value="Editing">
+                {% bootstrap_icon "star" %} Editing
+            </button>
+        {% endbuttons %}
+            </form>
+        {% endif %}
+    </div>
+  </div>
+</div>
 </body>
 </html>

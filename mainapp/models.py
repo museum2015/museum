@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 from django import forms
 from django.db import models
@@ -166,36 +167,36 @@ class AttributeAssignment(models.Model):
 
 
 class TempSaveForm(forms.Form):
-    name = forms.CharField(max_length=200, label='Name', required=False)  #
-    is_fragment = forms.BooleanField(label='Is it fragment?', required=False)  #
-    amount = forms.IntegerField(max_value=1000, label='Amount', required=False)  #
-    #date_creation = forms.CharField(max_length=20, label='Date of creation', required=False)
-    #place_of_creation = forms.CharField(max_length=200, label='Place of creation', required=False)
-    author = forms.CharField(max_length=200, label='Author', required=False)  #
-    technique = forms.CharField(max_length=200, label='Technique', required=False)  #
-    material = Custom.MultiMaterialField(required=False)  #
+    name = forms.CharField(max_length=200, label='Назва предмета', required=False)  #
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)  #
+    amount = forms.IntegerField(max_value=1000, label='Кількість', required=False)  #
+    #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=False)
+    #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=False)
+    author = forms.CharField(max_length=200, label='Автор', required=False)  #
+    technique = forms.CharField(max_length=200, label='Техніка', required=False)  #
+    material = Custom.MultiMaterialField(required=False, label='Матеріал')  #
     # size_type = forms.CharField(max_length=200, label='Type of size', required=False)#
-    size = Custom.MultiMaterialField(number=1, required=False)  #
+    size = Custom.MultiMaterialField(number=1, required=False, label='Розміри (включно із масою, пробою тощо)')  #
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
-    #condition_descr = forms.CharField(max_length=200, label='Description of condition', required=False)#
-    condition = forms.CharField(max_length=200, label='Condition', required=False)  #
-    description = forms.CharField(max_length=500, label='Description', required=False)  #
-    price = forms.CharField(max_length=200, label='Price', required=False)  #
-    note = forms.CharField(max_length=200, label='Note', required=False)  #
-    side_1 = forms.CharField(max_length=200, label='Object transferred from', required=False)  #
-    side_2 = forms.CharField(max_length=200, label='Object transferred to', required=False)  #
-    aim_of_receiving_gen = forms.CharField(max_length=200, label='Aim of receiving', required=False)  #
-    way_of_found = forms.CharField(max_length=200, label='Way of found', required=False)  #
-    reason = forms.CharField(max_length=200, label='Reason', required=False)  #
-    source = forms.CharField(max_length=200, label='Source', required=False)  #
-    collection = forms.CharField(max_length=200, label='Collection', required=False)  #
-    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back', required=False)  #
-    code = forms.CharField(max_length=50, label='Code of TS', required=False)  #
+    condition = forms.CharField(max_length=200, label='Стан збереженості (тип)', required=False)
+    condition_descr = forms.CharField(max_length=200, label='Опис стану збереженості', required=False)
+    description = forms.CharField(max_length=500, label='Опис предмета', required=False)  #
+    price = forms.CharField(max_length=200, label='Вартість', required=False)  #
+    note = forms.CharField(max_length=200, label='Примітка', required=False)  #
+    side_1 = forms.CharField(max_length=200, label='Сторона 1 (акт приймання на ТЗ)', required=False)  #
+    side_2 = forms.CharField(max_length=200, label='Сторона 2 (акт приймання на ТЗ)', required=False)  #
+    aim_of_receiving_gen = forms.CharField(max_length=200, label='Мета приймання на ТЗ', required=False)  #
+    way_of_found = forms.CharField(max_length=200, label='Спосіб надходження', required=False)  #
+    reason = forms.CharField(max_length=200, label='Підстава', required=False)  #
+    source = forms.CharField(max_length=200, label='Джерело надходження', required=False)  #
+    collection = forms.CharField(max_length=200, label='Фонд (колекція, відділ)', required=False)  #
+    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Термін повернення(до якої дати)', required=False)  #
+    code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=False)  #
     #date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
 
-    mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge', required=False)
-    storage = forms.CharField(max_length=200, label='Storage', required=False)  #
+    mat_person_in_charge = forms.CharField(max_length=50, label='Матеріально-відповідальна особа', required=False)
+    storage = forms.CharField(max_length=200, label='Фізичне місце збереження (топографія)', required=False)  #
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
 
@@ -209,61 +210,63 @@ class TempRetForm(forms.Form):
         ('returned', 'returned from TS'),
         ('add on PS', 'Adding the object on a persistent storage')
     )
-    name = forms.CharField(max_length=200, label='Name', required=False)  #
-    is_fragment = forms.BooleanField(label='Is it fragment?', required=False)  #
-    amount = forms.IntegerField(max_value=None, label='Amount', required=False)  #
-    #date_creation = forms.CharField(max_length=20, label='Date of creation', required=False)
-    #place_of_creation = forms.CharField(max_length=200, label='Place of creation', required=False)
-    author = forms.CharField(max_length=200, label='Author', required=False)  #
-    technique = forms.CharField(max_length=200, label='Technique', required=False)  #
-    material = Custom.MultiMaterialField(required=False)  #
-    size_type = forms.CharField(max_length=200, label='Type of size', required=False)  #
-    size = Custom.MaterialField(size1=2, size2=3, required=False)  #
-    condition = forms.CharField(max_length=200, label='Condition', required=False)  #
-    condition_descr = forms.CharField(max_length=200, label='Description of condition', required=False)
-    description = forms.CharField(max_length=500, label='Description', required=False)  #
-    price = forms.CharField(max_length=200, label='Price', required=False)  #
-    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Term of get back', required=False)
-    note = forms.CharField(max_length=200, label='Note', required=False)  #
-    side_1 = forms.CharField(max_length=100, label='First side', required=False)
-    side_2 = forms.CharField(max_length=100, label='Second side', required=False)
-    return_mark = forms.ChoiceField(choices=choices, required=False)
-    save_place = forms.CharField(max_length=200, label='Place of saving', required=False)
+    name = forms.CharField(max_length=200, label='Назва предмета', required=False)  #
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)  #
+    amount = forms.IntegerField(max_value=None, label='Кількість', required=False)  #
+    #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=False)
+    #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=False)
+    author = forms.CharField(max_length=200, label='Автор', required=False)  #
+    technique = forms.CharField(max_length=200, label='Техніка', required=False)  #
+    material = Custom.MultiMaterialField(required=False, label='Матеріал')  #
+    #size_type = forms.CharField(max_length=200, label='Type of size', required=False)  #
+    size = Custom.MaterialField(size1=2, size2=3, required=False, label='Розміри (включно із масою, пробою тощо)')  #
+    condition = forms.CharField(max_length=200, label='Стан збереженості (тип)', required=False)  #
+    condition_descr = forms.CharField(max_length=200, label='Опис стану збереженості', required=False)
+    description = forms.CharField(max_length=500, label='Опис предмета', required=False)  #
+    price = forms.CharField(max_length=200, label='Вартість', required=False)  #
+    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Термін повернення(до якої дати)', required=False)
+    note = forms.CharField(max_length=200, label='Примітка', required=False)  #
+    reason = forms.CharField(max_length=200, label='Підстава', required=False)  #
+    side_1 = forms.CharField(max_length=100, label='Сторона 1 (акт повернення з ТЗ)', required=False)
+    side_2 = forms.CharField(max_length=100, label='Сторона 2 (акт повернення з ТЗ)', required=False)
+    return_mark = forms.ChoiceField(choices=choices, required=False, label='Позначка про повернення предмета або переведення до музейного зібрання (ПЗ) у книзі ТЗ')
+    save_place = forms.CharField(max_length=200, label='Фізичне місце збереження (топографія)', required=False)
 
 
 class PersistentSaveForm(forms.Form):
-    choices=(
-        ('immediately', 'Immediately restoration'),
-        ('conservation', 'Conservation'),
-        ('preventive', 'Preventive view')
+    choices = (
+        ('immediately', 'Термінова реставрація'),
+        ('conservation', 'Консервація'),
+        ('preventive', 'Профілактичний огляд')
     )
-    name = forms.CharField(max_length=200, label='Name', required=False)
-    is_fragment = forms.BooleanField(label='Is it fragment?', required=False)
-    amount = forms.IntegerField(label='Amount', required=False)
-    #date_creation = forms.CharField(label='Date of creating', required=False)
-   # place_of_creating = forms.CharField(max_length=200, label='Place of creating', required=False)
-    author = forms.CharField(max_length=200, label='Author', required=False)
-    technique = forms.CharField(max_length=200, label='Technique', required=False)
-    material = Custom.MultiMaterialField(required=False)
-    size = Custom.MaterialField(size1=2, size2=3, required=False)
-    description = forms.CharField(max_length=200, label='Description', required=False)
-    condition = forms.CharField(max_length=200, label='Condition', required=False)
-    can_transport = forms.BooleanField(label='Can be transported?(y/n)', required=False)
-    recommandation_rest = forms.ChoiceField(choices=choices, required=False)
-    conservation_descr = forms.CharField(max_length=200,label='Description of conservation state', required=False)
-    price = forms.CharField(max_length=40, label='Price', required=False)
-    note = forms.CharField(max_length=200, label='Note', required=False)
-    PS_code = forms.CharField(max_length=200, label='Persistent save code', required=False)
-    way_of_found = forms.CharField(max_length=200, label='Way of found', required=False)
-    link_on_doc = forms.CharField(max_length=200, label='Link on document', required=False)
-    mat_person_in_charge = forms.CharField(max_length=50, label='Person in charge', required=False)
-    side_1 = forms.CharField(max_length=200, label='Side 1', required=False)
-    side_2 = forms.CharField(max_length=209, label='Side 2', required=False)
-    fond = forms.CharField(max_length=200, label='Fond(collection, department)', required=False)
-    save_place = forms.CharField(max_length=200, label='Place of saving', required=False)
-    old_registered_marks = forms.CharField(max_length=200, label='Old registered marks', required=False)
-    inventory_number = forms.CharField(max_length=200, label='Inventory number', required=False)
-    spec_inventory_numb = forms.CharField(max_length=200, label='Special inventory number', required=False)
+    name = forms.CharField(max_length=200, label='Назва предмета', required=False)
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
+    amount = forms.IntegerField(label='Кількість', required=False)
+    #date_creation = forms.CharField(label='Дата створення предмета', required=False)
+   # place_of_creating = forms.CharField(max_length=200, label='Місце створення предмета', required=False)
+    author = forms.CharField(max_length=200, label='Автор', required=False)
+    technique = forms.CharField(max_length=200, label='Техніка', required=False)
+    material = Custom.MultiMaterialField(required=False, label='Матеріал')
+    size = Custom.MaterialField(size1=2, size2=3, required=False, label='Розміри (включно із масою, пробою тощо)')
+    description = forms.CharField(max_length=200, label='Опис предмета', required=False)
+    condition = forms.CharField(max_length=200, label='Стан збереженості(тип)', required=False)
+    can_transport = forms.BooleanField(label='Можливість транспортування (так, ні)', required=False)
+    recommandation_rest = forms.ChoiceField(choices=choices, required=False, label='Рекомендації щодо реставрації')
+    conservation_descr = forms.CharField(max_length=200, label='Опис стану збереженості', required=False)
+    price = forms.CharField(max_length=40, label='Вартість', required=False)
+    note = forms.CharField(max_length=200, label='Примітка', required=False)
+    PS_code = forms.CharField(max_length=200, label='Шифр ПЗ (номер за книгою ПЗ)', required=False)
+    way_of_found = forms.CharField(max_length=200, label='Спосіб надходження ', required=False)
+    source = forms.CharField(max_length=200, label='Джерело надходження', required=False)
+    link_on_doc = forms.CharField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False)
+    side_1 = forms.CharField(max_length=200, label='Сторона 1 (акт ПЗ)', required=False)
+    side_2 = forms.CharField(max_length=209, label='Сторона 2 (акт ПЗ)', required=False)
+    fond = forms.CharField(max_length=200, label='Фонд (колекція, відділ)', required=False)
+    mat_person_in_charge = forms.CharField(max_length=50, label='Матеріально-відповідальна особа', required=False)
+    save_place = forms.CharField(max_length=200, label='Фізичне місце збереження (топографія)', required=False)
+    old_registered_marks = forms.CharField(max_length=200, label='Старі облікові позначення', required=False)
+    inventory_number = forms.CharField(max_length=200, label='Інвентарний номер', required=False)
+    spec_inventory_numb = forms.CharField(max_length=200, label='Спеціальний інвентарний номер', required=False)
 
 
 

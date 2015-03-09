@@ -1,14 +1,29 @@
 <!DOCTYPE html>
 <html>
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
 </head>
 <body>
-  <form method="post">
+<div class="container">
+ <div class="row">
+     <div class="col-md-12">
+      <div class="col-md-4 col-md-offset-4">
+         <form method="post" class="form">
              {% csrf_token %}
               {{form.as_p}}
-              <input type="submit">
-  </form>
+             {% buttons %}
+            <button type="submit" class="btn btn-success btn-block">
+                {% bootstrap_icon "star" %} Submit
+            </button>
+        {% endbuttons %}
+         </form>
+      </div>
+     </div>
+ </div>
+</div>
 </body>
 </html>
