@@ -1,10 +1,10 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
-    PersistentSaveForm, ObjectEditForm
+    PersistentSaveForm, ObjectEditForm, ObjectCreateForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, CreateView
 import ast
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -143,6 +143,11 @@ class ObjectUpdate(UpdateView):
     model = Object
     form_class = ObjectEditForm
     template_name_suffix = '_update_form'
+
+class ObjectCreate(CreateView):
+    model = Object
+    form_class = ObjectCreateForm
+    template_name_suffix = '_create_form'
 
 
 

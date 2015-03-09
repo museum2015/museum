@@ -77,8 +77,8 @@ class Object(models.Model):
     collection = models.CharField(max_length=200, default='')  #
     is_fragment = models.BooleanField(default=False)
     name = models.CharField(max_length=200, default='')  #
-    name_lang = models.CharField(max_length=200, default='')  ##
-    name_type = models.CharField(max_length=200, default='')
+    #name_lang = models.CharField(max_length=200, default='')  ##
+    #name_type = models.CharField(max_length=200, default='')
     amount = models.IntegerField(default=0)  #
     # size_type = models.CharField(max_length=200, default='') #
     size = models.CharField(max_length=40, default='')  #
@@ -89,20 +89,20 @@ class Object(models.Model):
     #measurement = models.CharField(max_length=400, default='')
     technique = models.CharField(max_length=200, default='')  #
     description = models.TextField(max_length=1000, default='')  #
-    description_lang = models.CharField(max_length=50, default='')  ##
-    description_type = models.CharField(max_length=200, default='')  ##
+    #description_lang = models.CharField(max_length=50, default='')  ##
+    #description_type = models.CharField(max_length=200, default='')  ##
     identifier = models.CharField(max_length=50, default='')
     image = models.ImageField(upload_to=get_image_path, default='default.jpg')
-    image_type = models.CharField(max_length=50, default='')
+    #image_type = models.CharField(max_length=50, default='')
     author = models.CharField(max_length=100, default='')  #
-    author_type = models.CharField(max_length=50, default='')  ##
+    #author_type = models.CharField(max_length=50, default='')  ##
     price = models.CharField(max_length=50, default='')  #
-    price_type = models.CharField(max_length=50, default='')  ##
+    #price_type = models.CharField(max_length=50, default='')  ##
     mark_on_object = models.CharField(max_length=200, default='')  ##
-    mark_type = models.CharField(max_length=50, default='')  ##
+    #mark_type = models.CharField(max_length=50, default='')  ##
     note = models.CharField(max_length=200, default='')  #
-    note_type = models.CharField(max_length=50, default='')  ##
-    mark_note_lang = models.CharField(max_length=30, default='')  ##
+    #note_type = models.CharField(max_length=50, default='')  ##
+    #mark_note_lang = models.CharField(max_length=30, default='')  ##
     #condition_descr=models.CharField(max_length=500, default='')#
     condition = models.CharField(max_length=100, default='')  #
     transport_possibility = models.BooleanField(default=False)  ##
@@ -267,5 +267,11 @@ class PersistentSaveForm(forms.Form):
 class ObjectEditForm(ModelForm):
     class Meta:
         model = Object
-    material = Custom.MultiMaterialField(require_all_fields=False)
+    material = Custom.MultiMaterialField()
+    size = Custom.MultiMaterialField(number=3)
+
+class ObjectCreateForm(ModelForm):
+    class Meta:
+        model = Object
+    material = Custom.MultiMaterialField()
     size = Custom.MultiMaterialField(number=3)
