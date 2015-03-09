@@ -82,7 +82,9 @@ def GetProject(request):
 
 def ApproveProject(request, offset):
     Activity.objects.get(id=int(offset)).approve()
-    return HttpResponse('Succesfully approved')
+    return HttpResponse('Succesfully approved<br><a href="/projects/'+
+                        str(Activity.objects.get(id=int(offset)).attributeassignment_set.all()[0].aim.id)+
+                        '/">Personal page</a>')
 
 
 @csrf_protect
@@ -151,6 +153,9 @@ def AddOnPS(request, id_number=0):
                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
+
+def Start(request):
+    return render(request, 'Main.html')
 
 
 class ObjectUpdate(UpdateView):
