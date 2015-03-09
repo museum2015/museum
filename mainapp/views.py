@@ -56,8 +56,8 @@ def TempRet(request, id_number=0):
     if project.attributeassignment_set.filter(approval=False, aim=project).exists():
              return HttpResponse('This object has not approved activity<br> Please, confirm they')
     if request.method == 'POST':
-        form = TempSaveForm(request.POST)
-        if form.is_fragment():
+        form = TempRetForm(request.POST)
+        if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Getting from temporary storage', actor=request.user)
             act.save()
