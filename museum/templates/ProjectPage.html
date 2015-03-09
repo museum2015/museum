@@ -46,7 +46,7 @@
             </form>
         {% endif %}
         {% if editing %}
-            <form action='' class="form">
+            <form action='/staff/editing/{{project.id}}/' class="form">
             {% buttons %}
             <button type="submit" class="btn btn-success btn-block" value="Editing">
                 {% bootstrap_icon "star" %} Editing
