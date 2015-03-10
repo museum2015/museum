@@ -1,19 +1,22 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 <head>
-	<title>Bootstrap In Practice - Landing Page Example</title>
+	<title>Головна</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<!-- Bootstrap -->
-	<link href="static/css/bootstrap.min.css" rel="stylesheet">
-	<link href="font-awesome/css/font-awesome.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="{% static "static/bootstrap.min.css" %}" >
+	<link rel="stylesheet" type="text/css"  href="{% static "fonts/css/font-awesome.css" %}" >
 
-	<link href="http://fonts.googleapis.com/css?family=Abel|Open+Sans:400,600" rel="stylesheet" />
+	<link rel="stylesheet" href="{% static "static/mycss.css" %}"  >
 
 	<style>
 
 		html {
-			background: url(img/background.jpg) no-repeat center center fixed; 
+			background: url("{% static "img/background.jpg"%}") no-repeat center center fixed;
 			-webkit-background-size: cover;
 			-moz-background-size: cover;
 			-o-background-size: cover;

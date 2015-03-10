@@ -16,10 +16,8 @@ urlpatterns = patterns('',
     url(r'^staff/add_on_ps/$', views.AddOnPS),
     url(r'^staff/add_on_ps/(?P<id_number>[0-9]+)/$', views.AddOnPS),
     url(r'^staff/edit/(?P<pk>[0-9]+)/$', views.ObjectUpdate.as_view()),
-<<<<<<< HEAD
     url(r'^$', views.MainPage),
-=======
+
     url(r'^staff/create/$', views.ObjectCreate.as_view()),
     url(r'^', views.Start)
->>>>>>> 581c64e4d6c776660e11beebbf20c6325726b9d4
 )
