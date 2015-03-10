@@ -154,9 +154,6 @@ def AddOnPS(request, id_number=0):
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
 
-def Start(request):
-    return render(request, 'Main.html')
-
 
 class ObjectUpdate(UpdateView):
     model = Object
@@ -173,5 +170,8 @@ class ObjectCreate(CreateView):
 def MainPage(request):
     return render(request, 'index.html', {})
 
+
+def ShowAllActivities(request):
+    return render(request, 'activities.html', {})
 
 

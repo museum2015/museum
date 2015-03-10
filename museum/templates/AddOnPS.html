@@ -1,25 +1,153 @@
 <!DOCTYPE html>
 <html>
-{% load bootstrap3 %}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
+{% load staticfiles %}
 <head lang="en">
     <meta charset="UTF-8">
-    <title></title>
+    <title>Занесення об'єкту на постійне зберігання</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<!-- Bootstrap -->
+	<link rel="stylesheet" type="text/css" href="{% static "static/bootstrap.min.css" %}" >
+	<link rel="stylesheet" type="text/css"  href="{% static "fonts/css/font-awesome.css" %}" >
+
+	<link rel="stylesheet" href="{% static "static/mycss.css" %}"  >
+
+	<style>
+
+		html {
+			background: url("{% static "img/background.jpg"%}") no-repeat center center fixed;
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			-o-background-size: cover;
+			background-size: cover;
+		}
+
+		body {
+			padding-top: 20px;
+			font-size: 16px;
+			font-family: "Open Sans",serif;
+			background: transparent;
+		}
+
+		h1 {
+			font-family: "Abel", Arial, sans-serif;
+			font-weight: 400;
+			font-size: 40px;
+			text-align: center;
+		}
+
+		/* Override B3 .panel adding a subtly transparent background */
+		.panel {
+			background-color: rgba(255, 255, 255, 0.9);
+		}
+
+		.margin-base-vertical {
+			margin: 40px 0;
+		}
+
+        input[type='text'] {
+	       width: 200px;
+	       font-size: 13px;
+           padding: 6px 0 4px 10px;
+	       border: 1px solid #c4e3f3;
+	       background: #f9f9f9;
+	       border-radius: 8px;
+        }
+
+        textarea {
+          margin: 0;
+          font: inherit;
+          color: inherit;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button {
+          height: auto;
+          border: 1px solid #c4e3f3;
+	      background: #f9f9f9;
+        }
+
+        input[type="search"] {
+           -webkit-box-sizing: border-box;
+           -moz-box-sizing: border-box;
+           box-sizing: border-box;
+        }
+
+        output {
+          display: block;
+          padding-top: 7px;
+          font-size: 14px;
+          line-height: 1.42857143;
+          color: #555;
+        }
+        .input-group {
+          position: relative;
+          display: table;
+          border-collapse: separate;
+        }
+        .input-group[class*="col-"] {
+          float: none;
+          padding-right: 0;
+          padding-left: 0;
+        }
+        .input-group .form-control1 {
+          position: relative;
+          display: table;
+          z-index: 2;
+          float: left;
+          width: 100%;
+          margin-bottom: 0;
+        }
+
+        .form-control {
+          display: table;
+          width: 100%;
+          height: 34px;
+          padding: 6px 12px;
+          font-size: 14px;
+          line-height: 1.42857143;
+          color: #555;
+          background-color: #fff;
+          background-image: none;
+          border: 2px solid #ccc;
+          border-radius: 4px;
+          -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+                  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+          -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+               -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+                  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+        }
+        .form-control:focus {
+          border-color: #66afe9;
+          outline: 0;
+          -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+                  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+        }
+        .form-control::-moz-placeholder {
+          color: #999;
+          opacity: 1;
+        }
+        .form-control:-ms-input-placeholder {
+          color: #999;
+        }
+        .form-control::-webkit-input-placeholder {
+          color: #999;
+        }
+
+    </style>
 </head>
 <body>
 <div class="container">
  <div class="row">
      <div class="col-md-12">
-      <div class="col-md-4 col-md-offset-4">
-         <form method="post" class="form">
+      <div class="col-md-6 col-md-offset-3 panel panel-default ">
+         <form method="post" class="margin-base-vertical form-control ">
              {% csrf_token %}
               {{form.as_p}}
-             {% buttons %}
+
             <button type="submit" class="btn btn-success btn-block">
-                {% bootstrap_icon "star" %} Submit
+                <span class="bootstrap_icon star"> </span> Submit
             </button>
-        {% endbuttons %}
+
          </form>
       </div>
      </div>

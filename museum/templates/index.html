@@ -1,9 +1,6 @@
 ﻿<!DOCTYPE html>
 <html>
 {% load staticfiles %}
-{% load bootstrap3 %}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
 <head>
 	<title>Головна</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -69,7 +66,7 @@
 					<li class="list-group-item"><a href='staff/add_on_ts/{{ project.id }}'>Приймання предметів на тимчасове зберігання ТЗ); <span class="badge">2.1</span></a></li>
 					<li class="list-group-item"><a href='staff/return/{{ project.id }}'>Повернення предметів з тимчасово зберігання(ТЗ); <span class="badge">2.2</span></a></li>
 					<li class="list-group-item"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання  (ПЗ). <span class="badge">2.3</span></a></li>
-				
+				    <li class="list-group-item"><a href='activities/'>Список всіх подій </a></li>
    				</ul>
 
 				<form class="margin-base-vertical">
