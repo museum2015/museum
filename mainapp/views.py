@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 @csrf_protect
+@login_required(login_url='/admin/')
 def TempSave(request, id_number=0):
     try:
         project = Object.objects.get(id=int(id_number))
@@ -45,6 +46,7 @@ def TempSave(request, id_number=0):
 
 
 @csrf_protect
+@login_required(login_url='/admin/')
 def TempRet(request, id_number=0):
     try:
         project = Object.objects.get(id=int(id_number))
@@ -76,12 +78,12 @@ def TempRet(request, id_number=0):
         form = TempSaveForm(initial=data)
         return render(request, 'ReturnFromTS.html', {'form': form})
 
-
+@login_required(login_url='/admin/')
 def GetProject(request):
     act_list = Activity.objects.all()
     return render(request, 'activities.html', {'acts': act_list})
 
-
+@login_required(login_url='/admin/')
 def ApproveProject(request, offset):
     if Activity.objects.get(id=int(offset)).approval == False:
         Activity.objects.get(id=int(offset)).approve()
@@ -90,6 +92,7 @@ def ApproveProject(request, offset):
         return HttpResponse('Вже затверджено ранiше<br><a href="/">На головну</a>')
 
 
+@login_required(login_url='/admin/')
 @csrf_protect
 def ProjectPage(request, id_number):
     if Object.objects.filter(id=int(id_number)).exists():
@@ -127,6 +130,7 @@ def ProjectPage(request, id_number):
                                                 'wire_off': wire_off,
                                                 'editing': editing})
 
+@login_required(login_url='/admin/')
 @csrf_protect
 def AddOnPS(request, id_number):
     try:
@@ -158,7 +162,7 @@ def AddOnPS(request, id_number):
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
 
-
+@login_required(login_url='/admin/')
 def PrepareRet(request):
     if request.method == 'POST':
         form = PrepareRetForm(request.POST)
@@ -171,7 +175,7 @@ def PrepareRet(request):
         form = PrepareRetForm()
         return render(request, 'AddOnTs.html', {'form': form})
 
-
+@login_required(login_url='/admin/')
 def PreparePS(request):
     if request.method == 'POST':
         form = PreparePSForm(request.POST)
@@ -184,6 +188,7 @@ def PreparePS(request):
         form = PreparePSForm()
         return render(request, 'AddOnPS.html', {'form': form})
 
+@login_required(login_url='/admin/')
 def ActivityPage(request, id_number):
     if Activity.objects.filter(id=int(id_number)).exists():
         act = Activity.objects.get(id=int(id_number))
