@@ -29,19 +29,19 @@ def TempSave(request, id_number=0):
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Приймання на тимчасове зберігання', actor=request.user)
-            act.save()
+
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
-            return HttpResponse('ok')
-        return HttpResponse('ne ok')
+            return HttpResponseRedirect('/')
+        return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
                 'size': project.size, 'condition': project.condition, 'description': project.description,
                 'price': project.price}
         form = TempSaveForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form})
 
 
 @csrf_protect
@@ -64,7 +64,9 @@ def TempRet(request, id_number=0):
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
-            return HttpResponse('ok')
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'ReturnFromTS.html', {'form': form, 'errors': form.errors})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
@@ -72,7 +74,7 @@ def TempRet(request, id_number=0):
                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
         form = TempSaveForm(initial=data)
-    return render(request, 'AddOnPS.html', {'form': form})
+        return render(request, 'ReturnFromTS.html', {'form': form})
 
 
 def GetProject(request):
@@ -82,9 +84,8 @@ def GetProject(request):
 
 def ApproveProject(request, offset):
     Activity.objects.get(id=int(offset)).approve()
-    return HttpResponse('Успішно затверджено<br><a href="/projects/'+
-                        str(Activity.objects.get(id=int(offset)).attributeassignment_set.all()[0].aim.id)+
-                        '/">Персональна сторінка</a>')
+    return HttpResponse('Успішно затверджено<br><a href="/'+
+                        '/">Назад</a>')
 
 
 @csrf_protect
@@ -143,8 +144,9 @@ def AddOnPS(request, id_number):
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
-            return HttpResponse('ok')
-        return HttpResponse(form.errors)
+            return HttpResponseRedirect('')
+        else:
+            return render(request, 'AddOnPS.html', {'form': form, 'errors': form.errors})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
@@ -178,7 +180,7 @@ def PreparePS(request):
             return HttpResponseRedirect('/')
     else:
         form = PreparePSForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnPS.html', {'form': form})
 
 
 class ObjectUpdate(UpdateView):
