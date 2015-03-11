@@ -186,6 +186,18 @@ def PreparePS(request):
         form = PreparePSForm()
         return render(request, 'AddOnPS.html', {'form': form})
 
+def ActivityPage(request, id_number):
+    if Activity.objects.filter(id=int(id_number)).exists():
+        act = Activity.objects.get(id=int(id_number))
+    else:
+        return HttpResponse('Подія не існує.<br>Спробуйте інший id.')
+
+    attrs = act.attributeassignment_set.all()
+
+    return render(request, 'attribute_assign.html', {'attrs': attrs,
+                                                     'act': act})
+
+
 
 class ObjectUpdate(UpdateView):
     model = Object
