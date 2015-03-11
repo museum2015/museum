@@ -194,7 +194,6 @@ def MainPage(request):
     return render(request, 'index.html', {})
 
 
-def ShowAllActivities(request):
-    return render(request, 'activities.html', {})
+
 
 
