@@ -180,7 +180,7 @@ class AttributeAssignment(models.Model):
 
 class TempSaveForm(forms.Form):
     name = forms.CharField(max_length=200, label='Назва предмета', required=True)
-    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=True)
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=1000, label='Кількість', required=True)
     #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
@@ -223,7 +223,7 @@ class TempRetForm(forms.Form):
         ('add on PS', 'Поставити об’єкт на постійне збереження ')
     )
     name = forms.CharField(max_length=200, label='Назва предмета', required=True)
-    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=True)
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=None, label='Кількість', required=True)
     #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
@@ -276,7 +276,7 @@ class PersistentSaveForm(forms.Form):
         ('preventive', 'Профілактичний огляд')
     )
     name = forms.CharField(max_length=200, label='Назва предмета', required=True)
-    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=True)
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
     #date_creation = forms.CharField(label='Дата створення предмета', required=True)
     # place_of_creating = forms.CharField(max_length=200, label='Місце створення предмета', required=True)

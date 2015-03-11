@@ -29,7 +29,7 @@ def TempSave(request, id_number=0):
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Приймання на тимчасове зберігання', actor=request.user)
-
+            act.save()
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
@@ -85,11 +85,9 @@ def GetProject(request):
 def ApproveProject(request, offset):
     if Activity.objects.get(id=int(offset)).approval == False:
         Activity.objects.get(id=int(offset)).approve()
-        return HttpResponse('Успішно затверджено<br><a href="/'+
-                            '/">На головну</a>')
+        return HttpResponse('Успішно затверджено<br><a href="/">На головну</a>')
     else:
-        return HttpResponse('Вже затверджено ранiше<br><a href="/'+
-                            '/">На головну</a>')
+        return HttpResponse('Вже затверджено ранiше<br><a href="/">На головну</a>')
 
 
 @csrf_protect
