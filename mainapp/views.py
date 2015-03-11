@@ -64,7 +64,7 @@ def TempRet(request, id_number=0):
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/activities')
         else:
             return render(request, 'ReturnFromTS.html', {'form': form, 'errors': form.errors})
     else:
@@ -83,9 +83,13 @@ def GetProject(request):
 
 
 def ApproveProject(request, offset):
-    Activity.objects.get(id=int(offset)).approve()
-    return HttpResponse('Успішно затверджено<br><a href="/'+
-                        '/">Назад</a>')
+    if Activity.objects.get(id=int(offset)).approval == False:
+        Activity.objects.get(id=int(offset)).approve()
+        return HttpResponse('Успішно затверджено<br><a href="/'+
+                            '/">На головну</a>')
+    else:
+        return HttpResponse('Вже затверджено ранiше<br><a href="/'+
+                            '/">На головну</a>')
 
 
 @csrf_protect

@@ -65,17 +65,20 @@
      <div class="row col-md-10 col-md-offset-1">
 
 
-        <table class="table-striped table-bordered margin-base-vertical ">
+         <table class="table-striped table-bordered margin-base-vertical ">
            <tr class="info">
-           <th>Атрибут</th> <th>Значення</th><th>Об’єкт</th><th>Подія</th><th>Підтверджено</th>
+           <th>Атрибут</th> <th>Значення</th><th>Об’єкт</th><th>Подія</th>
            </tr>
            {% for a in attrs %}
                <tr class="success">
                <tr>
-                   <td>{{ a.attr_name }}</td> <td>{{ a.attr_value }}</td><td>{{ a.aim }}</td><td>{{ a.event_initiator }}</td><td>{{ attr.approval }}</td>
+                   <td>{{ a.attr_name }}</td> <td>{{ a.attr_value }}</td><td>{{ a.aim }}</td><td>{{ a.event_initiator }}</td>
                </tr>
            {% endfor %}
-       </table>
+         </table>
+         {% if act.approval == False %}
+         <a class="btn btn-success btn-block" href="/projects/approve{{ act.id }}"><span class="bootstrap_icon star"> </span>Затвердити</a>
+         {% endif %}
      </div>
  </div>
 </body>

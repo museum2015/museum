@@ -64,8 +64,8 @@ class Custom:
 
     class MultiMaterialField(MultiValueField):
         def __init__(self, placeholder1='Золото', placeholder2='10г', number=5, *args, **kwargs):
-            list_fields = []
-            for i in range(number):
+            list_fields = [Custom.MaterialField(required=True)]
+            for i in range(number-1):
                 list_fields.append(Custom.MaterialField())
             super(Custom.MultiMaterialField, self).__init__(list_fields, widget=Custom.MultiMaterialWidget(number=number, placeholder1=placeholder1, placeholder2=placeholder2),
                                                             *args, **kwargs)
@@ -186,9 +186,9 @@ class TempSaveForm(forms.Form):
     #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.CharField(max_length=200, label='Техніка', required=True)
-    material = Custom.MultiMaterialField(required=True, label='Матеріал', placeholder1='Золото', placeholder2='10г')
+    material = Custom.MultiMaterialField(label='Матеріал', placeholder1='Золото', placeholder2='10г')
     # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
-    size = Custom.MultiMaterialField(number=3, required=True, label='Розміри', placeholder1='Ширина', placeholder2='2м')
+    size = Custom.MultiMaterialField(number=3, label='Розміри', placeholder1='Ширина', placeholder2='2м')
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
     condition = forms.CharField(max_length=200, label='Стан збереженості (тип)', required=True)
@@ -229,9 +229,9 @@ class TempRetForm(forms.Form):
     #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True) #
     technique = forms.CharField(max_length=200, label='Техніка', required=True)
-    material = Custom.MultiMaterialField(required=True, label='Матеріал') #
-#   size_type = forms.CharField(max_length=200, label='Type of size', required=True) #
-    size = Custom.MultiMaterialField(number=3, required=True, label='Розміри')
+    material = Custom.MultiMaterialField(label='Матеріал', placeholder1='Золото', placeholder2='10г')
+    # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
+    size = Custom.MultiMaterialField(number=3, label='Розміри', placeholder1='Ширина', placeholder2='2м')
     condition = forms.CharField(max_length=200, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=200, label='Опис стану збереженості', required=True)
     description = forms.CharField(max_length=500, label='Опис предмета', required=True)
@@ -282,8 +282,9 @@ class PersistentSaveForm(forms.Form):
     # place_of_creating = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.CharField(max_length=200, label='Техніка', required=True)
-    material = Custom.MultiMaterialField(required=True, label='Матеріал')
-    size = Custom.MultiMaterialField(number=3, required=True, label='Розміри')
+    material = Custom.MultiMaterialField(label='Матеріал', placeholder1='Золото', placeholder2='10г')
+    # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
+    size = Custom.MultiMaterialField(number=3, label='Розміри', placeholder1='Ширина', placeholder2='2м')
     description = forms.CharField(max_length=200, label='Опис предмета', required=True)
     condition = forms.CharField(max_length=200, label='Стан збереженості(тип)', required=True)
     can_transport = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
