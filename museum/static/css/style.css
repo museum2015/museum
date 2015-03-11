@@ -1,0 +1,122 @@
+
+/**********popup links**********/
+
+.link_group a {
+padding:5px 15px;
+color:#000;
+font-weight:bold;
+display:inline-block;
+vertical-align:top;
+*display:inline;
+*zoom:1;
+position:absolute;
+right:20px;
+top:20px;
+text-decoration:none;
+text-transform:uppercase;
+border:1px solid #ccc;
+-moz-border-radius:3px;
+-webkit-border-radius:3px;
+border-radius:3px;
+behavior: url(PIE.htc);
+}
+.link_group a:hover {
+color:#cc0000;
+}
+
+
+/**********All styles popup**********/
+.popup {
+padding:5px 15px 15px;
+position:fixed;
+top:100px;
+left:50%;
+display:none;
+overflow:hidden;
+border:1px solid #ccc;
+background:#fff;
+-moz-border-radius:15px;
+-webkit-border-radius:15px;
+border-radius:15px;
+z-index:100;
+behavior: url(PIE.htc);
+}
+.popup h2 {
+font:bold 18px/32px Arial, san-serif;
+text-align:center;
+}
+.popup a.close {
+width:16px;
+height:16px;
+display:block;
+text-indent:-9999px;
+position:absolute;
+top:10px;
+right:10px;
+background:url(../img/close.png) no-repeat;
+}
+.logout {
+position:absolute;
+right:30px;
+top:30px;
+
+}
+/**********popup with form**********/
+.reg_form {
+margin-left:-200px;
+width:400px;
+}
+.reg_form form {
+margin-top:10px;
+}
+.reg_form label {
+width:75px;
+height:20px;
+font-size: 16px;
+font-family: "Open Sans",serif;
+display:inline-block;
+vertical-align:center;
+*display:inline;
+*zoom:1;
+}
+.reg_form input[type=text], .reg_form input[type=password] {
+  width: 200px;
+  font-size: 13px;
+  padding: 6px 0 4px 10px;
+  border: 1px solid #c4e3f3;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+.reg_form input[type=submit] {
+margin:10px 5px 0 0;
+padding:3px 10px;
+float:right;
+background:#ccc;
+border:0;
+-moz-border-radius:3px;
+-webkit-border-radius:3px;
+border-radius:3px;
+font:bold 16px Arial, san-serif;
+text-transform:uppercase;
+position:relative;
+cursor:pointer;
+behavior: url(PIE.htc);
+}
+.reg_form input[type=submit]:hover {
+color:#fff;
+}
+
+
+
+
+/**********overlay styles**********/
+#overlay {
+width:100%;
+height:100%;
+position:fixed;
+top:0;
+left:0;
+display:none;
+background:#000;
+opacity:.8;
+}

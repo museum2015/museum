@@ -20,5 +20,6 @@ urlpatterns = patterns('',
     url(r'^staff/create/$', views.ObjectCreate.as_view()),
     url(r'^activity/(?P<id_number>[0-9]+)/$', views.ActivityPage),
     url(r'^activities/$', views.GetProject),
-    url(r'^$', views.MainPage),
+    url(r'^logout/$', views.logout),
+    url(r'^$', views.aut),
 )

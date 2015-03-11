@@ -318,3 +318,7 @@ class ObjectCreateForm(ModelForm):
         model = Object
     material = Custom.MultiMaterialField()
     size = Custom.MultiMaterialField(number=3)
+
+class AutForm(forms.Form):
+	username = forms.CharField(max_length=20, label='Логiн:')
+	password = forms.CharField(widget=forms.PasswordInput, max_length=30, label='Пароль:')

@@ -93,6 +93,7 @@ STATICFILES_DIRS = (
     ('img', os.path.join(BASE_DIR, 'museum/static/img/')),
     ('static', os.path.join(BASE_DIR, 'museum/static/css/')),
     ('fonts', os.path.join(BASE_DIR, 'museum/static/font-awesome/')),
+    ('js', os.path.join(BASE_DIR, 'museum/static/js/')),
 )
 
 MEDIA_URL = '/media/'

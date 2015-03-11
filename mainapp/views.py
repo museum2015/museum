@@ -3,7 +3,7 @@ from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelChoiceField
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
-    PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm
+    PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView, CreateView
@@ -11,6 +11,8 @@ import ast
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib import auth
+
 
 # Create your views here.
 
@@ -24,13 +26,13 @@ def TempSave(request, id_number=0):
             return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
         else:
             project = Object()
-            project.save()
     if request.method == 'POST':
         form = TempSaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Приймання на тимчасове зберігання', actor=request.user)
             act.save()
+            project.save()
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
@@ -80,7 +82,7 @@ def TempRet(request, id_number=0):
 
 @login_required(login_url='/admin/')
 def GetProject(request):
-    act_list = Activity.objects.all()
+    act_list = Activity.objects.all().order_by('time_stamp').reverse()
     return render(request, 'activities.html', {'acts': act_list})
 
 @login_required(login_url='/admin/')
@@ -140,13 +142,13 @@ def AddOnPS(request, id_number):
             return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
         else:
             project = Object()
-            project.save()
     if request.method == 'POST':
         form = PersistentSaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Приймання на постійне зберігання', actor=request.user)
             act.save()
+            project.save()
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
@@ -200,7 +202,29 @@ def ActivityPage(request, id_number):
     return render(request, 'attribute_assign.html', {'attrs': attrs,
                                                      'act': act})
 
+def aut(request):
+    if not request.user.is_authenticated():
+        if request.method == 'POST':
+            form = AutForm(request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                username=cd['username']
+                password=cd['password']
+                user = auth.authenticate(username=username, password=password)
+                if user is not None and user.is_active:
+                    auth.login(request, user)
+                    return HttpResponseRedirect("")
+            else:
+                return render(request, 'index.html', {'form': form})
+        else:
+            form = AutForm()
+            return render(request, 'index.html', {'form': form})
+    else:
+        return render(request, 'index.html', {'user': request.user.username})
 
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect("/")
 
 class ObjectUpdate(UpdateView):
     model = Object
@@ -214,7 +238,6 @@ class ObjectCreate(CreateView):
     template_name_suffix = '_create_form'
 
 
-def MainPage(request):
-    return render(request, 'index.html', {})
+
 
 

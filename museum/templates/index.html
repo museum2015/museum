@@ -7,8 +7,10 @@
 	<!-- Bootstrap -->
 	<link rel="stylesheet" type="text/css" href="{% static "static/bootstrap.min.css" %}" >
 	<link rel="stylesheet" type="text/css"  href="{% static "fonts/css/font-awesome.css" %}" >
-
+    <link href="{% static "static/style.css" %}" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="{% static "static/mycss.css" %}"  >
+    <script type="text/javascript" src="{% static "js/jquery-1.7.1.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/my_scripts.js" %}"></script>
 
 	<style>
 
@@ -44,11 +46,24 @@
 			margin: 40px 0;
 		}
 
+
+
 	</style>
 
 </head>
 <body>
-
+    {% if not form %}
+	<div class="logout">Ви увiйшли як {{ user }}<br><a href="/logout/">Вийти</a></div>
+	{% endif %}
+    <div class="popup reg_form">
+		<a class="close" href="#">Закрити</a>
+		<h2>Aвторизацiя</h2>
+		<form method="post" action="">
+			{% csrf_token %}
+            {{ form.as_p }}
+			<input type="submit" value="Log in">
+		</form>
+	</div>
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6 col-md-offset-3 panel panel-default">
@@ -75,6 +90,11 @@
 			</div><!-- //main content -->
 		</div><!-- //row -->
 	</div> <!-- //container -->
+    <div class="link_group">
+        {% if form %}
+        <a class="show_popup" rel="reg_form" href="#">Log in</a>
+        {% endif %}
+    </div>
 
 </body>
 </html>
