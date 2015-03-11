@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<div class="container">
+   <div class="row">
+       <table>
+           <tr>
+           <th>ID</th><th>Об’єкт</th> <th>Подія</th><th>Час</th><th>Особа</th><th>Підтверджено</th>
+           </tr>
+           {% for a in acts %}
+               <tr>
+                   <td>{{ a.id }}</td><td>{{ a.attributeassignment_set[0].aim }}</td> <td>Подія</td><td>Час</td><td>Особа</td><td>Підтверджено</td>
+               </tr>
+       </table>
+   </div>
+</div>
+{% endfor %}
+</body>
+</html>

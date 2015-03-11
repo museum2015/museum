@@ -1,7 +1,9 @@
-from django.shortcuts import render, HttpResponse, redirect
+# -*- coding: utf-8 -*-
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms import ModelChoiceField
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
-    PersistentSaveForm, ObjectEditForm, ObjectCreateForm
+    PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView, CreateView
@@ -18,7 +20,7 @@ def TempSave(request, id_number=0):
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
         if id_number != 0:
-            return HttpResponse('Object does not exist.<br>Try with another id_number.')
+            return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
         else:
             project = Object()
             project.save()
@@ -26,7 +28,7 @@ def TempSave(request, id_number=0):
         form = TempSaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Getting on temporary storage', actor=request.user)
+            act = Activity(time_stamp=dt.now(), type='Приймання на тимчасове зберігання', actor=request.user)
             act.save()
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
@@ -44,17 +46,15 @@ def TempSave(request, id_number=0):
 
 @csrf_protect
 def TempRet(request, id_number=0):
-    if Object.objects.get(id=int(id_number)).exists():
+    try:
         project = Object.objects.get(id=int(id_number))
-    else:
+    except ObjectDoesNotExist:
         if id_number != 0:
             return HttpResponse('Object does not exist.<br>Try with another id_number.')
         else:
-            project = Object()
-            project.save()
-
+            return HttpResponseRedirect('prepare')
     if project.attributeassignment_set.filter(approval=False, aim=project).exists():
-             return HttpResponse('This object has not approved activity<br> Please, confirm they')
+        return HttpResponse('This object has not approved activity<br> Please, confirm they')
     if request.method == 'POST':
         form = TempRetForm(request.POST)
         if form.is_valid():
@@ -72,19 +72,19 @@ def TempRet(request, id_number=0):
                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
         form = TempSaveForm(initial=data)
-    return render(request, 'AddOnTS.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form})
 
 
 def GetProject(request):
-    act_list = Activity.objects.filter(approval=False)
+    act_list = Activity.objects.all()
     return render(request, 'projects.html', {'acts': act_list})
 
 
 def ApproveProject(request, offset):
     Activity.objects.get(id=int(offset)).approve()
-    return HttpResponse('Succesfully approved<br><a href="/projects/'+
+    return HttpResponse('Успішно затверджено<br><a href="/projects/'+
                         str(Activity.objects.get(id=int(offset)).attributeassignment_set.all()[0].aim.id)+
-                        '/">Personal page</a>')
+                        '/">Персональна сторінка</a>')
 
 
 @csrf_protect
@@ -92,10 +92,10 @@ def ProjectPage(request, id_number):
     if Object.objects.filter(id=int(id_number)).exists():
         project = Object.objects.get(id=int(id_number))
     else:
-        return HttpResponse('Object does not exist.<br>Try with another id_number.')
+        return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
 
     if not project.attributeassignment_set.filter(approval=True).exists():
-        return HttpResponse('This object is not approved')
+        return HttpResponse('Об’єкт не затверджений')
 
     return_from_tc = False
     getting_on_pc = False
@@ -109,12 +109,12 @@ def ProjectPage(request, id_number):
 
     status = str(project.attributeassignment_set.filter(approval=True)[i].event_initiator)
     print status
-    if status == 'Getting on temporary storage':
+    if status == 'Приймання на тимчасове зберігання':
         return_from_tc = True
         getting_on_pc = True
         editing = True
 
-    if status == 'Getting on persistent storage':
+    if status == 'Приймання на постійне зберігання':
         wire_off = True
         editing = True
 
@@ -125,12 +125,12 @@ def ProjectPage(request, id_number):
                                                 'editing': editing})
 
 @csrf_protect
-def AddOnPS(request, id_number=0):
+def AddOnPS(request, id_number):
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
-        if id_number != 0:
-            return HttpResponse('Object does not exist.<br>Try with another id_number.')
+        if id_number != '0':
+            return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
         else:
             project = Object()
             project.save()
@@ -138,7 +138,7 @@ def AddOnPS(request, id_number=0):
         form = PersistentSaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Getting on persistent storage', actor=request.user)
+            act = Activity(time_stamp=dt.now(), type='Приймання на постійне зберігання', actor=request.user)
             act.save()
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
@@ -154,6 +154,29 @@ def AddOnPS(request, id_number=0):
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
 
+def PrepareRet(request):
+    if request.method == 'POST':
+        form = PrepareRetForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return HttpResponseRedirect('/staff/return/' + cd['obj'])
+        else:
+            return HttpResponseRedirect('/')
+    else:
+        form = PrepareRetForm()
+        return render(request, 'AddOnTs.html', {'form': form})
+
+def PreparePS(request):
+    if request.method == 'POST':
+        form = PreparePSForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return HttpResponseRedirect(cd['obj'])
+        else:
+            return HttpResponseRedirect('/')
+    else:
+        form = PreparePSForm()
+        return render(request, 'AddOnTs.html', {'form': form})
 
 class ObjectUpdate(UpdateView):
     model = Object

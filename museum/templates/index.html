@@ -13,11 +13,12 @@
 	<style>
 
 		html {
-			background: url("{% static "img/background.jpg"%}") no-repeat center center fixed;
+			/* background: url("{% static "img/background.jpg"%}") no-repeat center center fixed;
 			-webkit-background-size: cover;
 			-moz-background-size: cover;
 			-o-background-size: cover;
-			background-size: cover;
+			background-size: cover; */
+            background-color: rgba(240, 240, 255, 0.9)
 		}
 
 		body {
@@ -52,20 +53,18 @@
 		<div class="row">
 			<div class="col-md-6 col-md-offset-3 panel panel-default">
 
-				<h1 class="margin-base-vertical">Тустань - місто-фортеця</h1>
+				<h1 class="margin-base-vertical">Автоматизоване робоче місце для співробітників музею</h1>
 
-				<p>
-					Автоматизоване робоче місце (АРМ) для співробітників музею v0.1
-				</p>
+
 				<p>
 					<span class="glyphicon glyphicon-book"></span>
 					Основні облікові сценарії:
 				</p>
 								
 				<ul class="list-group">
-					<li class="list-group-item"><a href='staff/add_on_ts/{{ project.id }}'>Приймання предметів на тимчасове зберігання ТЗ); <span class="badge">2.1</span></a></li>
-					<li class="list-group-item"><a href='staff/return/{{ project.id }}'>Повернення предметів з тимчасово зберігання(ТЗ); <span class="badge">2.2</span></a></li>
-					<li class="list-group-item"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання  (ПЗ). <span class="badge">2.3</span></a></li>
+					<li class="list-group-item"><a href='staff/add_on_ts/{{ project.id }}'>Приймання предметів на тимчасове зберігання <span class="badge">2.1</span></a></li>
+					<li class="list-group-item"><a href='staff/return/{{ project.id }}'>Повернення предметів з тимчасово зберігання <span class="badge">2.2</span></a></li>
+					<li class="list-group-item"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання <span class="badge">2.3</span></a></li>
 				    <li class="list-group-item"><a href='activities/'>Список всіх подій </a></li>
    				</ul>
 

@@ -129,6 +129,15 @@ class Object(models.Model):
     def __unicode__(self):
         return self.name + ' (' + self.identifier + ')'
 
+    def status(self):
+        if not self.attributeassignment_set.filter(approval=True):
+            status = 'Пустий об’єкт'
+        else:
+            i = self.attributeassignment_set.filter(approval=True).count()-1
+            while str(self.attributeassignment_set.filter(approval=True)[i].event_initiator) == 'Editing':
+                i -= 1
+            status = str(self.attributeassignment_set.filter(approval=True)[i].event_initiator)
+        return status
 
 class Activity(models.Model):
     time_stamp = models.DateTimeField(default='2000-02-12 00:00')
@@ -208,7 +217,7 @@ class InitialTempSaveForm(forms.Form):
 class TempRetForm(forms.Form):
     choices = (
         ('returned', 'Повернутий з тимчасового збереження'),
-        ('add on PS', 'Поставити об\'єкт на постійне збереження ')
+        ('add on PS', 'Поставити об’єкт на постійне збереження ')
     )
     name = forms.CharField(max_length=200, label='Назва предмета', required=False)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
@@ -232,6 +241,27 @@ class TempRetForm(forms.Form):
     return_mark = forms.ChoiceField(choices=choices, required=False, label='Позначка про повернення предмета або переведення до музейного зібрання (ПЗ) у книзі ТЗ')
     save_place = forms.CharField(max_length=200, label='Фізичне місце збереження (топографія)', required=False)
 
+class PrepareRetForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(PrepareRetForm, self).__init__(*args, **kwargs)
+        objlist = []
+        for project in Object.objects.all():
+            if project.status() == 'Приймання на тимчасове зберігання':
+                objlist.append(project)
+        objects = [(o.id, o.__unicode__()) for o in objlist]
+        self.fields['obj'] = forms.ChoiceField(choices=objects)
+
+class PreparePSForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(PreparePSForm, self).__init__(*args, **kwargs)
+        objlist = []
+        for project in Object.objects.all():
+            if project.status() != 'Пустий об’єкт':
+                objlist.append(project)
+        objects = [(0, 'Новий об’єкт')]
+        for o in objlist:
+            objects.append((o.id, o.__unicode__()))
+        self.fields['obj'] = forms.ChoiceField(choices=objects)
 
 class PersistentSaveForm(forms.Form):
     choices = (
