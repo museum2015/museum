@@ -187,7 +187,7 @@ class TempSaveForm(forms.Form):
     technique = forms.CharField(max_length=200, label='Техніка', required=True)
     material = Custom.MultiMaterialField(required=True, label='Матеріал')
     # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
-    size = Custom.MultiMaterialField(number=1, required=True, label='Розміри (включно із масою, пробою тощо)')
+    size = Custom.MultiMaterialField(number=3, required=True, label='Розміри')
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
     condition = forms.CharField(max_length=200, label='Стан збереженості (тип)', required=True)
@@ -230,7 +230,7 @@ class TempRetForm(forms.Form):
     technique = forms.CharField(max_length=200, label='Техніка', required=True)
     material = Custom.MultiMaterialField(required=True, label='Матеріал') #
 #   size_type = forms.CharField(max_length=200, label='Type of size', required=True) #
-    size = Custom.MaterialField(size1=2, size2=3, required=True, label='Розміри (включно із масою, пробою тощо)')
+    size = Custom.MultiMaterialField(number=3, required=True, label='Розміри')
     condition = forms.CharField(max_length=200, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=200, label='Опис стану збереженості', required=True)
     description = forms.CharField(max_length=500, label='Опис предмета', required=True)
@@ -279,7 +279,7 @@ class PersistentSaveForm(forms.Form):
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.CharField(max_length=200, label='Техніка', required=True)
     material = Custom.MultiMaterialField(required=True, label='Матеріал')
-    size = Custom.MaterialField(size1=2, size2=3, required=True, label='Розміри (включно із масою, пробою тощо)')
+    size = Custom.MultiMaterialField(number=3, required=True, label='Розміри')
     description = forms.CharField(max_length=200, label='Опис предмета', required=True)
     condition = forms.CharField(max_length=200, label='Стан збереженості(тип)', required=True)
     can_transport = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
