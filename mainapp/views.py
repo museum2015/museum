@@ -196,6 +196,4 @@ class ObjectCreate(CreateView):
 def MainPage(request):
     return render(request, 'index.html', {})
 
-def ShowAttrAssign(request, id_activity):
-    attr_assign_list = AttributeAssignment.objects.get(event_initiator == id_activity)
-    return render(request, 'attribute_assign.html', {'attrs': attr_assign_list})
+
