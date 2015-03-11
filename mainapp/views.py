@@ -50,16 +50,16 @@ def TempRet(request, id_number=0):
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
         if id_number != 0:
-            return HttpResponse('Object does not exist.<br>Try with another id_number.')
+            return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
         else:
             return HttpResponseRedirect('prepare')
     if project.attributeassignment_set.filter(approval=False, aim=project).exists():
-        return HttpResponse('This object has not approved activity<br> Please, confirm they')
+        return HttpResponse('У цього об’єкта є незатвердженi подii.')
     if request.method == 'POST':
         form = TempRetForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Getting from temporary storage', actor=request.user)
+            act = Activity(time_stamp=dt.now(), type='Повернення з тимчасового зберiгання', actor=request.user)
             act.save()
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
@@ -72,7 +72,7 @@ def TempRet(request, id_number=0):
                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
         form = TempSaveForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+    return render(request, 'AddOnPS.html', {'form': form})
 
 
 def GetProject(request):
