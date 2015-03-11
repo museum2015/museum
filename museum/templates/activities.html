@@ -52,12 +52,17 @@
 <body>
  <div class="container-fluid">
      <div class="row">
-
-         <p> Сюди будеш писать свою табличку. Стиль їй я потім дам</p>
-
-
-
-
+        <table>
+        <table>
+           <tr>
+           <th>Об’єкт</th> <th>Подія</th><th>Час</th><th>Особа</th><th>Підтверджено</th>
+           </tr>
+           {% for a in acts %}
+               <tr>
+                   <td>{{ a.aim }}</td> <td>{{ a.type }}</td><td>{{ a.time_stamp }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td>
+               </tr>
+           {% endfor %}
+       </table>
      </div>
  </div>
 </body>

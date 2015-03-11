@@ -157,6 +157,8 @@ class Activity(models.Model):
         self.approval = True
         self.save()
 
+    def aim(self):
+        return self.attributeassignment_set.all()[:1].get().aim
 
 class AttributeAssignment(models.Model):
     attr_name = models.CharField(max_length=40)

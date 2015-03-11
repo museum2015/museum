@@ -77,7 +77,7 @@ def TempRet(request, id_number=0):
 
 def GetProject(request):
     act_list = Activity.objects.all()
-    return render(request, 'projects.html', {'acts': act_list})
+    return render(request, 'activities.html', {'acts': act_list})
 
 
 def ApproveProject(request, offset):
