@@ -75,13 +75,23 @@
 					<span class="glyphicon glyphicon-book"></span>
 					Основні облікові сценарії:
 				</p>
-								
+
+                {% if not form %}
 				<ul class="list-group">
 					<li class="list-group-item"><a href='staff/add_on_ts/{{ project.id }}'>Приймання предметів на тимчасове зберігання <span class="badge">2.1</span></a></li>
 					<li class="list-group-item"><a href='staff/return/{{ project.id }}'>Повернення предметів з тимчасового зберігання <span class="badge">2.2</span></a></li>
 					<li class="list-group-item"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання <span class="badge">2.3</span></a></li>
 				    <li class="list-group-item"><a href='activities/'>Список всіх подій </a></li>
    				</ul>
+                {% endif %}
+                {% if form %}
+				<ul class="list-group">
+					<li class="list-group-item" id="1" rel="reg_form"><a href='staff/add_on_ts/{{ project.id }}'>Приймання предметів на тимчасове зберігання <span class="badge">2.1</span></a></li>
+					<li class="list-group-item" id="2" rel="reg_form"><a href='staff/return/{{ project.id }}'>Повернення предметів з тимчасового зберігання <span class="badge">2.2</span></a></li>
+					<li class="list-group-item" id="3" rel="reg_form"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання <span class="badge">2.3</span></a></li>
+				    <li class="list-group-item" id="4" rel="reg_form"><a href='activities/'>Список всіх подій </a></li>
+   				</ul>
+                {% endif %}
 
 				<div class="margin-base-vertical">
 					<small class="text-muted">Розробка та підтримка <a href="http://integration-plus.kiev.ua/?page_id=201">ТОВ "Інтеграція-плюс"</a>, 2015 р. </small>

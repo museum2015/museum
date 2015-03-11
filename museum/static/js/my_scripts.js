@@ -5,7 +5,31 @@ $(function () {
 		$("body").append("<div id='overlay'></div>");
 		$('#overlay').show().css({'filter' : 'alpha(opacity=80)'});
 		return false;				
-	});	
+	});
+	$("#1").click(function () {
+		$('div.'+$(this).attr("rel")).fadeIn(500);
+		$("body").append("<div id='overlay'></div>");
+		$('#overlay').show().css({'filter' : 'alpha(opacity=80)'});
+		return false;
+	});
+	$("#2").click(function () {
+		$('div.'+$(this).attr("rel")).fadeIn(500);
+		$("body").append("<div id='overlay'></div>");
+		$('#overlay').show().css({'filter' : 'alpha(opacity=80)'});
+		return false;
+	});
+	$("#3").click(function () {
+		$('div.'+$(this).attr("rel")).fadeIn(500);
+		$("body").append("<div id='overlay'></div>");
+		$('#overlay').show().css({'filter' : 'alpha(opacity=80)'});
+		return false;
+	});
+	$("#4").click(function () {
+		$('div.'+$(this).attr("rel")).fadeIn(500);
+		$("body").append("<div id='overlay'></div>");
+		$('#overlay').show().css({'filter' : 'alpha(opacity=80)'});
+		return false;
+	});
 	$('a.close').click(function () {
 		$(this).parent().fadeOut(100);
 		$('#overlay').remove('#overlay');
