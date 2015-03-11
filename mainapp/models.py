@@ -251,7 +251,7 @@ class PrepareRetForm(forms.Form):
             if project.status() == 'Приймання на тимчасове зберігання':
                 objlist.append(project)
         objects = [(o.id, o.__unicode__()) for o in objlist]
-        self.fields['obj'] = forms.ChoiceField(choices=objects)
+        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
 
 class PreparePSForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -263,7 +263,7 @@ class PreparePSForm(forms.Form):
         objects = [(0, 'Новий об’єкт')]
         for o in objlist:
             objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects)
+        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
 
 class PersistentSaveForm(forms.Form):
     choices = (
