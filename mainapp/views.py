@@ -154,6 +154,7 @@ def AddOnPS(request, id_number):
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
 
+
 def PrepareRet(request):
     if request.method == 'POST':
         form = PrepareRetForm(request.POST)
@@ -166,6 +167,7 @@ def PrepareRet(request):
         form = PrepareRetForm()
         return render(request, 'AddOnTs.html', {'form': form})
 
+
 def PreparePS(request):
     if request.method == 'POST':
         form = PreparePSForm(request.POST)
@@ -177,6 +179,7 @@ def PreparePS(request):
     else:
         form = PreparePSForm()
         return render(request, 'AddOnTs.html', {'form': form})
+
 
 class ObjectUpdate(UpdateView):
     model = Object
@@ -193,7 +196,6 @@ class ObjectCreate(CreateView):
 def MainPage(request):
     return render(request, 'index.html', {})
 
-
-
-
-
+def ShowAttrAssign(request, id_activity):
+    attr_assign_list = AttributeAssignment.objects.get(event_initiator == id_activity)
+    return render(request, 'attribute_assign.html', {'attrs': attr_assign_list})

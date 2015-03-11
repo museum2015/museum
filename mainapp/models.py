@@ -45,7 +45,6 @@ class Custom:
             else:
                 return ''
 
-
     class MultiMaterialWidget(MultiWidget):
         def __init__(self, number=5):
             widgets = []
@@ -59,7 +58,6 @@ class Custom:
             else:
                 return []
                 # def format_output(self, rendered_widgets):
-
 
     class MultiMaterialField(MultiValueField):
         def __init__(self, number=5, *args, **kwargs):
@@ -243,6 +241,7 @@ class TempRetForm(forms.Form):
     return_mark = forms.ChoiceField(choices=choices, required=False, label='Позначка про повернення предмета або переведення до музейного зібрання (ПЗ) у книзі ТЗ')
     save_place = forms.CharField(max_length=200, label='Фізичне місце збереження (топографія)', required=False)
 
+
 class PrepareRetForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(PrepareRetForm, self).__init__(*args, **kwargs)
@@ -252,6 +251,7 @@ class PrepareRetForm(forms.Form):
                 objlist.append(project)
         objects = [(o.id, o.__unicode__()) for o in objlist]
         self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
+
 
 class PreparePSForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -264,6 +264,7 @@ class PreparePSForm(forms.Form):
         for o in objlist:
             objects.append((o.id, o.__unicode__()))
         self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
+
 
 class PersistentSaveForm(forms.Form):
     choices = (

@@ -19,5 +19,6 @@ urlpatterns = patterns('',
     url(r'^staff/edit/(?P<pk>[0-9]+)/$', views.ObjectUpdate.as_view()),
     url(r'^staff/create/$', views.ObjectCreate.as_view()),
     url(r'^activities/$', views.GetProject),
+    url(r'^activity/(?P<id_activity>[0-9]+)/$', views.ShowAttrAssign),
     url(r'^$', views.MainPage),
 )
