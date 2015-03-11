@@ -15,9 +15,9 @@ def get_image_path(self, filename):
 
 class Custom:
     class MaterialWidget(MultiWidget):
-        def __init__(self, size1=10, size2=10):
-            widgets = [TextInput(attrs={'size': size1, 'max_length': 30}),
-                       TextInput(attrs={'size': size2, 'max_length': 10})]
+        def __init__(self, placeholder1='', placeholder2='', size1=10, size2=10):
+            widgets = [TextInput(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1}),
+                       TextInput(attrs={'size': size2, 'max_length': 10, 'placeholder': placeholder2})]
             super(Custom.MaterialWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -28,9 +28,9 @@ class Custom:
                 return [None, None]
 
         def format_output(self, rendered_widgets):
+            dd = '<br>'
             res = u''.join(rendered_widgets)
-            res += '<br>'
-            return res
+            return dd+res
 
     class MaterialField(MultiValueField):
         def __init__(self, size1=10, size2=30, *args, **kwargs):
@@ -47,9 +47,9 @@ class Custom:
 
 
     class MultiMaterialWidget(MultiWidget):
-        def __init__(self, number=5):
-            widgets = []
-            for i in range(number):
+        def __init__(self, placeholder1, placeholder2, number=5):
+            widgets = [Custom.MaterialWidget(placeholder1=placeholder1, placeholder2=placeholder2)]
+            for i in range(number-1):
                 widgets.append(Custom.MaterialWidget())
             super(Custom.MultiMaterialWidget, self).__init__(widgets)
 
@@ -58,15 +58,17 @@ class Custom:
                 return value.split(';')
             else:
                 return []
-                # def format_output(self, rendered_widgets):
 
+        def format_output(self, rendered_widgets):
+            res = u''.join(rendered_widgets)
+            return res+'<br>'
 
     class MultiMaterialField(MultiValueField):
-        def __init__(self, number=5, *args, **kwargs):
+        def __init__(self, placeholder1='Золото', placeholder2='10г', number=5, *args, **kwargs):
             list_fields = []
             for i in range(number):
                 list_fields.append(Custom.MaterialField())
-            super(Custom.MultiMaterialField, self).__init__(list_fields, widget=Custom.MultiMaterialWidget(number),
+            super(Custom.MultiMaterialField, self).__init__(list_fields, widget=Custom.MultiMaterialWidget(number=number, placeholder1=placeholder1, placeholder2=placeholder2),
                                                             *args, **kwargs)
 
         def compress(self, values):
@@ -185,9 +187,9 @@ class TempSaveForm(forms.Form):
     #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.CharField(max_length=200, label='Техніка', required=True)
-    material = Custom.MultiMaterialField(required=True, label='Матеріал')
+    material = Custom.MultiMaterialField(required=True, label='Матеріал', placeholder1='Золото', placeholder2='10г')
     # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
-    size = Custom.MultiMaterialField(number=3, required=True, label='Розміри')
+    size = Custom.MultiMaterialField(number=3, required=True, label='Розміри', placeholder1='Ширина', placeholder2='2м')
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
     condition = forms.CharField(max_length=200, label='Стан збереженості (тип)', required=True)
