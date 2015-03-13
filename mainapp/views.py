@@ -3,7 +3,8 @@ from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelChoiceField
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
-    PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm
+    PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
+    InventorySaveForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView, CreateView
@@ -158,9 +159,10 @@ def AddOnPS(request, id_number):
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
-                'size': project.size, 'description': project.description, 'condition': project.condition,
+                'size': project.size, 'description': project.description, 'can_transport': project.transport_possibility,
+                'condition': project.condition, 'recommandation_rest': project.recomm_for_restauration,
                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
-                'transport_possibility': project.transport_possibility, 'collection': project.collection}
+                'transport_possibility': project.transport_possibility, 'fond': project.collection}
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
 
@@ -237,7 +239,50 @@ class ObjectCreate(CreateView):
     form_class = ObjectCreateForm
     template_name_suffix = '_create_form'
 
+@login_required(login_url='/admin/')
+def PrepareInventory(request):
+    if request.method == 'POST':
+        form = PrepareInventoryForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return HttpResponseRedirect(cd['obj'])
+        else:
+            return HttpResponseRedirect('/')
+    else:
+        form = PrepareInventoryForm()
+        return render(request, 'AddOnInventoryBook.html', {'form': form})
 
 
-
+@login_required(login_url='/admin/')
+@csrf_protect
+def AddOnInventorySave(request, id_number):
+    try:
+        project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist:
+        if id_number != '0':
+            return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
+        else:
+            project = Object()
+    if request.method == 'POST':
+        form = InventorySaveForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            act = Activity(time_stamp=dt.now(), type='Інвентарний облік', actor=request.user)
+            act.save()
+            project.save()
+            for (k, v) in cd.items():
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign.save()
+            return HttpResponseRedirect('')
+        else:
+            return render(request, 'AddOnInventoryBook.html', {'form': form, 'errors': form.errors})
+    else:
+        data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'size': project.size, 'description': project.description, 'can_transport': project.transport_possibility,
+                'condition': project.condition, 'recommandation_rest': project.recomm_for_restauration,
+                'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
+                'transport_possibility': project.transport_possibility, 'fond': project.collection}
+        form = InventorySaveForm(initial=data)
+    return render(request, 'AddOnInventoryBook.html', {'form': form})
 

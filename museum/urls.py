@@ -22,4 +22,6 @@ urlpatterns = patterns('',
     url(r'^activities/$', views.GetProject),
     url(r'^logout/$', views.logout),
     url(r'^$', views.aut),
+    url(r'^staff/inventory_save/$', views.PrepareInventory),
+    url(r'^staff/inventory_save/(?P<id_number>[0-9]+)/$', views.AddOnInventorySave)
 )

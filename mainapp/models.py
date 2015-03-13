@@ -161,6 +161,7 @@ class Activity(models.Model):
     def aim(self):
         return self.attributeassignment_set.all()[:1].get().aim
 
+
 class AttributeAssignment(models.Model):
     attr_name = models.CharField(max_length=40)
     attr_value = models.CharField(max_length=200)
@@ -306,6 +307,64 @@ class PersistentSaveForm(forms.Form):
     spec_inventory_numb = forms.CharField(max_length=200, label='Спеціальний інвентарний номер', required=True)
 
 
+class PrepareInventoryForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(PrepareInventoryForm, self).__init__(*args, **kwargs)
+        objlist = []
+        for project in Object.objects.all():
+            if project.status() == 'Приймання на постійне зберігання':
+                objlist.append(project)
+        objects = []
+        for o in objlist:
+            objects.append((o.id, o.__unicode__()))
+        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
+
+
+class InventorySaveForm(forms.Form):
+    choices = (
+        ('immediately', 'Термінова реставрація'),
+        ('conservation', 'Консервація'),
+        ('preventive', 'Профілактичний огляд')
+    )
+    name = forms.CharField(max_length=200, label='Назва предмета', required=True)
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
+    amount = forms.IntegerField(label='Кількість', required=True)
+    author = forms.CharField(max_length=200, label='Автор', required=True)
+    #date_creation = forms.CharField(label='Дата створення предмета', required=True)
+    # place_of_creating = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
+    #date_detection = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Дата знаходження', required=True)
+    #place_detection = forms.CharField(max_length=200, label='Місце виявлення')
+    #date_existence = forms.CharField(max_length=200, label='Дата побутування')
+    #place_existence = forms.CharField(max_length=200, label='Місце побутування')
+    technique = forms.CharField(max_length=200, label='Техніка', required=True)
+    material = Custom.MultiMaterialField(label='Матеріал', placeholder1='Золото', placeholder2='10г')
+    # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
+    size = Custom.MultiMaterialField(number=3, label='Розміри', placeholder1='Ширина', placeholder2='2м')
+    mark_on_object = forms.CharField(max_length=200, label='Позначки на предметі ')
+    #classification = forms.CharField(max_length=200, label='Класифікація')
+    #typology = forms.CharField(max_length=200, label='Типологія')
+    description = forms.CharField(max_length=200, label='Опис предмета', required=True)
+    #bibliography = forms.CharField(max_length=200, label='Бібліографія')
+    condition = forms.CharField(max_length=200, label='Стан збереженості(тип)', required=True)
+    condition_descr = forms.CharField(max_length=200, label='Опис стану збереженості', required=True)
+    can_transport = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
+    recommandation_rest = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
+    price = forms.CharField(max_length=40, label='Вартість', required=True)
+    note = forms.CharField(max_length=200, label='Примітка', required=True)
+    inventory_number = forms.CharField(max_length=100, label='Інвентарний номер')
+    #дата запису до інвентарної книги буде в Activity
+    PS_code = forms.CharField(max_length=200, label='Шифр ПЗ (номер за книгою ПЗ)', required=True)
+    way_of_found = forms.CharField(max_length=200, label='Спосіб надходження ', required=True)
+    source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
+    link_on_doc = forms.CharField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=True)
+    spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер')
+    fond = forms.CharField(max_length=200, label='Фонд (колекція, відділ)', required=True)
+    mat_person_in_charge = forms.CharField(max_length=50, label='Матеріально-відповідальна особа', required=True)
+    save_place = forms.CharField(max_length=200, label='Фізичне місце збереження (топографія)', required=True)
+    old_registered_marks = forms.CharField(max_length=200, label='Старі облікові позначення', required=True)
+    #особа яка здійснила запис також в Activity
+
+
 class ObjectEditForm(ModelForm):
     class Meta:
         model = Object
@@ -319,6 +378,7 @@ class ObjectCreateForm(ModelForm):
     material = Custom.MultiMaterialField()
     size = Custom.MultiMaterialField(number=3)
 
+
 class AutForm(forms.Form):
-	username = forms.CharField(max_length=20, label='Логiн:')
-	password = forms.CharField(widget=forms.PasswordInput, max_length=30, label='Пароль:')
+    username = forms.CharField(max_length=20, label='Логiн:')
+    password = forms.CharField(widget=forms.PasswordInput, max_length=30, label='Пароль:')
