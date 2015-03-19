@@ -1,11 +1,30 @@
 # -*- coding: utf-8 -*-
 import datetime
+import os
 from django import forms
 from django.db import models
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select, ModelForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+import xml.etree.ElementTree as et
 # Create your models here. test
+
+tree = et.parse('museum/my_xml.xml')
+root = tree.getroot()
+LANGUAGES = (())
+PREC_MATERIALS = (('', ''),)
+SEMI_PREC_MATERIALS = (('', ''),)
+NON_PREC_MATERIALS = (('', ''),)
+for choice in root.find('languages'):
+    LANGUAGES += ((choice.text, choice.text),)
+for choice in root.find('materials').find('precious'):
+    PREC_MATERIALS += ((choice.text, choice.text),)
+for choice in root.find('materials').find('semi-precious'):
+    SEMI_PREC_MATERIALS += ((choice.text, choice.text),)
+for choice in root.find('materials').find('non-precious'):
+    NON_PREC_MATERIALS += ((choice.text, choice.text),)
+
+
 
 
 def get_image_path(self, filename):
@@ -13,7 +32,107 @@ def get_image_path(self, filename):
     return path
 
 
+
 class Custom:
+    class MaterialSelectWidget(MultiWidget):
+        def __init__(self, choices, amount):
+            widgets = [Select(choices=choices)]
+            self.amo = amount
+            for i in range(amount-1):
+                widgets.append(Select(choices=choices, attrs={'style': 'display:none;'}))
+            super(Custom.MaterialSelectWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                return value.split(',')
+            else:
+                res = []
+                for i in range(self.amo):
+                    res.append(None)
+                return res
+
+        def format_output(self, rendered_widgets):
+            res = u''.join(rendered_widgets)
+            return res
+
+    class MaterialSelectField(MultiValueField):
+        def __init__(self, choices, amount, *args, **kwargs):
+            list_fields = []
+            for i in range(amount):
+                list_fields.append(fields.ChoiceField(choices=choices))
+            super(Custom.MaterialSelectField, self).__init__(list_fields,
+                                                             widget=Custom.MaterialSelectWidget(choices, amount),
+                                                             *args,
+                                                             **kwargs)
+
+        def compress(self, values):
+            if values:
+                return u','.join(values)
+            else:
+                return u''
+
+    class MultiMaterialSelectWidget(MultiWidget):
+        def __init__(self):
+            widgets = [Custom.MaterialSelectWidget(choices=PREC_MATERIALS, amount=100),
+                       Custom.MaterialSelectWidget(choices=SEMI_PREC_MATERIALS, amount=100),
+                       Custom.MaterialSelectWidget(choices=NON_PREC_MATERIALS, amount=100)]
+            super(Custom.MultiMaterialSelectWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                return value.split(';')
+            else:
+                return []
+
+        def format_output(self, rendered_widgets):
+            return u'\n<p><label for="id_temp2_0_0">Дорогоцінні: </label><br>' + rendered_widgets[0] + \
+                   u'\n<p><label for="id_temp2_1_0">Напів дорогоцінні: </label><br>' + rendered_widgets[1] + \
+                   u'\n<p><label for="id_temp2_2_0">Не дорогоцінні: </label><br>' + rendered_widgets[2]
+
+    class MultiMaterialSelectField(MultiValueField):
+        def __init__(self, *args, **kwargs):
+            list_fields = [Custom.MaterialSelectField(choices=PREC_MATERIALS, amount=100, label='Precious'),
+                           Custom.MaterialSelectField(choices=SEMI_PREC_MATERIALS, amount=100, label='Semi-precious'),
+                           Custom.MaterialSelectField(choices=NON_PREC_MATERIALS, amount=100, label='Non-precious')]
+            super(Custom.MultiMaterialSelectField, self).__init__(list_fields,
+                                                                  widget=Custom.MultiMaterialSelectWidget(),
+                                                                  *args, **kwargs)
+
+        def compress(self, values):
+            result = ';'
+            return result.join(values)
+
+    class TextChoiceWidget(MultiWidget):
+        def __init__(self, choices, placeholder1='', size1=10):
+            widgets = [TextInput(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1}),
+                       Select(choices=choices)]
+            super(Custom.TextChoiceWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                res = value.split(':')
+                return res
+            else:
+                return [None, None]
+
+        def format_output(self, rendered_widgets):
+            dd = '<br>'
+            res = u''.join(rendered_widgets)
+            return dd+res
+
+    class TextChoiceField(MultiValueField):
+        def __init__(self, choices, size1=10, *args, **kwargs):
+            list_fields = [fields.CharField(max_length=30),
+                           fields.ChoiceField(choices=choices)]
+            super(Custom.TextChoiceField, self).__init__(list_fields, widget=Custom.TextChoiceWidget(choices=choices, size1=size1), *args,
+                                                       **kwargs)
+
+        def compress(self, values):
+            if values:
+                return values[0] + ':' + values[1]
+            else:
+                return ''
+
     class MaterialWidget(MultiWidget):
         def __init__(self, placeholder1='', placeholder2='', size1=10, size2=10):
             widgets = [TextInput(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1}),
@@ -79,33 +198,20 @@ class Object(models.Model):
     collection = models.CharField(max_length=200, default='')  #
     is_fragment = models.BooleanField(default=False)
     name = models.CharField(max_length=200, default='')  #
-    #name_lang = models.CharField(max_length=200, default='')  ##
-    #name_type = models.CharField(max_length=200, default='')
     amount = models.IntegerField(default=0)  #
-    # size_type = models.CharField(max_length=200, default='') #
     size = models.CharField(max_length=40, default='')  #
-    #size_measurement_unit = models.CharField(max_length=200, default='') #
     _class = models.CharField(max_length=200, default='')  ##
     type = models.CharField(max_length=200, default='')  ##
     material = models.CharField(max_length=200, default='')  #
-    #measurement = models.CharField(max_length=400, default='')
     technique = models.CharField(max_length=200, default='')  #
     description = models.TextField(max_length=1000, default='')  #
-    #description_lang = models.CharField(max_length=50, default='')  ##
-    #description_type = models.CharField(max_length=200, default='')  ##
     identifier = models.CharField(max_length=50, default='')
     image = models.ImageField(upload_to=get_image_path, default='default.jpg')
     #image_type = models.CharField(max_length=50, default='')
     author = models.CharField(max_length=100, default='')  #
-    #author_type = models.CharField(max_length=50, default='')  ##
     price = models.CharField(max_length=50, default='')  #
-    #price_type = models.CharField(max_length=50, default='')  ##
     mark_on_object = models.CharField(max_length=200, default='')  ##
-    #mark_type = models.CharField(max_length=50, default='')  ##
     note = models.CharField(max_length=200, default='')  #
-    #note_type = models.CharField(max_length=50, default='')  ##
-    #mark_note_lang = models.CharField(max_length=30, default='')  ##
-    #condition_descr=models.CharField(max_length=500, default='')#
     condition = models.CharField(max_length=100, default='')  #
     transport_possibility = models.BooleanField(default=False)  ##
     recomm_for_restauration = models.CharField(max_length=100, default='')  ##
@@ -212,6 +318,8 @@ class TempSaveForm(forms.Form):
     storage = forms.CharField(max_length=200, label='Фізичне місце збереження (топографія)', required=True) #
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
+    temp = Custom.TextChoiceField(choices=LANGUAGES)
+    temp2 = Custom.MultiMaterialSelectField(label='Матеріали')
 
 
 class InitialTempSaveForm(forms.Form):

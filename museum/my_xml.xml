@@ -1,0 +1,21 @@
+<data>
+    <languages>
+        <choice>Английский</choice>
+        <choice>Русский</choice>
+    </languages>
+    <materials>
+        <precious>
+            <choice>Золото</choice>
+            <choice>Брюлики</choice>
+        </precious>
+        <semi-precious>
+            <choice>Серебро</choice>
+            <choice>Аквамарин</choice>
+        </semi-precious>
+        <non-precious>
+            <choice>Олово</choice>
+            <choice>Говно</choice>
+            <choice>Фантики</choice>
+        </non-precious>
+    </materials>
+</data>
