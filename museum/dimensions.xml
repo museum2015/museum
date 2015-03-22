@@ -1,0 +1,29 @@
+<root>
+    <dimension>
+        <type>
+            <choice>Валюта</choice>
+            <choice>Довжина</choice>
+            <choice>Діаметр</choice>
+            <choice>Вага</choice>
+            <choice>Щільність</choice>
+            <choice>Освітленість</choice>
+            <choice>Вміст речовини</choice>
+            <choice>Висота</choice>
+            <choice>Ширина</choice>
+            <choice>Інші дані ...</choice>
+        </type>
+        <number>
+            <choice>Тут має буть текстове поле, як зробить поки хз</choice>
+        </number>
+        <measurement_unit>
+            <choice>Фунтів</choice>
+            <choice>см</choice>
+            <choice>мм</choice>
+            <choice>фунтів(вага)</choice>
+            <choice>г/см^2</choice>
+            <choice>люменів ISO</choice>
+            <choice>%</choice>
+            <choice>років</choice>
+        </measurement_unit>
+    </dimension>
+</root>

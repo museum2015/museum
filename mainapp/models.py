@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 import xml.etree.ElementTree as et
 # Create your models here. test
 
-tree = et.parse('museum/my_xml.xml')
+tree = et.parse('museum/materials.xml')
 root = tree.getroot()
 LANGUAGES = (())
 PREC_MATERIALS = (('', ''),)
