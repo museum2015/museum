@@ -9,12 +9,14 @@ from django.contrib.auth.models import User
 import xml.etree.ElementTree as et
 # Create your models here. test
 
+# CONSTANTS
 tree = et.parse('museum/materials.xml')
 root = tree.getroot()
 LANGUAGES = (())
 PREC_MATERIALS = (('', ''),)
 SEMI_PREC_MATERIALS = (('', ''),)
 NON_PREC_MATERIALS = (('', ''),)
+UNITS = (('oz', 'oz'), ('kg', 'kg'))
 for choice in root.find('languages'):
     LANGUAGES += ((choice.text, choice.text),)
 for choice in root.find('materials').find('precious'):
@@ -23,7 +25,7 @@ for choice in root.find('materials').find('semi-precious'):
     SEMI_PREC_MATERIALS += ((choice.text, choice.text),)
 for choice in root.find('materials').find('non-precious'):
     NON_PREC_MATERIALS += ((choice.text, choice.text),)
-
+##
 
 
 
@@ -34,12 +36,42 @@ def get_image_path(self, filename):
 
 
 class Custom:
+    class SingleMaterialWidget(MultiWidget):
+        def __init__(self, choices, unit_choices, *args, **kwargs):
+            z = {'placeholder': '100',}
+            widgets = [Select(choices=choices, *args, **kwargs),
+                       TextInput(*args, **kwargs),
+                       Select(choices=unit_choices, *args, **kwargs)]
+            super(Custom.SingleMaterialWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                return value.split(':')
+            else:
+                return [None, None]
+
+
+    class SingleMaterialField(MultiValueField):
+        def __init__(self, choices, unit_choices, *args, **kwargs):
+            list_fields = [fields.ChoiceField(choices=choices),
+                           fields.CharField(max_length=50),
+                           fields.ChoiceField(choices=unit_choices)]
+            super(Custom.SingleMaterialField, self).__init__(list_fields,
+                                                             widget=Custom.SingleMaterialWidget(choices, unit_choices),
+                                                             *args, **kwargs)
+        def compress(self, values):
+            if values:
+                return values[0]+':'+values[1]+values[2]
+            else:
+                return u''
+
+
     class MaterialSelectWidget(MultiWidget):
-        def __init__(self, choices, amount):
-            widgets = [Select(choices=choices)]
+        def __init__(self, choices, unit_choices, amount):
+            widgets = [Custom.SingleMaterialWidget(choices=choices, unit_choices=unit_choices, attrs={})]
             self.amo = amount
             for i in range(amount-1):
-                widgets.append(Select(choices=choices, attrs={'style': 'display:none;'}))
+                widgets.append(Custom.SingleMaterialWidget(choices=choices, unit_choices=unit_choices, attrs={'style': 'display:none;'}))
             super(Custom.MaterialSelectWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -56,15 +88,14 @@ class Custom:
             return res
 
     class MaterialSelectField(MultiValueField):
-        def __init__(self, choices, amount, *args, **kwargs):
+        def __init__(self, choices, unit_choices, amount):
             list_fields = []
             for i in range(amount):
-                list_fields.append(fields.ChoiceField(choices=choices))
+                list_fields.append(Custom.SingleMaterialField(choices, unit_choices))
             super(Custom.MaterialSelectField, self).__init__(list_fields,
-                                                             widget=Custom.MaterialSelectWidget(choices, amount),
-                                                             *args,
-                                                             **kwargs)
-
+                                                             widget=Custom.MaterialSelectWidget(choices, unit_choices,
+                                                                                                amount),
+                                                             )
         def compress(self, values):
             if values:
                 return u','.join(values)
@@ -73,9 +104,9 @@ class Custom:
 
     class MultiMaterialSelectWidget(MultiWidget):
         def __init__(self):
-            widgets = [Custom.MaterialSelectWidget(choices=PREC_MATERIALS, amount=100),
-                       Custom.MaterialSelectWidget(choices=SEMI_PREC_MATERIALS, amount=100),
-                       Custom.MaterialSelectWidget(choices=NON_PREC_MATERIALS, amount=100)]
+            widgets = [Custom.MaterialSelectWidget(choices=PREC_MATERIALS, unit_choices=UNITS, amount=100),
+                       Custom.MaterialSelectWidget(choices=SEMI_PREC_MATERIALS, unit_choices=UNITS, amount=100),
+                       Custom.MaterialSelectWidget(choices=NON_PREC_MATERIALS, unit_choices=UNITS, amount=100)]
             super(Custom.MultiMaterialSelectWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -91,9 +122,9 @@ class Custom:
 
     class MultiMaterialSelectField(MultiValueField):
         def __init__(self, *args, **kwargs):
-            list_fields = [Custom.MaterialSelectField(choices=PREC_MATERIALS, amount=100, label='Precious'),
-                           Custom.MaterialSelectField(choices=SEMI_PREC_MATERIALS, amount=100, label='Semi-precious'),
-                           Custom.MaterialSelectField(choices=NON_PREC_MATERIALS, amount=100, label='Non-precious')]
+            list_fields = [Custom.MaterialSelectField(choices=PREC_MATERIALS, unit_choices=UNITS, amount=100),
+                           Custom.MaterialSelectField(choices=SEMI_PREC_MATERIALS, unit_choices=UNITS, amount=100),
+                           Custom.MaterialSelectField(choices=NON_PREC_MATERIALS, unit_choices=UNITS, amount=100)]
             super(Custom.MultiMaterialSelectField, self).__init__(list_fields,
                                                                   widget=Custom.MultiMaterialSelectWidget(),
                                                                   *args, **kwargs)
@@ -125,7 +156,7 @@ class Custom:
             list_fields = [fields.CharField(max_length=30),
                            fields.ChoiceField(choices=choices)]
             super(Custom.TextChoiceField, self).__init__(list_fields, widget=Custom.TextChoiceWidget(choices=choices, size1=size1), *args,
-                                                       **kwargs)
+                                                         **kwargs)
 
         def compress(self, values):
             if values:
