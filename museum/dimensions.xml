@@ -12,9 +12,6 @@
             <choice>Ширина</choice>
             <choice>Інші дані ...</choice>
         </type>
-        <number>
-            <choice>Тут має буть текстове поле, як зробить поки хз</choice>
-        </number>
         <measurement_unit>
             <choice>Фунтів</choice>
             <choice>см</choice>

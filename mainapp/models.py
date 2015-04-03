@@ -12,9 +12,16 @@ import xml.etree.ElementTree as et
 tree = et.parse('museum/materials.xml')
 root = tree.getroot()
 LANGUAGES = (())
-PREC_MATERIALS = (('', ''),)
-SEMI_PREC_MATERIALS = (('', ''),)
-NON_PREC_MATERIALS = (('', ''),)
+PREC_MATERIALS = (('', '--------'),)
+SEMI_PREC_MATERIALS = (('', '--------'),)
+NON_PREC_MATERIALS = (('', '--------'),)
+TECHNIQUE_CHOICES = (('', '--------'),)
+DIMENSIONS = (('', '--------'),)
+WAY_OF_FOUND_CHOICES = (('', '--------'),)
+UNITS = (('', '--------'),)
+COLLECTIONS = (('', '--------'),)
+TOPOGRAPHY = (('', '--------'),)
+CONDITIONS = (('', '--------'), ('Без пошкоджень', 'Без пошкоджень'), ('Задовільний', 'Задовільний'), ('Незадовільний', 'Незадовільний'))
 for choice in root.find('languages'):
     LANGUAGES += ((choice.text, choice.text),)
 for choice in root.find('materials').find('precious'):
@@ -23,15 +30,15 @@ for choice in root.find('materials').find('semi-precious'):
     SEMI_PREC_MATERIALS += ((choice.text, choice.text),)
 for choice in root.find('materials').find('non-precious'):
     NON_PREC_MATERIALS += ((choice.text, choice.text),)
-
-
+for choice in root.find('dimension').find('type'):
+    DIMENSIONS += ((choice.text, choice.text),)
+for choice in root.find('dimension').find('measurement_unit'):
+    UNITS += ((choice.text, choice.text),)
 
 
 def get_image_path(self, filename):
     path = ''.join(["/", filename])
     return path
-
-
 
 class Custom:
     class MaterialSelectWidget(MultiWidget):
@@ -102,37 +109,6 @@ class Custom:
             result = ';'
             return result.join(values)
 
-    class TextChoiceWidget(MultiWidget):
-        def __init__(self, choices, placeholder1='', size1=10):
-            widgets = [TextInput(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1}),
-                       Select(choices=choices)]
-            super(Custom.TextChoiceWidget, self).__init__(widgets)
-
-        def decompress(self, value):
-            if value:
-                res = value.split(':')
-                return res
-            else:
-                return [None, None]
-
-        def format_output(self, rendered_widgets):
-            dd = '<br>'
-            res = u''.join(rendered_widgets)
-            return dd+res
-
-    class TextChoiceField(MultiValueField):
-        def __init__(self, choices, size1=10, *args, **kwargs):
-            list_fields = [fields.CharField(max_length=30),
-                           fields.ChoiceField(choices=choices)]
-            super(Custom.TextChoiceField, self).__init__(list_fields, widget=Custom.TextChoiceWidget(choices=choices, size1=size1), *args,
-                                                       **kwargs)
-
-        def compress(self, values):
-            if values:
-                return values[0] + ':' + values[1]
-            else:
-                return ''
-
     class MaterialWidget(MultiWidget):
         def __init__(self, placeholder1='', placeholder2='', size1=10, size2=10):
             widgets = [TextInput(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1}),
@@ -193,45 +169,144 @@ class Custom:
             result = ';'
             return result.join(values)
 
+    class TextChoiceWidget(MultiWidget):
+        def __init__(self, choices, placeholder1='', size1=10):
+            widgets = [TextInput(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1}),
+                       Select(choices=choices)]
+            super(Custom.TextChoiceWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                res = value.split(':')
+                return res
+            else:
+                return [None, None]
+
+        def format_output(self, rendered_widgets):
+            dd = '<br>'
+            res = u''.join(rendered_widgets)
+            return dd+res
+
+    class TextChoiceField(MultiValueField):
+        def __init__(self, choices, placeholder1, size1=10, *args, **kwargs):
+            list_fields = [fields.CharField(max_length=30),
+                           fields.ChoiceField(choices=choices)]
+            super(Custom.TextChoiceField, self).__init__(list_fields,
+                                                         widget=Custom.TextChoiceWidget(choices=choices, size1=size1, placeholder1=placeholder1),
+                                                         *args,
+                                                         **kwargs)
+
+        def compress(self, values):
+            if values:
+                return values[0] + ':' + values[1]
+            else:
+                return ''
+
+    class ChoiceTextChoiceField(MultiValueField):
+        def __init__(self, choices1, choices2, placeholder1):
+            list_fields = [fields.ChoiceField(choices=choices1),
+                           fields.CharField(max_length=30),
+                           fields.ChoiceField(choices=choices2)]
+            super(Custom.ChoiceTextChoiceField, self).__init__(list_fields,
+                                                               widget=Custom.ChoiceTextChoiceWidget(choices1=choices1,
+                                                                                                    choices2=choices2,
+                                                                                                    placeholder1=placeholder1))
+        def compress(self, values):
+            if values:
+                return values[0] + ':' + values[1] + ':' + values[2]
+            else:
+                return ''
+
+    class ChoiceTextChoiceWidget(MultiWidget):
+        def __init__(self, choices1, choices2, placeholder1='', invisible=True, **kwargs):
+            if invisible:
+                attrs = {'max_length': 10, 'placeholder': placeholder1, 'style': 'display:none;'}
+            else:
+                attrs = {'max_length': 10, 'placeholder': placeholder1}
+            widgets = [Select(choices=choices1, **kwargs),
+                       TextInput(attrs),
+                       Select(choices=choices2, **kwargs)]
+            super(Custom.ChoiceTextChoiceWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                res = value.split(':')
+                return res
+            else:
+                return [None, None, None]
+
+        def format_output(self, rendered_widgets):
+            return u''.join(rendered_widgets)
+
+    class MultiChoiceTextChoiceWidget(MultiWidget):
+        def __init__(self, number):
+            widgets = [Custom.ChoiceTextChoiceWidget(placeholder1='0,2', choices1=DIMENSIONS, choices2=UNITS, invisible=False)]
+            for i in range(number-1):
+                widgets.append(Custom.ChoiceTextChoiceWidget(placeholder1='', choices1=DIMENSIONS, choices2=UNITS, attrs={'style': 'display:none;'}))
+            super(Custom.MultiChoiceTextChoiceWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                return value.split(';')
+            else:
+                return []
+
+        def format_output(self, rendered_widgets):
+            return ''.join(rendered_widgets)
+
+    class MultiChoiceTextChoiceField(MultiValueField):
+        def __init__(self, number=10, *args, **kwargs):
+            list_fields = [Custom.ChoiceTextChoiceField(choices1=DIMENSIONS, choices2=UNITS, placeholder1='0.2')]
+            for i in range(number-1):
+                list_fields.append(Custom.ChoiceTextChoiceField(choices1=DIMENSIONS, choices2=UNITS, placeholder1=''))
+            super(Custom.MultiChoiceTextChoiceField, self).__init__(list_fields,
+                                                                    widget=Custom.MultiChoiceTextChoiceWidget(number),
+                                                                    *args,
+                                                                    **kwargs)
+
+        def compress(self, values):
+            return ';'.join(values)
+
 
 class Object(models.Model):
-    collection = models.CharField(max_length=200, default='')  #
+    collection = models.CharField(max_length=200, default='', null=True)  #
     is_fragment = models.BooleanField(default=False)
-    name = models.CharField(max_length=200, default='')  #
-    amount = models.IntegerField(default=0)  #
-    size = models.CharField(max_length=40, default='')  #
-    _class = models.CharField(max_length=200, default='')  ##
-    type = models.CharField(max_length=200, default='')  ##
-    material = models.CharField(max_length=200, default='')  #
-    technique = models.CharField(max_length=200, default='')  #
-    description = models.TextField(max_length=1000, default='')  #
-    identifier = models.CharField(max_length=50, default='')
-    image = models.ImageField(upload_to=get_image_path, default='default.jpg')
-    #image_type = models.CharField(max_length=50, default='')
-    author = models.CharField(max_length=100, default='')  #
-    price = models.CharField(max_length=50, default='')  #
-    mark_on_object = models.CharField(max_length=200, default='')  ##
-    note = models.CharField(max_length=200, default='')  #
-    condition = models.CharField(max_length=100, default='')  #
+    name = models.CharField(max_length=200, default='', null=True)  #
+    amount = models.IntegerField(default=0, null=True)  #
+    size = models.CharField(max_length=40, default='', null=True)  #
+    _class = models.CharField(max_length=200, default='', null=True)  ##
+    type = models.CharField(max_length=200, default='', null=True)  ##
+    material = models.CharField(max_length=200, default='', null=True)  #
+    technique = models.CharField(max_length=200, default='', null=True)  #
+    description = models.TextField(max_length=1000, default='', null=True)  #
+    identifier = models.CharField(max_length=50, default='', null=True)
+    image = models.ImageField(upload_to=get_image_path, default='default.jpg', null=True)
+    #image_type = models.CharField(max_length=50, default='', null=True)
+    author = models.CharField(max_length=100, default='', null=True)  #
+    price = models.CharField(max_length=50, default='', null=True)  #
+    mark_on_object = models.CharField(max_length=200, default='', null=True)  ##
+    note = models.CharField(max_length=200, default='', null=True)  #
+    condition = models.CharField(max_length=100, default='', null=True)  #
+    condition_descr = models.CharField(max_length=2000, null=True)
     transport_possibility = models.BooleanField(default=False)  ##
-    recomm_for_restauration = models.CharField(max_length=100, default='')  ##
-    restauration_notes = models.CharField(max_length=200, default='')  ##
-    storage = models.CharField(max_length=200, default='')  #
-    place_appellation = models.CharField(max_length=200, default='')  ##
-    is_there = models.CharField(max_length=200, default='')  ##
+    recomm_for_restauration = models.CharField(max_length=100, default='', null=True)  ##
+    restauration_notes = models.CharField(max_length=200, default='', null=True)  ##
+    storage = models.CharField(max_length=200, default='', null=True)  #
+    place_appellation = models.CharField(max_length=200, default='', null=True)  ##
+    is_there = models.CharField(max_length=200, default='', null=True)  ##
     #documented_in = models.CharField(max_length=200)
     #documented_type = models.CharField(max_length=50)
-    way_of_found = models.CharField(max_length=200, default='')  #
+    way_of_found = models.CharField(max_length=200, default='', null=True)  #
     #link_on_doc = models.CharField(max_length=200)
     #doc_type = models.CharField(max_length=50)
-    transferred_from = models.CharField(max_length=200, default='')  #
-    transferred_to = models.CharField(max_length=200, default='')  #
-    term_back = models.DateTimeField(max_length=200, default='2000-02-12 00:00')  #
-    aim_of_receiving_gen = models.CharField(max_length=200, default='')  #
+    transferred_from = models.CharField(max_length=200, default='', null=True)  #
+    transferred_to = models.CharField(max_length=200, default='', null=True)  #
+    term_back = models.DateTimeField(max_length=200, default='2000-02-12 00:00', null=True)  #
+    aim_of_receiving_gen = models.CharField(max_length=200, default='', null=True)  #
     #aim_of_receiving = models.ForeignKey(Activity)
-    circumst_write_off = models.CharField(max_length=200, default='')  ##
-    reason = models.CharField(max_length=200, default='')  #
-    source = models.CharField(max_length=200, default='')  #
+    circumst_write_off = models.CharField(max_length=200, default='', null=True)  ##
+    reason = models.CharField(max_length=200, default='', null=True)  #
+    source = models.CharField(max_length=200, default='', null=True)  #
 
     def __unicode__(self):
         return self.name + ' (' + self.identifier + ')'
@@ -270,56 +345,62 @@ class Activity(models.Model):
 
 class AttributeAssignment(models.Model):
     attr_name = models.CharField(max_length=40)
-    attr_value = models.CharField(max_length=200)
+    attr_value = models.CharField(max_length=200, default='None', null=True)
+    actual = models.BooleanField(default=False)
     aim = models.ForeignKey(Object)
     event_initiator = models.ForeignKey(Activity)
     approval = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.attr_name + ' : ' + self.attr_value
+        if self.attr_value:
+            return self.attr_name + ' : ' + self.attr_value
+        else:
+            return self.attr_name
 
     def approve(self):
         setattr(self.aim, self.attr_name, self.attr_value)
         self.aim.save()
         self.approval = True
+        self.actual = True
+        for query in self.aim.attributeassignment_set.filter(attr_name=self.attr_name):
+            query.actual = False
         self.save()
 
 
 class TempSaveForm(forms.Form):
-    name = forms.CharField(max_length=200, label='Назва предмета', required=True)
+    name = Custom.TextChoiceField(choices=LANGUAGES, label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=1000, label='Кількість', required=True)
     #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
-    technique = forms.CharField(max_length=200, label='Техніка', required=True)
-    material = Custom.MultiMaterialField(label='Матеріал', placeholder1='Золото', placeholder2='10г')
+    technique = forms.ChoiceField(choices=DIMENSIONS, label='Техніка', required=False)
+    material = Custom.MultiMaterialSelectField(label='Матеріали')
     # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
-    size = Custom.MultiMaterialField(number=3, label='Розміри', placeholder1='Ширина', placeholder2='2м')
+    size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
     #measurement =
-    condition = forms.CharField(max_length=200, label='Стан збереженості (тип)', required=True)
-    condition_descr = forms.CharField(max_length=200, label='Опис стану збереженості', required=True)
-    description = forms.CharField(max_length=500, label='Опис предмета', required=True)
+    condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+    condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
+                                      widget=forms.widgets.Textarea)
+    description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea)
+    note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea)
     price = forms.CharField(max_length=200, label='Вартість', required=True)
-    note = forms.CharField(max_length=200, label='Примітка', required=True)
     side_1 = forms.CharField(max_length=200, label='Сторона 1 (акт приймання на ТЗ)', required=True)
     side_2 = forms.CharField(max_length=200, label='Сторона 2 (акт приймання на ТЗ)', required=True)
-    aim_of_receiving_gen = forms.CharField(max_length=200, label='Мета приймання на ТЗ', required=True)
-    way_of_found = forms.CharField(max_length=200, label='Спосіб надходження', required=True)
-    reason = forms.CharField(max_length=200, label='Підстава', required=True)
+    #aim_of_receiving_gen = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Мета приймання на ТЗ', required=True)
+    way_of_found = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=False)
+    reason = forms.FileField(label='Підстава', required=False)
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
-    collection = forms.CharField(max_length=200, label='Фонд (колекція, відділ)', required=True)
+    collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=False)
     term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Термін повернення(до якої дати)', required=True)
     code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
     #date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
 
-    mat_person_in_charge = forms.CharField(max_length=50, label='Матеріально-відповідальна особа', required=True)
-    storage = forms.CharField(max_length=200, label='Фізичне місце збереження (топографія)', required=True) #
+    mat_person_in_charge = forms.ModelChoiceField(queryset=User.objects.all(), label='Матеріально-відповідальна особа', required=False)
+    storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=False) #
     #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
-    temp = Custom.TextChoiceField(choices=LANGUAGES)
-    temp2 = Custom.MultiMaterialSelectField(label='Матеріали')
 
 
 class InitialTempSaveForm(forms.Form):
@@ -331,27 +412,28 @@ class TempRetForm(forms.Form):
         ('returned', 'Повернутий з тимчасового збереження'),
         ('add on PS', 'Поставити об’єкт на постійне збереження ')
     )
-    name = forms.CharField(max_length=200, label='Назва предмета', required=True)
+    name = Custom.TextChoiceField(choices=LANGUAGES, label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=None, label='Кількість', required=True)
     #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True) #
-    technique = forms.CharField(max_length=200, label='Техніка', required=True)
-    material = Custom.MultiMaterialField(label='Матеріал', placeholder1='Золото', placeholder2='10г')
+    technique = forms.ChoiceField(choices=DIMENSIONS, label='Техніка', required=True)
+    material = Custom.MultiMaterialSelectField(label='Матеріал')
     # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
-    size = Custom.MultiMaterialField(number=3, label='Розміри', placeholder1='Ширина', placeholder2='2м')
-    condition = forms.CharField(max_length=200, label='Стан збереженості (тип)', required=True)
-    condition_descr = forms.CharField(max_length=200, label='Опис стану збереженості', required=True)
-    description = forms.CharField(max_length=500, label='Опис предмета', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Розміри')
+    condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+    condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
+                                      widget=forms.widgets.Textarea)
+    description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea)
+    note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea)
     price = forms.CharField(max_length=200, label='Вартість', required=True)
     term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Термін повернення(до якої дати)', required=True)
-    note = forms.CharField(max_length=200, label='Примітка', required=True)
     reason = forms.CharField(max_length=200, label='Підстава', required=True)
     side_1 = forms.CharField(max_length=100, label='Сторона 1 (акт повернення з ТЗ)', required=True)
     side_2 = forms.CharField(max_length=100, label='Сторона 2 (акт повернення з ТЗ)', required=True)
     return_mark = forms.ChoiceField(choices=choices, required=True, label='Позначка про повернення предмета або переведення до музейного зібрання (ПЗ) у книзі ТЗ')
-    save_place = forms.CharField(max_length=200, label='Фізичне місце збереження (топографія)', required=True)
+    save_place = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True) #
 
 
 class PrepareRetForm(forms.Form):

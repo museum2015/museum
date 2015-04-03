@@ -17,6 +17,7 @@ from django.contrib import auth
 
 # Create your views here.
 
+
 @csrf_protect
 @login_required(login_url='/admin/')
 def TempSave(request, id_number=0):
@@ -42,7 +43,7 @@ def TempSave(request, id_number=0):
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
-                'size': project.size, 'condition': project.condition, 'description': project.description,
+                'size': project.size, 'condition': project.condition, 'condition_descr': project.condition_descr, 'description': project.description,
                 'price': project.price}
         form = TempSaveForm(initial=data)
         return render(request, 'AddOnTs.html', {'form': form})
@@ -71,20 +72,24 @@ def TempRet(request, id_number=0):
                 attr_assign.save()
             return HttpResponseRedirect('/activities')
         else:
-            return render(request, 'ReturnFromTS.html', {'form': form, 'errors': form.errors})
+            return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
                 'size': project.size, 'description': project.description, 'condition': project.condition,
+                'condition_descr': project.condition_descr,
+                'reason': project.attributeassignment_set.get(attr_name='reason', actual=True).attr_value,
                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
-        form = TempSaveForm(initial=data)
-        return render(request, 'ReturnFromTS.html', {'form': form})
+        form = TempRetForm(initial=data)
+        return render(request, 'AddOnTs.html', {'form': form})
+
 
 @login_required(login_url='/admin/')
 def GetProject(request):
     act_list = Activity.objects.all().order_by('time_stamp').reverse()
     return render(request, 'activities.html', {'acts': act_list})
+
 
 @login_required(login_url='/admin/')
 def ApproveProject(request, offset):
@@ -133,6 +138,7 @@ def ProjectPage(request, id_number):
                                                 'wire_off': wire_off,
                                                 'editing': editing})
 
+
 @login_required(login_url='/admin/')
 @csrf_protect
 def AddOnPS(request, id_number):
@@ -166,6 +172,7 @@ def AddOnPS(request, id_number):
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
 
+
 @login_required(login_url='/admin/')
 def PrepareRet(request):
     if request.method == 'POST':
@@ -178,6 +185,7 @@ def PrepareRet(request):
     else:
         form = PrepareRetForm()
         return render(request, 'AddOnTs.html', {'form': form})
+
 
 @login_required(login_url='/admin/')
 def PreparePS(request):
@@ -192,6 +200,7 @@ def PreparePS(request):
         form = PreparePSForm()
         return render(request, 'AddOnPS.html', {'form': form})
 
+
 @login_required(login_url='/admin/')
 def ActivityPage(request, id_number):
     if Activity.objects.filter(id=int(id_number)).exists():
@@ -203,6 +212,7 @@ def ActivityPage(request, id_number):
 
     return render(request, 'attribute_assign.html', {'attrs': attrs,
                                                      'act': act})
+
 
 def aut(request):
     if not request.user.is_authenticated():
@@ -224,9 +234,11 @@ def aut(request):
     else:
         return render(request, 'index.html', {'user': request.user.username})
 
+
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
+
 
 class ObjectUpdate(UpdateView):
     model = Object
@@ -238,6 +250,7 @@ class ObjectCreate(CreateView):
     model = Object
     form_class = ObjectCreateForm
     template_name_suffix = '_create_form'
+
 
 @login_required(login_url='/admin/')
 def PrepareInventory(request):
