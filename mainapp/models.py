@@ -9,32 +9,22 @@ from django.contrib.auth.models import User
 import xml.etree.ElementTree as et
 # Create your models here. test
 
-tree = et.parse('museum/materials.xml')
-root = tree.getroot()
-LANGUAGES = (())
-PREC_MATERIALS = (('', '--------'),)
-SEMI_PREC_MATERIALS = (('', '--------'),)
-NON_PREC_MATERIALS = (('', '--------'),)
 TECHNIQUE_CHOICES = (('', '--------'),)
-DIMENSIONS = (('', '--------'),)
 WAY_OF_FOUND_CHOICES = (('', '--------'),)
-UNITS = (('', '--------'),)
 COLLECTIONS = (('', '--------'),)
 TOPOGRAPHY = (('', '--------'),)
 CONDITIONS = (('', '--------'), ('Без пошкоджень', 'Без пошкоджень'), ('Задовільний', 'Задовільний'), ('Незадовільний', 'Незадовільний'))
-for choice in root.find('languages'):
-    LANGUAGES += ((choice.text, choice.text),)
-for choice in root.find('materials').find('precious'):
-    PREC_MATERIALS += ((choice.text, choice.text),)
-for choice in root.find('materials').find('semi-precious'):
-    SEMI_PREC_MATERIALS += ((choice.text, choice.text),)
-for choice in root.find('materials').find('non-precious'):
-    NON_PREC_MATERIALS += ((choice.text, choice.text),)
-for choice in root.find('dimension').find('type'):
-    DIMENSIONS += ((choice.text, choice.text),)
-for choice in root.find('dimension').find('measurement_unit'):
-    UNITS += ((choice.text, choice.text),)
 
+
+def get_choice(table1, table2=''):
+    choice = (('', '--------'),)
+    if table2:
+        for str in et.parse('museum/materials.xml').getroot().find(table1).find(table2):
+            choice += ((str.text, str.text),)
+    else:
+        for str in et.parse('museum/materials.xml').getroot().find(table1):
+            choice += ((str.text, str.text),)
+    return choice
 
 def get_image_path(self, filename):
     path = ''.join(["/", filename])
@@ -80,9 +70,9 @@ class Custom:
 
     class MultiMaterialSelectWidget(MultiWidget):
         def __init__(self):
-            widgets = [Custom.MaterialSelectWidget(choices=PREC_MATERIALS, amount=100),
-                       Custom.MaterialSelectWidget(choices=SEMI_PREC_MATERIALS, amount=100),
-                       Custom.MaterialSelectWidget(choices=NON_PREC_MATERIALS, amount=100)]
+            widgets = [Custom.MaterialSelectWidget(choices=get_choice('materials', 'precious'), amount=100),
+                       Custom.MaterialSelectWidget(choices=get_choice('materials', 'semi-precious'), amount=100),
+                       Custom.MaterialSelectWidget(choices=get_choice('materials', 'non-precious'), amount=100)]
             super(Custom.MultiMaterialSelectWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -98,9 +88,9 @@ class Custom:
 
     class MultiMaterialSelectField(MultiValueField):
         def __init__(self, *args, **kwargs):
-            list_fields = [Custom.MaterialSelectField(choices=PREC_MATERIALS, amount=100, label='Precious'),
-                           Custom.MaterialSelectField(choices=SEMI_PREC_MATERIALS, amount=100, label='Semi-precious'),
-                           Custom.MaterialSelectField(choices=NON_PREC_MATERIALS, amount=100, label='Non-precious')]
+            list_fields = [Custom.MaterialSelectField(choices=get_choice('materials', 'precious'), amount=100, label='Precious'),
+                           Custom.MaterialSelectField(choices=get_choice('materials', 'semi-precious'), amount=100, label='Semi-precious'),
+                           Custom.MaterialSelectField(choices=get_choice('materials', 'non-precious'), amount=100, label='Non-precious')]
             super(Custom.MultiMaterialSelectField, self).__init__(list_fields,
                                                                   widget=Custom.MultiMaterialSelectWidget(),
                                                                   *args, **kwargs)
@@ -240,9 +230,9 @@ class Custom:
 
     class MultiChoiceTextChoiceWidget(MultiWidget):
         def __init__(self, number):
-            widgets = [Custom.ChoiceTextChoiceWidget(placeholder1='0,2', choices1=DIMENSIONS, choices2=UNITS, invisible=False)]
+            widgets = [Custom.ChoiceTextChoiceWidget(placeholder1='0,2', choices1=get_choice('dimension', 'type'), choices2=get_choice('dimension', 'measurement_unit'), invisible=False)]
             for i in range(number-1):
-                widgets.append(Custom.ChoiceTextChoiceWidget(placeholder1='', choices1=DIMENSIONS, choices2=UNITS, attrs={'style': 'display:none;'}))
+                widgets.append(Custom.ChoiceTextChoiceWidget(placeholder1='', choices1=get_choice('dimension', 'type'), choices2=get_choice('dimension', 'measurement_unit'), attrs={'style': 'display:none;'}))
             super(Custom.MultiChoiceTextChoiceWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -256,9 +246,9 @@ class Custom:
 
     class MultiChoiceTextChoiceField(MultiValueField):
         def __init__(self, number=10, *args, **kwargs):
-            list_fields = [Custom.ChoiceTextChoiceField(choices1=DIMENSIONS, choices2=UNITS, placeholder1='0.2')]
+            list_fields = [Custom.ChoiceTextChoiceField(choices1=get_choice('dimension', 'type'), choices2=get_choice('dimension', 'measurement_unit'), placeholder1='0.2')]
             for i in range(number-1):
-                list_fields.append(Custom.ChoiceTextChoiceField(choices1=DIMENSIONS, choices2=UNITS, placeholder1=''))
+                list_fields.append(Custom.ChoiceTextChoiceField(choices1=get_choice('dimension', 'type'), choices2=get_choice('dimension', 'measurement_unit'), placeholder1=''))
             super(Custom.MultiChoiceTextChoiceField, self).__init__(list_fields,
                                                                     widget=Custom.MultiChoiceTextChoiceWidget(number),
                                                                     *args,
@@ -368,13 +358,13 @@ class AttributeAssignment(models.Model):
 
 
 class TempSaveForm(forms.Form):
-    name = Custom.TextChoiceField(choices=LANGUAGES, label='Назва', placeholder1='')
+    name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=1000, label='Кількість', required=True)
     #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
-    technique = forms.ChoiceField(choices=DIMENSIONS, label='Техніка', required=False)
+    technique = forms.ChoiceField(choices=get_choice('dimension', 'type'), label='Техніка', required=False)
     material = Custom.MultiMaterialSelectField(label='Матеріали')
     # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
@@ -412,13 +402,13 @@ class TempRetForm(forms.Form):
         ('returned', 'Повернутий з тимчасового збереження'),
         ('add on PS', 'Поставити об’єкт на постійне збереження ')
     )
-    name = Custom.TextChoiceField(choices=LANGUAGES, label='Назва', placeholder1='')
+    name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=None, label='Кількість', required=True)
     #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True) #
-    technique = forms.ChoiceField(choices=DIMENSIONS, label='Техніка', required=True)
+    technique = forms.ChoiceField(choices=get_choice('dimension', 'type'), label='Техніка', required=True)
     material = Custom.MultiMaterialSelectField(label='Матеріал')
     # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
