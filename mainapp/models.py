@@ -16,14 +16,13 @@ TOPOGRAPHY = (('', '--------'),)
 CONDITIONS = (('', '--------'), ('Без пошкоджень', 'Без пошкоджень'), ('Задовільний', 'Задовільний'), ('Незадовільний', 'Незадовільний'))
 
 
-def get_choice(table1, table2=''):
+def get_choice(*args):
     choice = (('', '--------'),)
-    if table2:
-        for str in et.parse('museum/materials.xml').getroot().find(table1).find(table2):
-            choice += ((str.text, str.text),)
-    else:
-        for str in et.parse('museum/materials.xml').getroot().find(table1):
-            choice += ((str.text, str.text),)
+    root = et.parse('museum/materials.xml').getroot()
+    for table in args:
+        root = root.find(table)
+    for s in root:
+        choice += ((s.text, s.text),)
     return choice
 
 def get_image_path(self, filename):
@@ -63,10 +62,12 @@ class Custom:
                                                              **kwargs)
 
         def compress(self, values):
-            if values:
-                return u','.join(values)
-            else:
-                return u''
+            res = ''
+            for value in values:
+                if value:
+                    res += value
+            return res
+
 
     class MultiMaterialSelectWidget(MultiWidget):
         def __init__(self):
@@ -255,7 +256,11 @@ class Custom:
                                                                     **kwargs)
 
         def compress(self, values):
-            return ';'.join(values)
+            res = ''
+            for value in values:
+                if value:
+                    res += value
+            return res
 
 
 class Object(models.Model):
