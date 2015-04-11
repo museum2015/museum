@@ -244,7 +244,7 @@ class Custom:
                 return []
 
         def format_output(self, rendered_widgets):
-            return ''.join(rendered_widgets)
+            return '<br/>' + ''.join(rendered_widgets)
 
     class MultiChoiceTextChoiceField(MultiValueField):
         def __init__(self, number=10, *args, **kwargs):
