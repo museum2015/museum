@@ -25,11 +25,11 @@
             document.getElementById(size1).removeAttribute("style")
             document.getElementById(size2).removeAttribute("style")
             $("<br/>").insertBefore("#"+size0);
-            param = param + 1
+            size = size + 1
         }
         function add_prec() {
             var br = document.createTextNode('<br />')
-            var size0 = "id_material_0_" + param
+            var size0 = "id_material_0_" + prec
             document.getElementById(size0).removeAttribute("style")
             $("<br/>").insertBefore("#"+size0);
             prec = prec + 1
