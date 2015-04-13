@@ -7,6 +7,7 @@ from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiW
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import xml.etree.ElementTree as et
+from django.forms.extras.widgets import SelectDateWidget
 # Create your models here. test
 
 TECHNIQUE_CHOICES = (('', '--------'),)
@@ -300,7 +301,7 @@ class Object(models.Model):
     aim_of_receiving_gen = models.CharField(max_length=200, default='', null=True)  #
     #aim_of_receiving = models.ForeignKey(Activity)
     circumst_write_off = models.CharField(max_length=200, default='', null=True)  ##
-    reason = models.CharField(max_length=200, default='', null=True)  #
+    reason = models.CharField(max_length=200, default='default.txt', null=True)  #
     source = models.CharField(max_length=200, default='', null=True)  #
 
     def __unicode__(self):
@@ -366,8 +367,8 @@ class TempSaveForm(forms.Form):
     name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=1000, label='Кількість', required=True)
-    #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
-    #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
+    date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
+    place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=get_choice('dimension', 'type'), label='Техніка', required=False)
     material = Custom.MultiMaterialSelectField(label='Матеріали')
@@ -388,7 +389,7 @@ class TempSaveForm(forms.Form):
     reason = forms.FileField(label='Підстава', required=False)
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
     collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=False)
-    term_back = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Термін повернення(до якої дати)', required=True)
+    term_back = forms.CharField(widget=SelectDateWidget, label='Термін повернення(до якої дати)', required=True)
     code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
     #date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
 

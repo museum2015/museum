@@ -138,20 +138,42 @@
 </head>
 <body>
 <div class="container">
- <div class="row">
-      <div class="col-md-6 col-md-offset-3 panel panel-default">
-         <form method="post" class="margin-base-vertical form-control">
-             {% csrf_token %}
-              {{ form.as_p }}
-                
-            <button type="submit" class="btn btn-success btn-block">
-                <span class="glyphicon glyphicon-star"></span>  Submit
-            </button>
-         </form>
-      </div>
- </div>
-</div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 panel panel-default">
+            <button id="add_field"  onclick="add_field('material')" >
+                    <span class="glyphicon glyphicon-star"></span> add material</button>
+            <form method="post" class="margin-base-vertical form-control">
+                {% csrf_token %}
 
+                 {{   form.as_p}}
+
+
+                <button type="submit" class="btn btn-success btn-block">
+                <span class="glyphicon glyphicon-star"></span>  Submit
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function add_field(param){
+    var parametr = String(param);
+ for(var i=2; i<10;i++){
+    var el = document.getElementsByTagName('select');
+    alert(el[i].id);
+    el[i].visible=true;
+    location.reload(true);
+    }
+
+}
+    function add1(type) {
+        var element = document.createElement("input");
+        element.type = String(type);
+        element.name = "textfield";
+
+    }
+
+</script>
 
 </body>
 </html>
