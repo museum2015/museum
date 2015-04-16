@@ -1,32 +1,89 @@
 <!DOCTYPE html>
 <html>
-{% load bootstrap3 %}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
+{% load staticfiles %}
 <head lang="en">
     <meta charset="UTF-8">
-    <title></title>
+    <link rel="stylesheet" type="text/css" href="{% static "static/table.css" %}"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" language="javascript" src="{% static "js/TF_Modules/tablefilter.js" %}"></script>
 </head>
 <body>
 
-<div class="container">
-   <div class="row">
-   {% for a in acts %}
-      <div class="col-md-4 col-md-offset-4">
-        <h2>{{ a }}</h2>
-        {% for qs in a.attributeassignment_set.all %}
-            {{ qs }} <br>
-        {% endfor %}
-        <form action='approve{{a.id}}/' class="form-actions">
-         {% buttons %}
-            <button type="submit" class="btn btn-success btn-block">
-                {% bootstrap_icon "star" %} Submit
-            </button>
-         {% endbuttons %}
-        </form>
-      </div>
-   </div>
-</div>
-{% endfor %}
+<table id="table1">
+    <thead>
+    <tr>
+							<th>ID</th>
+							<th>Об’єкт</th>
+                            <th>Подія</th>
+                            <th id="nosort">Час</th>
+                            <th>Особа</th>
+                            <th>Підтверджено</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for a in acts %}
+    <tr><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"d-m-Y f:s" }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script type="text/javascript">
+        var $table = $('table'),
+        $bodyCells = $table.find('tbody tr:first').children(),
+        colWidth;
+
+        $bodyCells.each(function(i, v) {
+            $(v).width($(v).width() + 50);
+        });
+
+        colWidth = $bodyCells.map(function() {
+            return $(this).width();
+        }).get();
+
+        $table.find('thead tr').children().each(function(i, v) {
+            $(v).width(colWidth[i]);
+        });
+
+        var rows = $('tr').not(':first');
+
+        /* Create 'click' event handler for rows */
+        rows.on('click', function(e) {
+
+            /* Get current row */
+            var row = $(this);
+
+            rows.removeClass('highlight');
+            row.addClass('highlight');
+
+
+        });
+
+
+        $(document).bind('selectstart dragstart', function(e) {
+            e.preventDefault(); return false;
+        });
+
+        var table_props =  {
+                    col_0: "none",
+                    col_5: "select",
+                    display_all_text: " [ Show all ] ",
+                    sort_select: true,
+                    paging: true,
+                    paging_length: 20,
+                    rows_counter: true,
+                    rows_counter_text: "Рядки:",
+                    btn_reset: false,
+                    btn_next_page_html: '<a href="javascript:;" style="margin:3px;">Наступна ></a>',
+                    btn_prev_page_html: '<a href="javascript:;" style="margin:3px;">< Попередня</a>',
+                    btn_last_page_html: '<a href="javascript:;" style="margin:3px;"> Остання >|</a>',
+                    btn_first_page_html: '<a href="javascript:;" style="margin:3px;"><| Перша</a>',
+                    loader: true,
+                    loader_html: '<h4 style="color:red;">Завантаження, будь ласка зачекайте...</h4>',
+                    sort: true,
+                    sort_types: ['Number', 'String', 'String', 'Number', 'String', 'String']
+    };
+
+
+        var tf = setFilterGrid("table1", table_props);
+</script>
 </body>
 </html>
