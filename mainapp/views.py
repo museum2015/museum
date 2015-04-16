@@ -61,7 +61,7 @@ def TempRet(request, id_number=0):
         else:
             return HttpResponseRedirect('prepare')
     if project.attributeassignment_set.filter(approval=False, aim=project).exists():
-        return HttpResponse('У цього об’єкта є незатвердженi подii.')
+        return HttpResponse('У цього об’єкта є незатвердженi подiї.')
     if request.method == 'POST':
         form = TempRetForm(request.POST)
         if form.is_valid():
@@ -71,7 +71,7 @@ def TempRet(request, id_number=0):
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
-            return HttpResponseRedirect('/activities')
+            return HttpResponseRedirect('/')
         else:
             return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
@@ -160,14 +160,15 @@ def AddOnPS(request, id_number):
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
-            return HttpResponseRedirect('')
+            return HttpResponseRedirect('/')
         else:
             return render(request, 'AddOnPS.html', {'form': form, 'errors': form.errors})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
                 'size': project.size, 'description': project.description, 'can_transport': project.transport_possibility,
-                'condition': project.condition, 'recommandation_rest': project.recomm_for_restauration,
+                'condition': project.condition, 'condition_descr': project.condition_descr,
+                'recommandation_rest': project.recomm_for_restauration,
                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
                 'transport_possibility': project.transport_possibility, 'fond': project.collection}
         form = PersistentSaveForm(initial=data)
