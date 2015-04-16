@@ -88,7 +88,7 @@ def TempRet(request, id_number=0):
 @login_required(login_url='/admin/')
 def GetProject(request):
     act_list = Activity.objects.all().order_by('time_stamp').reverse()
-    return render(request, 'activities.html', {'acts': act_list})
+    return render(request, 'projects.html', {'acts': act_list})
 
 
 @login_required(login_url='/admin/')
@@ -298,4 +298,6 @@ def AddOnInventorySave(request, id_number):
                 'transport_possibility': project.transport_possibility, 'fond': project.collection}
         form = InventorySaveForm(initial=data)
     return render(request, 'AddOnInventoryBook.html', {'form': form})
+
+#def menu(request):
 
