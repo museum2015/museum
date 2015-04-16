@@ -139,11 +139,6 @@ SortableTable.prototype.initHeader = function (oSortTypes) {
 			else
 				c.onclick = this._headerOnclick;
 		}
-		else
-		{
-			c.setAttribute( "_sortType", oSortTypes[i] );
-			c._sortType = "None";
-		}
 	}
 	this.updateHeaderArrows();
 };
@@ -429,10 +424,20 @@ SortableTable.toDate = function (s) {
 	return d.valueOf();
 };
 
+SortableTable.toDMYDate = function (s) {
+	var parts = s.split("-");
+	var d = new Date(0);
+	d.setFullYear(parts[2]);
+	d.setDate(parts[0]);
+	d.setMonth(parts[1] - 1);
+	return d.valueOf();
+};
+
 
 // add sort types
 SortableTable.prototype.addSortType("Number", Number);
 SortableTable.prototype.addSortType("CaseInsensitiveString", SortableTable.toUpperCase);
 SortableTable.prototype.addSortType("Date", SortableTable.toDate);
+SortableTable.prototype.addSortType("DMYDate", SortableTable.toDMYDate);
 SortableTable.prototype.addSortType("String");
 // None is a special case

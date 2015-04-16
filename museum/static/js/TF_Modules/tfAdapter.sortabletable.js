@@ -118,17 +118,16 @@ TF.prototype.SetSortTable = function(){
 		var l = cells.length;
 		var img, c;
 		for (var i = 0; i < l; i++) {
-			c = cells[i];
-			if (this.sortTypes[i] != null && this.sortTypes[i] != 'None') {
-				c.style.cursor = 'pointer';
-				img = tf_CreateElm('img',['src', o.sortImgPath + o.sortImgBlank]);
-				c.appendChild(img);
-				if (this.sortTypes[i] != null)
-					c.setAttribute( '_sortType', this.sortTypes[i]);
-				tf_AddEvent(c, 'click', this._headerOnclick);
-			} else {
-				c.setAttribute( '_sortType', oSortTypes[i] );
-				c._sortType = 'None';
+			if (i!=3) {
+				c = cells[i];
+				if (this.sortTypes[i] != null && this.sortTypes[i] != 'None') {
+					c.style.cursor = 'pointer';
+					img = tf_CreateElm('img',['src', o.sortImgPath + o.sortImgBlank]);
+					c.appendChild(img);
+					if (this.sortTypes[i] != null)
+						c.setAttribute( '_sortType', this.sortTypes[i]);
+					tf_AddEvent(c, 'click', this._headerOnclick);
+				} 
 			}
 		}
 		this.updateHeaderArrows();

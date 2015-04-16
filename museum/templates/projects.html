@@ -15,14 +15,14 @@
 							<th>ID</th>
 							<th>Об’єкт</th>
                             <th>Подія</th>
-                            <th>Час</th>
+                            <th id="nosort">Час</th>
                             <th>Особа</th>
                             <th>Підтверджено</th>
     </tr>
     </thead>
     <tbody>
     {% for a in acts %}
-    <tr><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td></tr>
+    <tr><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"d-m-Y f:s" }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td></tr>
     {% endfor %}
     </tbody>
 </table>
@@ -79,6 +79,7 @@
                     loader: true,
                     loader_html: '<h4 style="color:red;">Завантаження, будь ласка зачекайте...</h4>',
                     sort: true,
+                    sort_types: ['Number', 'String', 'String', 'Number', 'String', 'String']
     };
 
 
