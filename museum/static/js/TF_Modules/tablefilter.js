@@ -431,8 +431,8 @@ var TF = function(id)
 		this.sorted =				false; //indicates if tables was sorted
 		this.sortConfig =			f.sort_config!=undefined ? f.sort_config : {};
 		this.sortConfig.name =		this.sortConfig['name']!=undefined ? f.sort_config.name : 'sortabletable';
-		this.sortConfig.src =		this.sortConfig['src']!=undefined ? f.sort_config.src : this.basePath+'sortabletable.js';
-		this.sortConfig.adapterSrc = this.sortConfig['adapter_src']!=undefined ? f.sort_config.adapter_src : this.basePath+'tfAdapter.sortabletable.js';
+		this.sortConfig.src =		this.sortConfig['src']!=undefined ? f.sort_config.src : this.modulesPath+'sortabletable.js';
+		this.sortConfig.adapterSrc = this.sortConfig['adapter_src']!=undefined ? f.sort_config.adapter_src : this.modulesPath+'tfAdapter.sortabletable.js';
 		this.sortConfig.initialize =this.sortConfig['initialize']!=undefined ? f.sort_config.initialize : function(o){ if(o.SetSortTable) o.SetSortTable(); };
 		this.sortConfig.sortTypes =	this.sortConfig['sort_types']!=undefined ? f.sort_config.sort_types : [];
 		this.sortConfig.sortCol =	this.sortConfig['sort_col']!=undefined ? f.sort_config.sort_col : null;
