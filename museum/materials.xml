@@ -2,6 +2,7 @@
     <languages>
         <choice>Английский</choice>
         <choice>Русский</choice>
+        <choice>Українська</choice>
     </languages>
     <materials>
         <precious>
@@ -17,6 +18,31 @@
             <choice>Фантики</choice>
         </non-precious>
     </materials>
+    <assay>
+        <Золото>
+            <choice>999</choice>
+            <choice>958</choice>
+            <choice>750</choice>
+            <choice>585</choice>
+            <choice>500</choice>
+            <choice>375</choice>
+        </Золото>
+        <silver>
+            <choice>960</choice>
+            <choice>925</choice>
+            <choice>875</choice>
+            <choice>830</choice>
+            <choice>800</choice>
+        </silver>
+        <platinum>
+            <choice>950</choice>
+            <choice>900</choice>
+        </platinum>
+        <palladium>
+            <choice>850</choice>
+            <choice>500</choice>
+        </palladium>
+    </assay>
     <dimension>
         <type>
             <choice>Валюта</choice>
@@ -31,14 +57,65 @@
             <choice>Інші дані ...</choice>
         </type>
         <measurement_unit>
-            <choice>Фунтів</choice>
-            <choice>см</choice>
-            <choice>мм</choice>
-            <choice>фунтів(вага)</choice>
-            <choice>г/см^2</choice>
-            <choice>люменів ISO</choice>
-            <choice>%</choice>
-            <choice>років</choice>
+            <!--<Вага>
+                <choice>фунтів</choice>
+                <choice>г</choice>
+                <choice>кг</choice>
+                <choice>карат</choice>
+            </Вага>
+            <Довжина>
+                <choice>Фунт</choice>
+                <choice>см</choice>
+                <choice>мм</choice>
+                <choice>м</choice>
+                <choice>дм</choice>
+                <choice>км</choice>
+                <choice>миля</choice>
+            </Довжина>
+            <Щільність>
+                <choice>г/см^2</choice>
+            </Щільність>
+            <Освітленість>
+                <choice>люменів ISO</choice>
+            </Освітленість>
+            <Вміст>
+                <choice>%</choice>
+            </Вміст>
+            <Висота>
+                <choice>Фунт</choice>
+                <choice>см</choice>
+                <choice>мм</choice>
+                <choice>м</choice>
+                <choice>дм</choice>
+                <choice>км</choice>
+                <choice>миля</choice>
+            </Висота>
+            <Ширина>
+                <choice>Фунт</choice>
+                <choice>см</choice>
+                <choice>мм</choice>
+                <choice>м</choice>
+                <choice>дм</choice>
+                <choice>км</choice>
+                <choice>миля</choice>
+            </Ширина>
+            <Інші>
+                <choice>років</choice>
+            </Інші>-->
+                <choice>фунтів</choice>
+                <choice>г</choice>
+                <choice>кг</choice>
+                <choice>карат</choice>
+                <choice>Фунт</choice>
+                <choice>см</choice>
+                <choice>мм</choice>
+                <choice>м</choice>
+                <choice>дм</choice>
+                <choice>км</choice>
+                <choice>миля</choice>
+                <choice>г/см^2</choice>
+                <choice>люменів ISO</choice>
+                <choice>%</choice>
         </measurement_unit>
     </dimension>
 </data>
