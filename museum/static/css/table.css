@@ -10,4 +10,9 @@ tr {
     background: #999999;
 }
 
+input[type="button"] {
+    position: absolute;
+    left: 70%;
+    top: 20%;
+}
 

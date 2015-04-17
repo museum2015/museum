@@ -8,24 +8,24 @@
     <script type="text/javascript" language="javascript" src="{% static "js/TF_Modules/tablefilter.js" %}"></script>
 </head>
 <body>
-
+<div>
 <table id="table1">
     <thead>
     <tr>
-							<th>ID</th>
-							<th>Об’єкт</th>
-                            <th>Подія</th>
-                            <th>Час</th>
-                            <th>Особа</th>
-                            <th>Підтверджено</th>
+							<th id="number0">ID</th>
+							<th>Назва</th>
+							<th id="number1">Кількість</th>
+                            <th>Статус</th>
     </tr>
     </thead>
     <tbody>
-    {% for a in acts %}
-    <tr><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"d/m/Y H:m:s" }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td></tr>
+    {% for a in objects %}
+    <tr><td>{{ a.id }}</td><td>{{ a.name }}</td><td>{{ a.amount }}</td><td>{{ a.status }}</td>
     {% endfor %}
     </tbody>
 </table>
+<input type='button' onclick='ts_ps()' value='Прийняти на постійне зберігання'/>
+</div>
 <script type="text/javascript">
         var $table = $('table'),
         $bodyCells = $table.find('tbody tr:first').children(),
@@ -58,7 +58,9 @@
         });
 
 
-
+        $(document).bind('selectstart dragstart', function(e) {
+            e.preventDefault(); return false;
+        });
 
         var table_props =  {
                     col_0: "none",
@@ -78,12 +80,19 @@
                     loader_html: '<h4 style="color:red;">Завантаження, будь ласка зачекайте...</h4>',
                     sort: true,
                     sort_config: {
-                        sort_types: ['Number', 'String', 'String', 'None', 'String', 'String'],
+                        sort_types:['Number', 'String', 'Number', 'String'],
                     }
     };
 
 
         var tf = setFilterGrid("table1", table_props);
+        var ts_ps = function() {
+            var t = $(".highlight td:first-child").text()
+            var link = "/staff/add_on_ps/" + t
+            window.location.replace(link);
+        };
+
+
 </script>
 </body>
 </html>

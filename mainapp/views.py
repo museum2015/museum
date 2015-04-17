@@ -213,6 +213,11 @@ def ActivityPage(request, id_number):
     return render(request, 'attribute_assign.html', {'attrs': attrs,
                                                      'act': act})
 
+@login_required(login_url='/')
+def ObjectList(request):
+    qs = Object.objects.all()
+    return render(request, 'objects.html', {'objects': qs})
+
 
 def aut(request):
     if not request.user.is_authenticated():

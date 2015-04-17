@@ -9,7 +9,7 @@ Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
 "Software"), to deal in the Software without restriction, including
 without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Softіware, and to
+distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
 the following conditions:
 
@@ -82,14 +82,14 @@ var TF = function(id)
 		try{ this.nbCells = this.GetCellsNb(this.refRow) }
 		catch(e){ this.nbCells = this.GetCellsNb(0) }
 
-		this.basePath = f.base_path!=undefined ? f.base_path : '/static/js/TF_Modules/'; //default script base path
+		this.basePath = f.base_path!=undefined ? f.base_path : '/static/js/'; //default script base path
 
 		if(this.enableModules){
 			/*** Modules: features of the script ***/
 			this.registeredModules = []; //modules to be loaded
 			this.alreadyImportedModules = []; //modules already imported in the page
 			this.importedModules = []; //modules imported by the TF script
-			this.modulesPath = f.modules_path!=undefined ? f.modules_path : this.basePath; //js modules files path
+			this.modulesPath = f.modules_path!=undefined ? f.modules_path : this.basePath+'TF_Modules/'; //js modules files path
 			this.module = {
 				populateSelect:{ name:'populateSelect', desc:'Builds select type filters',
 					path: this.modulesPath + 'tf_populateSelect.js', loaded:0,
@@ -1674,7 +1674,6 @@ TF.prototype = {
 		}//starts paging process
 		//invokes eventual onafter function
 		if(this.onAfterFilter) this.onAfterFilter.call(null,this);
-		
 	},
 
 	ApplyGridProps: function()
@@ -2493,7 +2492,7 @@ function tf_IsValidDate(dateStr, format){
 function tf_FormatDate(dateStr, format){
 	if(format === null){ format = 'DMY'; }
 	if(!dateStr || dateStr === ''){ return new Date(1001, 0, 1); }
-	var oDate, parts;
+	var oDate, parts, left, right;
 
 	function y2kDate(yr){
 		if(yr == undefined) return 0;
@@ -2543,8 +2542,6 @@ function tf_FormatDate(dateStr, format){
 			oDate = new Date(y2kDate(parts[0]),parts[1]-1,parts[2]);
 		break;
 		default: //in case format is not correct
-			parts = dateStr.replace(/^(0?[1-9]|[12][0-9]|3[01])([- \/.])(0?[1-9]|1[012])([- \/.])((\d\d)?\d\d)$/,'$1 $3 $5').split(' ');
-			oDate = new Date(y2kDate(parts[2]),parts[1]-1,parts[0]);
 		break;
 	}
 	return oDate;
