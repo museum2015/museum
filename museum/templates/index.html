@@ -82,16 +82,18 @@
 					<li class="list-group-item"><a href='staff/return/{{ project.id }}'>Повернення предметів з тимчасового зберігання <span class="badge">2.2</span></a></li>
 					<li class="list-group-item"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання <span class="badge">2.3</span></a></li>
 				    <li class="list-group-item"><a href='activities/'>Список всіх подій </a></li>
+                    <li class="list-group-item"><a href='objects/'>Список всіх об'єктів </a></li>
                     <li class="list-group-item"><a href='staff/inventory_save/'>Поставити предмет на інвентарний облік<span class="badge">2.4</span></a></li>
    				</ul>
                 {% endif %}
                 {% if form %}
 				<ul class="list-group">
-					<li class="list-group-item" id="1" rel="reg_form"><a href='staff/add_on_ts/{{ project.id }}'>Приймання предметів на тимчасове зберігання <span class="badge">2.1</span></a></li>
-					<li class="list-group-item" id="2" rel="reg_form"><a href='staff/return/{{ project.id }}'>Повернення предметів з тимчасового зберігання <span class="badge">2.2</span></a></li>
-					<li class="list-group-item" id="3" rel="reg_form"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання <span class="badge">2.3</span></a></li>
-				    <li class="list-group-item" id="4" rel="reg_form"><a href='activities/'>Список всіх подій </a></li>
-                    <li class="list-group-item" id="5" rel="reg_form"><a href='staff/inventory_save/'>Поставити предмет на інвентарний облік<span class="badge">2.4</span></a></li>
+					<li class="list-group-item login" rel="reg_form"><a href='staff/add_on_ts/{{ project.id }}'>Приймання предметів на тимчасове зберігання <span class="badge">2.1</span></a></li>
+					<li class="list-group-item login" rel="reg_form"><a href='staff/return/{{ project.id }}'>Повернення предметів з тимчасового зберігання <span class="badge">2.2</span></a></li>
+					<li class="list-group-item login" rel="reg_form"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання <span class="badge">2.3</span></a></li>
+				    <li class="list-group-item login" rel="reg_form"><a href='activities/'>Список всіх подій </a></li>
+                    <li class="list-group-item login" rel="reg_form"><a href='objects/'>Список всіх об'єктів  </a></li>
+                    <li class="list-group-item login" rel="reg_form"><a href='staff/inventory_save/'>Поставити предмет на інвентарний облік<span class="badge">2.4</span></a></li>
    				</ul>
                 {% endif %}
 

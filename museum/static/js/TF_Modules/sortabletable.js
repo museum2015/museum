@@ -139,6 +139,11 @@ SortableTable.prototype.initHeader = function (oSortTypes) {
 			else
 				c.onclick = this._headerOnclick;
 		}
+		else
+		{
+			c.setAttribute( "_sortType", oSortTypes[i] );
+			c._sortType = "None";
+		}
 	}
 	this.updateHeaderArrows();
 };
@@ -407,6 +412,15 @@ SortableTable.basicCompare = function compare(n1, n2) {
 	return 0;
 };
 
+
+SortableTable.dateCompare = function compare(n1, n2) {
+	if (n1 < n2)
+		return -1;
+	if (n2 < n1)
+		return 1;
+	return 0;
+};
+
 SortableTable.idFunction = function (x) {
 	return x;
 };
@@ -416,28 +430,20 @@ SortableTable.toUpperCase = function (s) {
 };
 
 SortableTable.toDate = function (s) {
-	var parts = s.split("-");
 	var d = new Date(0);
-	d.setFullYear(parts[0]);
-	d.setDate(parts[2]);
-	d.setMonth(parts[1] - 1);
-	return d.valueOf();
-};
-
-SortableTable.toDMYDate = function (s) {
-	var parts = s.split("-");
-	var d = new Date(0);
-	d.setFullYear(parts[2]);
-	d.setDate(parts[0]);
-	d.setMonth(parts[1] - 1);
-	return d.valueOf();
+	left = s.split(' ')[0];
+    right = s.split(' ')[1];
+    left = left.split('-');
+    right = left.split(':');
+    d = new Date(left[2],left[1]-1, left[0], right[2], right[1], right[0]);
+    alert(d);
+	return d;
 };
 
 
 // add sort types
 SortableTable.prototype.addSortType("Number", Number);
 SortableTable.prototype.addSortType("CaseInsensitiveString", SortableTable.toUpperCase);
-SortableTable.prototype.addSortType("Date", SortableTable.toDate);
-SortableTable.prototype.addSortType("DMYDate", SortableTable.toDMYDate);
+SortableTable.prototype.addSortType("Date", SortableTable.toDate, SortableTable.dateCompare);
 SortableTable.prototype.addSortType("String");
 // None is a special case

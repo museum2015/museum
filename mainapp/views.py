@@ -140,6 +140,19 @@ def ProjectPage(request, id_number):
                                                 'editing': editing})
 
 
+def get_attrib_assigns(act_type, project, attribute):
+    act = Activity.objects.filter(type=act_type, approval=True)
+    a = []
+    for i in act:
+            b = AttributeAssignment.objects.filter(event_initiator=i, aim=project, attr_name=attribute)
+            if not b:
+                continue
+            else:
+                a.append(b)
+    return a[0][0].attr_value
+
+
+
 @login_required(login_url='/admin/')
 @csrf_protect
 def AddOnPS(request, id_number):
@@ -178,16 +191,7 @@ def AddOnPS(request, id_number):
     return render(request, 'AddOnPS.html', {'form': form})
 
 
-def get_attrib_assigns(act_type, project, attribute):
-    act = Activity.objects.filter(type=act_type, approval=True)
-    a = []
-    for i in act:
-            b = AttributeAssignment.objects.filter(event_initiator=i, aim=project, attr_name=attribute)
-            if not b:
-                continue
-            else:
-                a.append(b)
-    return a[0][0].attr_value
+
 
 
 @login_required(login_url='/admin/')
@@ -229,6 +233,11 @@ def ActivityPage(request, id_number):
 
     return render(request, 'attribute_assign.html', {'attrs': attrs,
                                                      'act': act})
+
+@login_required(login_url='/')
+def ObjectList(request):
+    qs = Object.objects.all()
+    return render(request, 'objects.html', {'objects': qs})
 
 
 def aut(request):

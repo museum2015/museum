@@ -118,16 +118,17 @@ TF.prototype.SetSortTable = function(){
 		var l = cells.length;
 		var img, c;
 		for (var i = 0; i < l; i++) {
-			if (i!=3) {
-				c = cells[i];
-				if (this.sortTypes[i] != null && this.sortTypes[i] != 'None') {
-					c.style.cursor = 'pointer';
-					img = tf_CreateElm('img',['src', o.sortImgPath + o.sortImgBlank]);
-					c.appendChild(img);
-					if (this.sortTypes[i] != null)
-						c.setAttribute( '_sortType', this.sortTypes[i]);
-					tf_AddEvent(c, 'click', this._headerOnclick);
-				} 
+			c = cells[i];
+			if (this.sortTypes[i] != null && this.sortTypes[i] != 'None') {
+				c.style.cursor = 'pointer';
+				img = tf_CreateElm('img',['src', o.sortImgPath + o.sortImgBlank]);
+				c.appendChild(img);
+				if (this.sortTypes[i] != null)
+					c.setAttribute( '_sortType', this.sortTypes[i]);
+				tf_AddEvent(c, 'click', this._headerOnclick);
+			} else {
+				c.setAttribute( '_sortType', oSortTypes[i] );
+				c._sortType = 'None';
 			}
 		}
 		this.updateHeaderArrows();
@@ -201,15 +202,7 @@ TF.prototype.SetSortTable = function(){
 	//Custom sort types
 	this.AddSortType('number', Number);
 	this.AddSortType('caseinsensitivestring', SortableTable.toUpperCase);
-	this.AddSortType('date', SortableTable.toDate);
 	this.AddSortType('string');
-	this.AddSortType('us', usNumberConverter);
-	this.AddSortType('eu', euNumberConverter);
-	this.AddSortType('dmydate', dmyDateConverter);
-	this.AddSortType('ymddate', ymdDateConverter);
-	this.AddSortType('mdydate', mdyDateConverter);
-	this.AddSortType('ddmmmyyyydate', ddmmmyyyyDateConverter);
-	this.AddSortType('ipaddress', ipAddress, sortIP);
 
 	this.st = new SortableTable(this.tbl,sortTypes);
 
@@ -298,6 +291,7 @@ function dateConverter(s, format){ return tf_formatDate(s, format); }
 function dmyDateConverter(s){ return dateConverter(s,'DMY'); }
 function mdyDateConverter(s){ return dateConverter(s,'MDY'); }
 function ymdDateConverter(s){ return dateConverter(s,'YMD'); }
+function dmyhsDateConverter(s){ return dateConverter(s,'DMYHS'); }
 function ddmmmyyyyDateConverter(s){ return dateConverter(s,'DDMMMYYYY'); }
 
 function ipAddress(val){

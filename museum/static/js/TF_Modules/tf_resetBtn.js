@@ -78,7 +78,7 @@ TF.prototype.SetHelpInstructions = function()
 	this.helpInstrContTgtId = 	f.help_instructions_container_target_id!=undefined //id of custom container element for instructions
 									? f.help_instructions_container_target_id : null;
 	this.helpInstrText =		f.help_instructions_text //defines help text
-									? f.help_instructions_text : ''	;
+									? f.help_instructions_text : '';
 	this.helpInstrHtml = 		f.help_instructions_html!=undefined 
 									? f.help_instructions_html : null; //defines help innerHtml
 	this.helpInstrBtnText = 	f.help_instructions_btn_text!=undefined 
@@ -91,7 +91,7 @@ TF.prototype.SetHelpInstructions = function()
 									? f.help_instructions_container_css_class : 'helpCont';
 	this.helpInstrBtnEl =		null; //help button element
 	this.helpInstrContEl =		null; //help content div
-	this.helpInstrDefaultHtml = '';
+	this.helpInstrDefaultHtml = ''
 	
 	var helpspan = tf_CreateElm('span',['id',this.prfxHelpSpan+this.id]);
 	var helpdiv = tf_CreateElm('div',['id',this.prfxHelpDiv+this.id]);

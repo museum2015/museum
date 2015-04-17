@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 import datetime
 import os
 from django import forms
@@ -616,8 +616,9 @@ class PrepareSpecInventoryForm(forms.Form):
 """
 
 
-class Passport(forms.Form):
-    department = forms.ChoiceField(choices=get_choice('department'), label='Відомство')
+
+#class Passport(forms.Form):
+    #department = forms.ChoiceField(choices=get_choice('department'), label='Відомство')
 
 
 class ObjectEditForm(ModelForm):
