@@ -615,8 +615,8 @@ class PrepareSpecInventoryForm(forms.Form):
 """
 
 
-class Passport(forms.Form):
-    department = forms.ChoiceField(choices=get_choice('department'), amount=1, label='Відомство')
+#class Passport(forms.Form):
+    #department = forms.ChoiceField(choices=get_choice('department'), amount=1, label='Відомство')
 
 
 class ObjectEditForm(ModelForm):
