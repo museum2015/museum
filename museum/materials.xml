@@ -118,4 +118,7 @@
                 <choice>%</choice>
         </measurement_unit>
     </dimension>
+    <department>
+        <choice>Держбуд України</choice>
+    </department>
 </data>

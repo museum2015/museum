@@ -12,6 +12,7 @@ from django.forms.extras.widgets import SelectDateWidget
 
 TECHNIQUE_CHOICES = (('', '--------'),)
 WAY_OF_FOUND_CHOICES = (('', '--------'),)
+MARKS_ON_OBJECT = (('', '--------'), ('Написи', 'Написи'), ('Печатки', 'Печатки'), ('Клейма', 'Клейма'),)
 COLLECTIONS = (('', '--------'),)
 TOPOGRAPHY = (('', '--------'), ('шкаф', 'шкаф'))
 CONDITIONS = (('', '--------'), ('Без пошкоджень', 'Без пошкоджень'), ('Задовільний', 'Задовільний'), ('Незадовільний', 'Незадовільний'))
@@ -469,8 +470,8 @@ class PersistentSaveForm(forms.Form):
     name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='') #
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False) #
     amount = forms.IntegerField(label='Кількість', required=True) #
-    #date_creation = forms.CharField(label='Дата створення предмета', required=True)
-    # place_of_creating = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
+    date_creation = forms.CharField(label='Дата створення предмета', required=True)
+    place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True) #
     technique = forms.ChoiceField(choices=get_choice('dimension', 'type'), label='Техніка', required=True) #
     material = Custom.MultiMaterialSelectField(label='Матеріал') #
@@ -479,8 +480,8 @@ class PersistentSaveForm(forms.Form):
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
-    can_transport = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
-    recommandation_rest = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
+    transport_possibility = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
+    recomm_for_restauration = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     price = forms.CharField(max_length=40, label='Вартість', required=True)
     note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     PS_code = forms.CharField(max_length=200, label='Шифр ПЗ (номер за книгою ПЗ)', required=True)
@@ -522,7 +523,7 @@ class InventorySaveForm(forms.Form):
     amount = forms.IntegerField(label='Кількість', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     date_creation = forms.CharField(label='Дата створення предмета', required=True)
-    place_of_creating = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
+    place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     date_detection = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Дата знаходження', required=True)
     place_detection = forms.CharField(max_length=200, label='Місце виявлення')
     date_existence = forms.CharField(max_length=200, label='Дата побутування')
@@ -530,22 +531,22 @@ class InventorySaveForm(forms.Form):
     technique = forms.ChoiceField(choices=get_choice('dimension', 'type'), label='Техніка', required=True)
     material = Custom.MultiMaterialSelectField(label='Матеріал')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
-    mark_on_object = Custom.TextChoiceField(choices=get_choice('languages'), label='Позначки на предметі', placeholder1='')
-    #classification = forms.CharField(max_length=200, label='Класифікація')
-    #typology = forms.CharField(max_length=200, label='Типологія')
+    mark_on_object = Custom.TextChoiceField(choices=MARKS_ON_OBJECT, label='Позначки на предметі', placeholder1='')
+    classification = forms.CharField(max_length=200, label='Класифікація')
+    typology = forms.CharField(max_length=200, label='Типологія')
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
-    #bibliography = forms.CharField(max_length=200, label='Бібліографія')
+    bibliography = forms.CharField(max_length=200, label='Бібліографія')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
-    can_transport = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
-    recommandation_rest = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
+    transport_possibility = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
+    recomm_for_restauration = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     price = forms.CharField(max_length=40, label='Вартість', required=True)
     note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     inventory_number = forms.CharField(max_length=100, label='Інвентарний номер')
     #дата запису до інвентарної книги буде в Activity
     PS_code = forms.CharField(max_length=200, label='Шифр ПЗ (номер за книгою ПЗ)', required=True)
-    way_of_found = forms.CharField(max_length=200, label='Спосіб надходження ', required=True)
+    way_of_found = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=False)
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
     link_on_doc = forms.FileField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False)
     spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер')
@@ -616,7 +617,7 @@ class PrepareSpecInventoryForm(forms.Form):
 
 
 class Passport(forms.Form):
-    department = forms.ChoiceField(choices=get_choice('department'), amount=1, label='Відомство')
+    department = forms.ChoiceField(choices=get_choice('department'), label='Відомство')
 
 
 class ObjectEditForm(ModelForm):

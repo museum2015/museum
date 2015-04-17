@@ -164,15 +164,30 @@ def AddOnPS(request, id_number):
         else:
             return render(request, 'AddOnPS.html', {'form': form, 'errors': form.errors})
     else:
+        place_creation = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'place_of_creation')
+        date_creation = get_attrib_assigns('Приймання на тимчасове зберігання', project, "date_creation")
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
                 'size': project.size, 'description': project.description, 'can_transport': project.transport_possibility,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
-                'recommandation_rest': project.recomm_for_restauration,
-                'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
+                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': date_creation,
+                'place_of_creation': place_creation, 'source': project.source,
+                'price': project.price,  'way_of_found': project.way_of_found,
                 'transport_possibility': project.transport_possibility, 'fond': project.collection}
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
+
+
+def get_attrib_assigns(act_type, project, attribute):
+    act = Activity.objects.filter(type=act_type, approval=True)
+    a = []
+    for i in act:
+            b = AttributeAssignment.objects.filter(event_initiator=i, aim=project, attr_name=attribute)
+            if not b:
+                continue
+            else:
+                a.append(b)
+    return a[0][0].attr_value
 
 
 @login_required(login_url='/admin/')
@@ -292,11 +307,19 @@ def AddOnInventorySave(request, id_number):
         else:
             return render(request, 'AddOnInventoryBook.html', {'form': form, 'errors': form.errors})
     else:
+        old_registered_marks = get_attrib_assigns('Приймання на постійне зберігання', project, 'old_registered_marks')
+        link_on_doc = get_attrib_assigns('Приймання на постійне зберігання', project, 'link_on_doc')
+        ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
+        place_creation = get_attrib_assigns('Приймання на постійне зберігання', project, 'place_of_creation')
+        date_creation = get_attrib_assigns('Приймання на постійне зберігання', project, "date_creation")
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
                 'size': project.size, 'description': project.description, 'can_transport': project.transport_possibility,
-                'condition': project.condition, 'recommandation_rest': project.recomm_for_restauration,
-                'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
+                'condition': project.condition, 'condition_descr': project.condition_descr,
+                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': date_creation,
+                'place_of_creation': place_creation, 'source': project.source, 'note': project.note,
+                'price': project.price,  'way_of_found': project.way_of_found, 'PS_code': ps_code,
+                'link_on_doc': link_on_doc, 'old_registered_marks': old_registered_marks,
                 'transport_possibility': project.transport_possibility, 'fond': project.collection}
         form = InventorySaveForm(initial=data)
     return render(request, 'AddOnInventoryBook.html', {'form': form})
