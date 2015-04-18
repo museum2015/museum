@@ -12,6 +12,7 @@ from django.forms.extras.widgets import SelectDateWidget
 
 TECHNIQUE_CHOICES = (('', '--------'),)
 WAY_OF_FOUND_CHOICES = (('', '--------'),)
+AIMS = (('', '--------'),)
 MARKS_ON_OBJECT = (('', '--------'), ('Написи', 'Написи'), ('Печатки', 'Печатки'), ('Клейма', 'Клейма'),)
 COLLECTIONS = (('', '--------'),)
 TOPOGRAPHY = (('', '--------'), ('шкаф', 'шкаф'))
@@ -284,6 +285,12 @@ class Object(models.Model):
     #image_type = models.CharField(max_length=50, default='', null=True)
     author = models.CharField(max_length=100, default='', null=True)  #
     price = models.CharField(max_length=50, default='', null=True)  #
+    date_creation = models.CharField(max_length=50, default='', null=True)
+    place_of_creation = models.CharField(max_length=50, default='', null=True)
+    date_detection = models.CharField(max_length=50, default='', null=True)
+    place_detection = models.CharField(max_length=50, default='', null=True)
+    date_existence = models.CharField(max_length=50, default='', null=True)
+    place_existence = models.CharField(max_length=50, default='', null=True)
     mark_on_object = models.CharField(max_length=200, default='', null=True)  ##
     note = models.CharField(max_length=200, default='', null=True)  #
     condition = models.CharField(max_length=100, default='', null=True)  #
@@ -291,22 +298,24 @@ class Object(models.Model):
     transport_possibility = models.BooleanField(default=False)  ##
     recomm_for_restauration = models.CharField(max_length=100, default='', null=True)  ##
     restauration_notes = models.CharField(max_length=200, default='', null=True)  ##
+    memorial_subject = models.CharField(max_length=200, default='', null=True)
     storage = models.CharField(max_length=200, default='', null=True)  #
     place_appellation = models.CharField(max_length=200, default='', null=True)  ##
     is_there = models.CharField(max_length=200, default='', null=True)  ##
+    bibliography = models.CharField(max_length=1000, default='', null=True)
     #documented_in = models.CharField(max_length=200)
     #documented_type = models.CharField(max_length=50)
     way_of_found = models.CharField(max_length=200, default='', null=True)  #
-    #link_on_doc = models.CharField(max_length=200)
+    link_on_doc = models.CharField(max_length=200, default='', null=True)
     #doc_type = models.CharField(max_length=50)
-    transferred_from = models.CharField(max_length=200, default='', null=True)  #
-    transferred_to = models.CharField(max_length=200, default='', null=True)  #
+    side_1 = models.CharField(max_length=200, default='', null=True)  #
+    side_2 = models.CharField(max_length=200, default='', null=True)  #
     term_back = models.DateTimeField(max_length=200, default='2000-02-12 00:00', null=True)  #
     aim_of_receiving_gen = models.CharField(max_length=200, default='', null=True)  #
-    #aim_of_receiving = models.ForeignKey(Activity)
+    #aim_of_receiving = models.CharField(max_length=1000, default='', null=True)
     circumst_write_off = models.CharField(max_length=200, default='', null=True)  ##
-    reason = models.FileField(default='default.txt', null=True, upload_to=get_image_path)  #
-    source = models.CharField(max_length=200, default='', null=True)  #
+    #reason = models.FileField(default='default.txt', null=True, upload_to=get_image_path)  #
+    #source = models.CharField(max_length=200, default='', null=True)  #
 
     def __unicode__(self):
         return self.name + ' (' + self.identifier + ')'
@@ -377,10 +386,7 @@ class TempSaveForm(forms.Form):
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=get_choice('dimension', 'type'), label='Техніка', required=False)
     material = Custom.MultiMaterialSelectField(label='Матеріали')
-    # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
-    #size_measurement_unit = forms.CharField(max_length=50, label='Measurement Unit')
-    #measurement =
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
@@ -389,18 +395,15 @@ class TempSaveForm(forms.Form):
     price = forms.CharField(max_length=200, label='Вартість', required=True)
     side_1 = forms.CharField(max_length=200, label='Сторона 1 (акт приймання на ТЗ)', required=True)
     side_2 = forms.CharField(max_length=200, label='Сторона 2 (акт приймання на ТЗ)', required=True)
-    #aim_of_receiving_gen = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Мета приймання на ТЗ', required=True)
+    #aim_of_receiving = forms.ChoiceField(choices=AIMS, label='Мета приймання на ТЗ', required=True)
     way_of_found = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=False)
     reason = forms.FileField(label='Підстава', required=False)
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
     collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=False)
     term_back = forms.DateTimeField(widget=SelectDateWidget)
-    code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
-    #date_write_TS = forms.DateTimeField(input_formats=['%Y-%m-%d'],label='Date of writing in the book of TS')
-
+    TS_code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
     mat_person_in_charge = forms.ModelChoiceField(queryset=User.objects.all(), label='Матеріально-відповідальна особа', required=False)
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=False) #
-    #ne nado, v activity est' #writing_person = forms.CharField(max_length=50, label='Person who writes is TS book')
     #return_mark = forms.BooleanField(label='Is it returned?')
 
 
@@ -416,20 +419,19 @@ class TempRetForm(forms.Form):
     name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=None, label='Кількість', required=True)
-    #date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
-    #place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
-    author = forms.CharField(max_length=200, label='Автор', required=True) #
+    date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
+    place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
+    author = forms.CharField(label='Автор', required=True) #
     technique = forms.ChoiceField(choices=get_choice('dimension', 'type'), label='Техніка', required=True)
     material = Custom.MultiMaterialSelectField(label='Матеріал')
-    # size_type = forms.CharField(max_length=200, label='Type of size', required=True)
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea)
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 450px;"}))
-    note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': 'margin: 0px; height: 252px; width: 450px;'}))
     price = forms.CharField(max_length=200, label='Вартість', required=True)
-    term_back = forms.DateTimeField(widget=SelectDateWidget)
+    term_back = forms.DateTimeField(widget=SelectDateWidget, label='Термін повернення')
+    note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': 'margin: 0px; height: 252px; width: 450px;'}))
     reason = forms.FileField(label='Підстава', required=False)
     side_1 = forms.CharField(max_length=100, label='Сторона 1 (акт повернення з ТЗ)', required=True)
     side_2 = forms.CharField(max_length=100, label='Сторона 2 (акт повернення з ТЗ)', required=True)
@@ -616,9 +618,33 @@ class PrepareSpecInventoryForm(forms.Form):
 """
 
 
-
 #class Passport(forms.Form):
     #department = forms.ChoiceField(choices=get_choice('department'), label='Відомство')
+
+class FromPStoTSForm(forms.Form):
+    name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='') #
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
+    amount = forms.IntegerField(label='Кількість', required=True)
+    date_creation = forms.CharField(label='Дата створення предмета', required=True)
+    place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
+    author = forms.CharField(max_length=200, label='Автор', required=True)
+    technique = forms.ChoiceField(choices=get_choice('dimension', 'type'), label='Техніка', required=True)
+    material = Custom.MultiMaterialSelectField(label='Матеріал')
+    size = Custom.MultiChoiceTextChoiceField(label='Розміри')
+    condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+    condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    insurable_value = forms.CharField(max_length=30, label='Страхова вартість', required=True)
+    note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    side_1 = forms.CharField(max_length=200, label='Сторона 1 юридична особа', required=True)
+    side_1_person_in_charge = forms.CharField(max_length=200, label='Сторона 1 головний зберігач (матеріально-відповідальна особа)', required=True)
+    side_1_fond_saver = forms.CharField(max_length=200, label='Сторона 1 зберігач фонду', required=True)
+    side_2 = forms.CharField(max_length=200, label='Сторона 2 юридична особа', required=True)
+    side_2_person_in_charge = forms.CharField(max_length=200, label='Сторона 2 відповідальна особа/приватна особа', required=True)
+    #aim_of_receiving = forms.CharField(max_length=2000, label='Мета передачі на ТЗ', required=True,
+    #                                   widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+
 
 
 class ObjectEditForm(ModelForm):
