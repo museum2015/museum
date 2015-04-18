@@ -362,7 +362,6 @@ def FromPSToTS(request, id_number):
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Видача предметів з Постійного зберігання на Тимчасове зберігання', actor=request.user)
-            project.status = 'Приймання на тимчасове зберігання'
             act.save()
             project.save()
             for (k, v) in cd.items():

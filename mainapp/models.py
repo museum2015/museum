@@ -447,7 +447,7 @@ class PrepareRetForm(forms.Form):
         super(PrepareRetForm, self).__init__(*args, **kwargs)
         objlist = []
         for project in Object.objects.all():
-            if project.status() == 'Приймання на тимчасове зберігання':
+            if project.status() == 'Приймання на тимчасове зберігання' or project.status() == 'Видача предметів з Постійного зберігання на Тимчасове зберігання':
                 objlist.append(project)
         objects = [(o.id, o.__unicode__()) for o in objlist]
         self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
