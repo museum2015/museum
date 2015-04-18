@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelChoiceField
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
     PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
-    InventorySaveForm
+    InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, FromPStoTSForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView, CreateView
@@ -75,11 +75,13 @@ def TempRet(request, id_number=0):
         else:
             return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
+        reason = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'reason')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
                 'size': project.size, 'description': project.description, 'condition': project.condition,
-                'condition_descr': project.condition_descr,
-                'reason': project.attributeassignment_set.get(attr_name='reason', actual=True).attr_value,
+                'condition_descr': project.condition_descr, 'date_creation': project.date_creation,
+                'place_of_creation': project.place_of_creation, 'term_back': project.term_back,
+                'reason': reason, 'side_1': project.side_1, 'side_2': project.side_2,
                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
         form = TempRetForm(initial=data)
@@ -177,14 +179,13 @@ def AddOnPS(request, id_number):
         else:
             return render(request, 'AddOnPS.html', {'form': form, 'errors': form.errors})
     else:
-        place_creation = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'place_of_creation')
-        date_creation = get_attrib_assigns('Приймання на тимчасове зберігання', project, "date_creation")
+        source = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'source')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
                 'size': project.size, 'description': project.description, 'can_transport': project.transport_possibility,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
-                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': date_creation,
-                'place_of_creation': place_creation, 'source': project.source,
+                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
+                'place_of_creation': project.place_of_creation, 'source': source,
                 'price': project.price,  'way_of_found': project.way_of_found,
                 'transport_possibility': project.transport_possibility, 'fond': project.collection}
         form = PersistentSaveForm(initial=data)
@@ -312,26 +313,73 @@ def AddOnInventorySave(request, id_number):
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
-            return HttpResponseRedirect('')
+            return HttpResponseRedirect('/')
         else:
             return render(request, 'AddOnInventoryBook.html', {'form': form, 'errors': form.errors})
     else:
+        source = get_attrib_assigns('Приймання на постійне зберігання', project, 'source')
         old_registered_marks = get_attrib_assigns('Приймання на постійне зберігання', project, 'old_registered_marks')
-        link_on_doc = get_attrib_assigns('Приймання на постійне зберігання', project, 'link_on_doc')
         ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
-        place_creation = get_attrib_assigns('Приймання на постійне зберігання', project, 'place_of_creation')
-        date_creation = get_attrib_assigns('Приймання на постійне зберігання', project, "date_creation")
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
-                'size': project.size, 'description': project.description, 'can_transport': project.transport_possibility,
+                'size': project.size, 'description': project.description,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
-                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': date_creation,
-                'place_of_creation': place_creation, 'source': project.source, 'note': project.note,
+                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
+                'place_of_creation': project.place_of_creation, 'note': project.note, 'source': source,
                 'price': project.price,  'way_of_found': project.way_of_found, 'PS_code': ps_code,
-                'link_on_doc': link_on_doc, 'old_registered_marks': old_registered_marks,
+                'link_on_doc': project.link_on_doc, 'old_registered_marks': old_registered_marks,
                 'transport_possibility': project.transport_possibility, 'fond': project.collection}
         form = InventorySaveForm(initial=data)
     return render(request, 'AddOnInventoryBook.html', {'form': form})
 
 #def menu(request):
 
+
+@login_required(login_url='/admin/')
+def PreparePSToTS(request):
+    if request.method == 'POST':
+        form = PreparePStoTSForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return HttpResponseRedirect(cd['obj'])
+        else:
+            return HttpResponseRedirect('/')
+    else:
+        form = PreparePStoTSForm()
+        return render(request, 'FromPStoTS.html', {'form': form})
+
+
+@login_required(login_url='/admin/')
+@csrf_protect
+def FromPSToTS(request, id_number):
+    try:
+        project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist:
+        return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
+
+    if request.method == 'POST':
+        form = FromPStoTSForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            act = Activity(time_stamp=dt.now(), type='Видача предметів з Постійного зберігання на Тимчасове зберігання', actor=request.user)
+            project.status = 'Приймання на тимчасове зберігання'
+            act.save()
+            project.save()
+            for (k, v) in cd.items():
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign.save()
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'FromPStoTS.html', {'form': form, 'errors': form.errors})
+    else:
+        ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
+        inventory_number = get_attrib_assigns('Приймання на постійне зберігання', project, 'inventory_number')
+        data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'size': project.size, 'description': project.description, 'note': project.note,
+                'condition': project.condition, 'condition_descr': project.condition_descr,
+                'date_creation': project.date_creation, 'place_of_creation': project.place_of_creation,
+                'PS_code': ps_code, 'inventory_number': inventory_number,
+                }
+        form = FromPStoTSForm(initial=data)
+    return render(request, 'FromPStoTS.html', {'form': form})

@@ -83,7 +83,8 @@
 					<li class="list-group-item"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання <span class="badge">2.3</span></a></li>
 				    <li class="list-group-item"><a href='activities/'>Список всіх подій </a></li>
                     <li class="list-group-item"><a href='objects/'>Список всіх об'єктів </a></li>
-                    <li class="list-group-item"><a href='staff/inventory_save/'>Поставити предмет на інвентарний облік<span class="badge">2.4</span></a></li>
+                    <li class="list-group-item"><a href='staff/inventory_save/{{ project.id }}'>Поставити предмет на інвентарний облік<span class="badge">2.4</span></a></li>
+                    <li class="list-group-item"><a href='staff/ps_to_ts/{{ project.id }}'>Повернення предмета з ПЗ на ТЗ<span class="badge">2.7</span></a></li>
    				</ul>
                 {% endif %}
                 {% if form %}
@@ -93,7 +94,8 @@
 					<li class="list-group-item login" rel="reg_form"><a href='staff/add_on_ps/{{ project.id }}'>Приймання предметів на постійне зберігання <span class="badge">2.3</span></a></li>
 				    <li class="list-group-item login" rel="reg_form"><a href='activities/'>Список всіх подій </a></li>
                     <li class="list-group-item login" rel="reg_form"><a href='objects/'>Список всіх об'єктів  </a></li>
-                    <li class="list-group-item login" rel="reg_form"><a href='staff/inventory_save/'>Поставити предмет на інвентарний облік<span class="badge">2.4</span></a></li>
+                    <li class="list-group-item login" rel="reg_form"><a href='staff/inventory_save/{{ project.id }}'>Поставити предмет на інвентарний облік<span class="badge">2.4</span></a></li>
+                    <li class="list-group-item login" rel="reg_form"><a href='staff/ps_to_ts/{{ project.id }}'>Повернення предмета з ПЗ на ТЗ<span class="badge">2.7</span></a></li>
    				</ul>
                 {% endif %}
 

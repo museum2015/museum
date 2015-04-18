@@ -24,5 +24,7 @@ urlpatterns = patterns('',
     url(r'^$', views.aut),
     url(r'^staff/inventory_save/$', views.PrepareInventory),
     url(r'^staff/inventory_save/(?P<id_number>[0-9]+)/$', views.AddOnInventorySave),
+    url(r'^staff/ps_to_ts/$', views.PreparePSToTS),
+    url(r'^staff/ps_to_ts/(?P<id_number>[0-9]+)/$', views.FromPSToTS),
    #url(r'^menu/', views.menu),
 )
