@@ -333,6 +333,10 @@ class Object(models.Model):
             status = str(self.attributeassignment_set.filter(approval=True)[i].event_initiator)
         return status
 
+    def change_attributes(self):
+        for i in AttributeAssignment.objects.filter(aim=self):
+            i.actual = False
+
 
 class Activity(models.Model):
     time_stamp = models.DateTimeField(default='2000-02-12 00:00')
@@ -375,7 +379,7 @@ class AttributeAssignment(models.Model):
         self.aim.save()
         self.approval = True
         self.actual = True
-        for query in self.aim.attributeassignment_set.filter(attr_name=self.attr_name):
+        for query in self.aim.attributeassignment_set.filter(attr_name=self.attr_name, aim=self.aim):
             query.actual = False
         self.save()
 
@@ -659,7 +663,50 @@ class FromPStoTSForm(forms.Form):
     PS_code = forms.CharField(max_length=200, label='Шифр та номер за книгою надходжень (ПЗ)', required=True)
     inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
     TS_code = forms.CharField(max_length=100, label='Шифр та номер ТЗ (актуальний)', required=True)
-    is_there = forms.ChoiceField(choices=PLACE[1:], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
+    is_there = forms.ChoiceField(choices=PLACE[2:4], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
+
+
+class PrepareTStoPSForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(PrepareTStoPSForm, self).__init__(*args, **kwargs)
+        objlist = []
+        for project in Object.objects.all():
+            if project.status() == 'Видача предметів з Постійного зберігання на Тимчасове зберігання':
+                objlist.append(project)
+        objects = []
+        for o in objlist:
+            objects.append((o.id, o.__unicode__()))
+        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
+
+
+class FromTStoPSForm(forms.Form):
+    name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='') #
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
+    amount = forms.IntegerField(label='Кількість', required=True)
+    date_creation = forms.CharField(label='Дата створення предмета', required=True)
+    place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
+    author = forms.CharField(max_length=200, label='Автор', required=True)
+    technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
+    material = Custom.MultiMaterialSelectField(label='Матеріал')
+    size = Custom.MultiChoiceTextChoiceField(label='Розміри')
+    condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+    condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    insurable_value = forms.CharField(max_length=30, label='Страхова вартість', required=True)
+    note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    side_1 = forms.CharField(max_length=200, label='Сторона 1 юридична особа', required=True)
+    side_1_person_in_charge = forms.CharField(max_length=200, label='Сторона 1 головний зберігач (матеріально-відповідальна особа)', required=True)
+    side_1_fond_saver = forms.CharField(max_length=200, label='Сторона 1 зберігач фонду', required=True)
+    side_2 = forms.CharField(max_length=200, label='Сторона 2 юридична особа', required=True)
+    side_2_person_in_charge = forms.CharField(max_length=200, label='Сторона 2 відповідальна особа/приватна особа', required=True)
+    #aim_of_receiving = forms.CharField(max_length=2000, label='Мета передачі на ТЗ', required=True,
+    #                                   widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    reason = forms.CharField(label='Посилання на документи: акт видачі на ТЗ, договір, наказ директора, наказ вищої інстанції тощо', max_length=400, required=True)
+    term_back = forms.DateTimeField(widget=SelectDateWidget, label='Термін повернення')
+    PS_code = forms.CharField(max_length=200, label='Шифр та номер за книгою надходжень (ПЗ)', required=True)
+    inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
+    is_there = forms.ChoiceField(choices=PLACE[1:2], label='Фізичне місце збереження (топографія) – позначка про повернення у фонди', required=True)
 
 
 class ObjectEditForm(ModelForm):
