@@ -333,10 +333,6 @@ class Object(models.Model):
             status = str(self.attributeassignment_set.filter(approval=True)[i].event_initiator)
         return status
 
-    def change_attributes(self):
-        for i in AttributeAssignment.objects.filter(aim=self):
-            i.actual = False
-
 
 class Activity(models.Model):
     time_stamp = models.DateTimeField(default='2000-02-12 00:00')
@@ -451,7 +447,9 @@ class PrepareRetForm(forms.Form):
         super(PrepareRetForm, self).__init__(*args, **kwargs)
         objlist = []
         for project in Object.objects.all():
-            if project.status() == 'Приймання на тимчасове зберігання' or project.status() == 'Видача предметів з Постійного зберігання на Тимчасове зберігання':
+            if project.status() == 'Приймання на тимчасове зберігання'\
+                    and project.status() != 'Списання (втрата тощо)'\
+                    and project.status() != 'Пустий об’єкт':
                 objlist.append(project)
         objects = [(o.id, o.__unicode__()) for o in objlist]
         self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
@@ -462,7 +460,11 @@ class PreparePSForm(forms.Form):
         super(PreparePSForm, self).__init__(*args, **kwargs)
         objlist = []
         for project in Object.objects.all():
-            if project.status() != 'Пустий об’єкт' and project.status() != 'Приймання на постійне зберігання':
+            if project.status() != 'Пустий об’єкт' and project.status() != 'Приймання на постійне зберігання'\
+                    and project.status() != 'Списання (втрата тощо)'\
+                    and project.status() != 'Передача на постійне зберігання'\
+                    and project.status() != 'Повернення творів з Тимчасового зберігання на Постійне зберігання'\
+                    and project.status() != 'Видача предметів з Постійного зберігання на Тимчасове зберігання':
                 objlist.append(project)
         objects = [(0, 'Новий об’єкт')]
         for o in objlist:
@@ -513,7 +515,9 @@ class PrepareInventoryForm(forms.Form):
         super(PrepareInventoryForm, self).__init__(*args, **kwargs)
         objlist = []
         for project in Object.objects.all():
-            if project.status() == 'Приймання на постійне зберігання':
+            if project.status() == 'Приймання на постійне зберігання'\
+                    and project.status() != 'Списання (втрата тощо)'\
+                    and project.status() != 'Пустий об’єкт':
                 objlist.append(project)
         objects = [(0, 'Новий об’єкт')]
         for o in objlist:
@@ -569,7 +573,8 @@ class PrepareSpecInventoryForm(forms.Form):
         super(PrepareSpecInventoryForm, self).__init__(*args, **kwargs)
         objlist = []
         for project in Object.objects.all():
-            if project.status() == 'Інвентарний облік' or project.status() == 'Приймання на постійне зберігання' :
+            if project.status() == 'Інвентарний облік' or project.status() == 'Приймання на постійне зберігання'\
+                    and project.status() != 'Списання (втрата тощо)':
                 objlist.append(project)
         objects = []
         for o in objlist:
@@ -627,7 +632,10 @@ class PreparePStoTSForm(forms.Form):
         super(PreparePStoTSForm, self).__init__(*args, **kwargs)
         objlist = []
         for project in Object.objects.all():
-            if project.status() == 'Приймання на постійне зберігання':
+            if project.status() == 'Приймання на постійне зберігання'\
+                    and project.status() != 'Списання (втрата тощо)'\
+                    and project.status() != 'Передача на постійне зберігання'\
+                    and project.status() != 'Видача предметів з Постійного зберігання на Тимчасове зберігання':
                 objlist.append(project)
         objects = []
         for o in objlist:
@@ -671,7 +679,8 @@ class PrepareTStoPSForm(forms.Form):
         super(PrepareTStoPSForm, self).__init__(*args, **kwargs)
         objlist = []
         for project in Object.objects.all():
-            if project.status() == 'Видача предметів з Постійного зберігання на Тимчасове зберігання':
+            if project.status() == 'Видача предметів з Постійного зберігання на Тимчасове зберігання'\
+                    and project.status() != 'Списання (втрата тощо)':
                 objlist.append(project)
         objects = []
         for o in objlist:
@@ -707,6 +716,78 @@ class FromTStoPSForm(forms.Form):
     PS_code = forms.CharField(max_length=200, label='Шифр та номер за книгою надходжень (ПЗ)', required=True)
     inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
     is_there = forms.ChoiceField(choices=PLACE[1:2], label='Фізичне місце збереження (топографія) – позначка про повернення у фонди', required=True)
+
+
+class PrepareSendOnPSForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(PrepareSendOnPSForm, self).__init__(*args, **kwargs)
+        objlist = []
+        for project in Object.objects.all():
+            if project.status() != 'Приймання на постійне зберігання' \
+                    and project.status() != 'Повернення творів з Тимчасового зберігання на Постійне зберігання'\
+                    and project.status() != 'Пустий об’єкт'\
+                    and project.status() != 'Передача на постійне зберігання'\
+                    and project.status() != 'Списання (втрата тощо)':
+                objlist.append(project)
+        objects = []
+        for o in objlist:
+            objects.append((o.id, o.__unicode__()))
+        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
+
+
+class SendOnPSForm(forms.Form):
+    name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='') #
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
+    amount = forms.IntegerField(label='Кількість', required=True)
+    technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
+    material = Custom.MultiMaterialSelectField(label='Матеріал')
+    size = Custom.MultiChoiceTextChoiceField(label='Розміри')
+    condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+    condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    side_1 = forms.CharField(max_length=200, label='Сторона 1 юридична особа', required=True)
+    side_1_person_in_charge = forms.CharField(max_length=200, label='Сторона 1 головний зберігач', required=True)
+    side_1_fond_saver = forms.CharField(max_length=200, label='Сторона 1 зберігач фонду', required=True)
+    side_2 = forms.CharField(max_length=200, label='Сторона 2 юридична особа', required=True)
+    side_2_person_in_charge = forms.CharField(max_length=200, label='Сторона 2 відповідальна особа/приватна особа', required=True)
+    reason = forms.CharField(label='Підстава (посилання на документи: договір, наказ Міністерства культури тощо, наказ директора музею)', max_length=400, required=True)
+    PS_code = forms.CharField(max_length=200, label='Шифр та номер за книгою надходжень (ПЗ)', required=True)
+    inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
+    spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер', required=True)
+    TS_code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
+    is_there = forms.ChoiceField(choices=PLACE[2:4], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
+
+
+class PrepareWritingOffForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(PrepareWritingOffForm, self).__init__(*args, **kwargs)
+        objlist = []
+        for project in Object.objects.all():
+            if project.status() != 'Пустий об’єкт' and project.status() != 'Списання (втрата тощо)' :
+                objlist.append(project)
+        objects = []
+        for o in objlist:
+            objects.append((o.id, o.__unicode__()))
+        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
+
+
+class WritingOffForm(forms.Form):
+    name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='') #
+    is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
+    amount = forms.IntegerField(label='Кількість', required=True)
+    note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    main_saver = forms.ModelChoiceField(queryset=User.objects.all(), label='Головний зберігач', required=True)
+    fond_saver = forms.ModelChoiceField(queryset=User.objects.all(), label='Зберігач фонду', required=True)
+    reason = forms.CharField(label='Причина', max_length=400, required=True)
+    circumstance = forms.CharField(label='Обставини ', max_length=400, required=True)
+    link_on_doc = forms.CharField(max_length=200, label='Посилання на документи: акти звірення, погодження Міністерства культури тощо', required=False)
+    PS_code = forms.CharField(max_length=200, label='Шифр та номер за книгою надходжень (ПЗ)', required=True)
+    inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
+    spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер', required=True)
+    TS_code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
+    is_there = forms.ChoiceField(choices=PLACE[2:4], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
 
 
 class ObjectEditForm(ModelForm):

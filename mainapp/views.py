@@ -4,7 +4,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelChoiceField
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
     PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
-    InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm
+    InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
+    PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView, CreateView
@@ -146,7 +147,7 @@ def get_attrib_assigns(act_type, project, attribute):
     act = Activity.objects.filter(type=act_type, approval=True)
     a = []
     for i in act:
-            b = AttributeAssignment.objects.filter(event_initiator=i, aim=project, attr_name=attribute)
+            b = AttributeAssignment.objects.filter(event_initiator=i, aim=project, attr_name=attribute, actual=True)
             if not b:
                 continue
             else:
@@ -175,7 +176,6 @@ def AddOnPS(request, id_number):
             act = Activity(time_stamp=dt.now(), type='Приймання на постійне зберігання', actor=request.user)
             act.save()
             project.save()
-            project.change_attributes()
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
@@ -368,7 +368,6 @@ def FromPSToTS(request, id_number):
             act = Activity(time_stamp=dt.now(), type='Видача предметів з Постійного зберігання на Тимчасове зберігання', actor=request.user)
             act.save()
             project.save()
-            project.change_attributes()
             for (k, v) in cd.items():
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
                 attr_assign.save()
@@ -443,4 +442,103 @@ def FromTSToPS(request, id_number):
                 'term_back': project.term_back, 'insurable_value': insurable_value,
                 }
         form = FromTStoPSForm(initial=data)
+    return render(request, 'AddOnTs.html', {'form': form})
+
+
+@login_required(login_url='/admin/')
+def PrepareSendOnPS(request):
+    if request.method == 'POST':
+        form = PrepareSendOnPSForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return HttpResponseRedirect(cd['obj'])
+        else:
+            return HttpResponseRedirect('/')
+    else:
+        form = PrepareSendOnPSForm()
+        return render(request, 'AddOnTs.html', {'form': form})
+
+
+@login_required(login_url='/admin/')
+@csrf_protect
+def SendOnPS(request, id_number):
+    try:
+        project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist:
+        return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
+
+    if request.method == 'POST':
+        form = SendOnPSForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            act = Activity(time_stamp=dt.now(), type='Передача на постійне зберігання', actor=request.user)
+            act.save()
+            project.save()
+            for (k, v) in cd.items():
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign.save()
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
+    else:
+        ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
+        inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
+        spec_inventory_numb = get_attrib_assigns('Спеціальний інвентарний облік', project, 'spec_inventory_numb')
+        ts_code = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'TS_code')
+        data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'technique': project.technique, 'material': project.material,
+                'size': project.size, 'description': project.description, 'note': project.note,
+                'condition': project.condition, 'condition_descr': project.condition_descr,
+                'PS_code': ps_code, 'inventory_number': inventory_number, 'spec_inventory_numb': spec_inventory_numb,
+                'TS_code': ts_code,
+                }
+        form = SendOnPSForm(initial=data)
+    return render(request, 'AddOnTs.html', {'form': form})
+
+
+@login_required(login_url='/admin/')
+def PrepareWritingOff(request):
+    if request.method == 'POST':
+        form = PrepareWritingOffForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return HttpResponseRedirect(cd['obj'])
+        else:
+            return HttpResponseRedirect('/')
+    else:
+        form = PrepareWritingOffForm()
+        return render(request, 'AddOnTs.html', {'form': form})
+
+
+@login_required(login_url='/admin/')
+@csrf_protect
+def WritingOff(request, id_number):
+    try:
+        project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist:
+        return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
+
+    if request.method == 'POST':
+        form = WritingOffForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            act = Activity(time_stamp=dt.now(), type='Списання (втрата тощо)', actor=request.user)
+            act.save()
+            project.save()
+            for (k, v) in cd.items():
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign.save()
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
+    else:
+        ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
+        inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
+        spec_inventory_numb = get_attrib_assigns('Спеціальний інвентарний облік', project, 'spec_inventory_numb')
+        ts_code = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'TS_code')
+        data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'note': project.note, 'PS_code': ps_code, 'inventory_number': inventory_number,
+                'spec_inventory_numb': spec_inventory_numb, 'TS_code': ts_code,
+                }
+        form = WritingOffForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
