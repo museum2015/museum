@@ -377,6 +377,7 @@ class AttributeAssignment(models.Model):
         self.actual = True
         for query in self.aim.attributeassignment_set.filter(attr_name=self.attr_name, aim=self.aim):
             query.actual = False
+            query.save()
         self.save()
 
 
