@@ -273,6 +273,14 @@ class Custom:
 
 
 class Object(models.Model):
+    class Meta:
+        permissions = (('see_all_obj', 'бачити всi'),
+                       ('see_personal_obj', 'бачити своi'),
+                       ('action_obj', 'облiковi процедури'),
+                       ('add_new_obj', 'додавання'),
+                       ('change_obj', 'редагування'),
+                       ('remove_obj', 'видалення'),
+        )
     collection = models.CharField(max_length=200, default='', null=True)  #
     is_fragment = models.BooleanField(default=False)
     name = models.CharField(max_length=200, default='', null=True)  #
@@ -335,6 +343,9 @@ class Object(models.Model):
 
 
 class Activity(models.Model):
+    class Meta:
+        permissions = (('only_personal_activity', 'бачити тiльки своi'),
+                       ('all_activity', 'бачити все'))
     time_stamp = models.DateTimeField(default='2000-02-12 00:00')
     type = models.CharField(max_length=30)
     actor = models.ForeignKey(User)

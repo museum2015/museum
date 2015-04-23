@@ -10,14 +10,13 @@ from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView, CreateView
 import ast
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.contrib.auth import authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import auth
 
 
 # Create your views here.
-
 
 @csrf_protect
 @login_required(login_url='/admin/')
@@ -49,7 +48,6 @@ def TempSave(request, id_number=0):
         form = TempSaveForm(initial=data)
 
         return render(request, 'AddOnTs.html', {'form': form})
-
 
 @csrf_protect
 @login_required(login_url='/admin/')
@@ -88,12 +86,12 @@ def TempRet(request, id_number=0):
         form = TempRetForm(initial=data)
         return render(request, 'AddOnTs.html', {'form': form})
 
-
-@login_required(login_url='/admin/')
+@permission_required('mainapp.only_personal_activity', login_url='/admin')
 def GetProject(request):
-    act_list = Activity.objects.all().order_by('time_stamp').reverse()
+    act_list = Activity.objects.filter(actor=request.user).order_by('time_stamp').reverse()
+    if request.user.has_perm('mainapp.all_activity'):
+        act_list = Activity.objects.all().order_by('time_stamp').reverse()
     return render(request, 'projects.html', {'acts': act_list})
-
 
 @login_required(login_url='/admin/')
 def ApproveProject(request, offset):
@@ -102,7 +100,6 @@ def ApproveProject(request, offset):
         return HttpResponse('Успішно затверджено<br><a href="/">На головну</a>')
     else:
         return HttpResponse('Вже затверджено ранiше<br><a href="/">На головну</a>')
-
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -142,7 +139,6 @@ def ProjectPage(request, id_number):
                                                 'wire_off': wire_off,
                                                 'editing': editing})
 
-
 def get_attrib_assigns(act_type, project, attribute):
     act = Activity.objects.filter(type=act_type, approval=True)
     a = []
@@ -156,8 +152,6 @@ def get_attrib_assigns(act_type, project, attribute):
         return a[0][0].attr_value
     except IndexError:
         return ''
-
-
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -195,10 +189,6 @@ def AddOnPS(request, id_number):
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnPS.html', {'form': form})
 
-
-
-
-
 @login_required(login_url='/admin/')
 def PrepareRet(request):
     if request.method == 'POST':
@@ -211,7 +201,6 @@ def PrepareRet(request):
     else:
         form = PrepareRetForm()
         return render(request, 'AddOnTs.html', {'form': form})
-
 
 @login_required(login_url='/admin/')
 def PreparePS(request):
@@ -226,11 +215,12 @@ def PreparePS(request):
         form = PreparePSForm()
         return render(request, 'AddOnPS.html', {'form': form})
 
-
 @login_required(login_url='/admin/')
 def ActivityPage(request, id_number):
     if Activity.objects.filter(id=int(id_number)).exists():
         act = Activity.objects.get(id=int(id_number))
+        if not (act.actor == request.user or request.user.has_perm('mainapp.all_activity')):
+            return HttpResponse('Ви не маєте доступу до цiєi подii')
     else:
         return HttpResponse('Подія не існує.<br>Спробуйте інший id.')
 
@@ -239,11 +229,10 @@ def ActivityPage(request, id_number):
     return render(request, 'attribute_assign.html', {'attrs': attrs,
                                                      'act': act})
 
-@login_required(login_url='/')
+@permission_required('mainapp.see_all_obj', login_url='/admin')
 def ObjectList(request):
     qs = Object.objects.all()
     return render(request, 'objects.html', {'objects': qs})
-
 
 def aut(request):
     if not request.user.is_authenticated():
@@ -265,23 +254,19 @@ def aut(request):
     else:
         return render(request, 'index.html', {'user': request.user.username})
 
-
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
-
 
 class ObjectUpdate(UpdateView):
     model = Object
     form_class = ObjectEditForm
     template_name_suffix = '_update_form'
 
-
 class ObjectCreate(CreateView):
     model = Object
     form_class = ObjectCreateForm
     template_name_suffix = '_create_form'
-
 
 @login_required(login_url='/admin/')
 def PrepareInventory(request):
@@ -295,7 +280,6 @@ def PrepareInventory(request):
     else:
         form = PrepareInventoryForm()
         return render(request, 'AddOnInventoryBook.html', {'form': form})
-
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -336,9 +320,6 @@ def AddOnInventorySave(request, id_number):
         form = InventorySaveForm(initial=data)
     return render(request, 'AddOnInventoryBook.html', {'form': form})
 
-#def menu(request):
-
-
 @login_required(login_url='/admin/')
 def PreparePSToTS(request):
     if request.method == 'POST':
@@ -351,7 +332,6 @@ def PreparePSToTS(request):
     else:
         form = PreparePStoTSForm()
         return render(request, 'AddOnTs.html', {'form': form})
-
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -387,7 +367,6 @@ def FromPSToTS(request, id_number):
         form = FromPStoTSForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
 
-
 @login_required(login_url='/admin/')
 def PrepareTSToPS(request):
     if request.method == 'POST':
@@ -400,7 +379,6 @@ def PrepareTSToPS(request):
     else:
         form = PrepareTStoPSForm()
         return render(request, 'AddOnTs.html', {'form': form})
-
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -444,7 +422,6 @@ def FromTSToPS(request, id_number):
         form = FromTStoPSForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
 
-
 @login_required(login_url='/admin/')
 def PrepareSendOnPS(request):
     if request.method == 'POST':
@@ -457,7 +434,6 @@ def PrepareSendOnPS(request):
     else:
         form = PrepareSendOnPSForm()
         return render(request, 'AddOnTs.html', {'form': form})
-
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -495,7 +471,6 @@ def SendOnPS(request, id_number):
         form = SendOnPSForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
 
-
 @login_required(login_url='/admin/')
 def PrepareWritingOff(request):
     if request.method == 'POST':
@@ -508,7 +483,6 @@ def PrepareWritingOff(request):
     else:
         form = PrepareWritingOffForm()
         return render(request, 'AddOnTs.html', {'form': form})
-
 
 @login_required(login_url='/admin/')
 @csrf_protect
