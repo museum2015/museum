@@ -42,6 +42,18 @@
 {% endif %}
 </div>
 <script type="text/javascript">
+        var remove_attr = function() {
+            i = 0;
+            but = $(".button"+i);
+            while(but.length > 0) {
+                but.removeAttr("disabled");
+                i++;
+                but = $(".button"+i);
+            };
+        };
+
+        $( document ).ready(remove_attr());
+
         var $table = $('table'),
         $bodyCells = $table.find('tbody tr:first').children(),
         colWidth;
@@ -69,13 +81,7 @@
             rows.removeClass('highlight');
             row.addClass('highlight');
 
-            i = 0;
-            but = $(".button"+i);
-            while(but.length > 0) {
-                but.removeAttr("disabled");
-                i++;
-                but = $(".button"+i);
-            };
+            remove_attr();
 
             if ($(".highlight td:nth-child(4)").text() == "Приймання на тимчасове зберігання") $(".button3").attr("disabled", "");
 
