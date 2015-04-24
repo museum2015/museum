@@ -24,7 +24,9 @@
     {% endfor %}
     </tbody>
 </table>
-<input type='button' onclick='ts_ps()' value='Прийняти на постійне зберігання'/>
+<input type='button' onclick='ts_ps()' value='Прийняти на постійне зберігання' class='button1'>
+<input type='button' onclick='writing_off()' value='Списати' class='button2'>
+<input type='button' onclick='' value='prosto_baton' class='button3'>
 </div>
 <script type="text/javascript">
         var $table = $('table'),
@@ -53,7 +55,14 @@
 
             rows.removeClass('highlight');
             row.addClass('highlight');
-
+            if ($(".highlight td:nth-child(4)").text() == "Приймання на тимчасове зберігання") {
+                $(".button0").remove();
+                var temp_ret = "<input type='button' onclick='ret()' value='Повернення з тимчасового зберігання' class='button0' >";
+                $(temp_ret).insertAfter(".button1");
+                }
+            else {
+                $(".button0").attr("disabled", "");
+                };
 
         });
 
@@ -89,6 +98,16 @@
         var ts_ps = function() {
             var t = $(".highlight td:first-child").text();
             var link = "/staff/add_on_ps/" + t;
+            window.location.replace(link);
+        };
+        var writing_off = function() {
+            var t = $(".highlight td:first-child").text();
+            var link = "/staff/writing_off/" + t;
+            window.location.replace(link);
+        };
+        var ret = function() {
+            var t = $(".highlight td:first-child").text();
+            var link = "/staff/return/" + t;
             window.location.replace(link);
         };
 
