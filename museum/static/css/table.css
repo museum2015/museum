@@ -30,3 +30,33 @@ input[class="button3"] {
     left: 70%;
     top: 28%;
 }
+input[class="button4"] {
+    position: absolute;
+    left: 70%;
+    top: 32%;
+}
+input[class="button5"] {
+    position: absolute;
+    left: 70%;
+    top: 36%;
+}
+input[class="button6"] {
+    position: absolute;
+    left: 70%;
+    top: 40%;
+}
+input[class="button7"] {
+    position: absolute;
+    left: 70%;
+    top: 44%;
+}
+input[class="button8"] {
+    position: absolute;
+    left: 70%;
+    top: 48%;
+}
+input[class="button9"] {
+    position: absolute;
+    left: 70%;
+    top: 52%;
+}

@@ -232,7 +232,13 @@ def ActivityPage(request, id_number):
 @permission_required('mainapp.see_all_obj', login_url='/admin')
 def ObjectList(request):
     qs = Object.objects.all()
-    return render(request, 'objects.html', {'objects': qs})
+    add = request.user.has_perm('mainapp.add_new_obj')
+    change = request.user.has_perm('mainapp.change_obj')
+    remove = request.user.has_perm('mainapp.remove_oobj')
+    return render(request, 'objects.html', {'objects': qs,
+                                            'add': add,
+                                            'change': change,
+                                            'remove': remove})
 
 def aut(request):
     if not request.user.is_authenticated():

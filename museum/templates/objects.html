@@ -24,9 +24,22 @@
     {% endfor %}
     </tbody>
 </table>
+<input type='button' onclick='ret()' value='Повернення з тимчасового зберігання' class='button0'>
 <input type='button' onclick='ts_ps()' value='Прийняти на постійне зберігання' class='button1'>
-<input type='button' onclick='writing_off()' value='Списати' class='button2'>
-<input type='button' onclick='' value='prosto_baton' class='button3'>
+<input type='button' onclick='io()' value='Поставити на інвентарний облік' class='button2'>
+<input type='button' onclick='ps_ts()' value='Повернення предмета з ПЗ на ТЗ' class='button3'>
+<input type='button' onclick='ts_ps()' value='Повернення предмета з ТЗ на ПЗ' class='button4'>
+<input type='button' onclick='send_ps()' value='Передача на постійне зберігання' class='button5'>
+<input type='button' onclick='writing_off()' value='Списати' class='button6'>
+{% if add %}
+    <input type='button' onclick='' value='Створити' class='button7'>
+{% endif %}
+{% if change %}
+    <input type='button' onclick='' value='Редагувати' class='button8'>
+{% endif %}
+{% if remove %}
+    <input type='button' onclick='' value='Видалити' class='button9'>
+{% endif %}
 </div>
 <script type="text/javascript">
         var $table = $('table'),
@@ -55,13 +68,20 @@
 
             rows.removeClass('highlight');
             row.addClass('highlight');
-            if ($(".highlight td:nth-child(4)").text() == "Приймання на тимчасове зберігання") {
-                $(".button0").remove();
-                var temp_ret = "<input type='button' onclick='ret()' value='Повернення з тимчасового зберігання' class='button0' >";
-                $(temp_ret).insertAfter(".button1");
-                }
-            else {
+
+            i = 0;
+            but = $(".button"+i);
+            while(but.length > 0) {
+                but.removeAttr("disabled");
+                i++;
+                but = $(".button"+i);
+            };
+
+            if ($(".highlight td:nth-child(4)").text() == "Приймання на тимчасове зберігання") $(".button3").attr("disabled", "");
+
+            if ($(".highlight td:nth-child(4)").text() == "Приймання на постійне зберігання"){
                 $(".button0").attr("disabled", "");
+                $(".button4").attr("disabled", "");
                 };
 
         });
@@ -103,6 +123,26 @@
         var writing_off = function() {
             var t = $(".highlight td:first-child").text();
             var link = "/staff/writing_off/" + t;
+            window.location.replace(link);
+        };
+        var io = function() {
+            var t = $(".highlight td:first-child").text();
+            var link = "/staff/inventory_save/" + t;
+            window.location.replace(link);
+        };
+        var ps_ts = function() {
+            var t = $(".highlight td:first-child").text();
+            var link = "staff/ps_to_ts/" + t;
+            window.location.replace(link);
+        };
+        var ts_ps = function() {
+            var t = $(".highlight td:first-child").text();
+            var link = "staff/ts_to_ps/" + t;
+            window.location.replace(link);
+        };
+        var send_ps = function() {
+            var t = $(".highlight td:first-child").text();
+            var link = "staff/send_on_ps/" + t;
             window.location.replace(link);
         };
         var ret = function() {
