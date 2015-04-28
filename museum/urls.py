@@ -32,5 +32,4 @@ urlpatterns = patterns('',
     url(r'^staff/send_on_ps/(?P<id_number>[0-9]+)/$', views.SendOnPS),
     url(r'^staff/writing_off/$', views.PrepareWritingOff),
     url(r'^staff/writing_off/(?P<id_number>[0-9]+)/$', views.WritingOff),
-   #url(r'^menu/', views.menu),
 )

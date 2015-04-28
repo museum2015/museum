@@ -27,7 +27,7 @@ def TempSave(request, id_number=0):
         if id_number != 0:
             return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
         else:
-            project = Object()
+            project = Object(name='Новий')
     if request.method == 'POST':
         form = TempSaveForm(request.POST)
         if form.is_valid():
@@ -36,7 +36,8 @@ def TempSave(request, id_number=0):
             act.save()
             project.save()
             for (k, v) in cd.items():
-                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
         return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
@@ -68,7 +69,8 @@ def TempRet(request, id_number=0):
             act = Activity(time_stamp=dt.now(), type='Повернення з тимчасового зберiгання', actor=request.user)
             act.save()
             for (k, v) in cd.items():
-                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:
@@ -101,44 +103,6 @@ def ApproveProject(request, offset):
     else:
         return HttpResponse('Вже затверджено ранiше<br><a href="/">На головну</a>')
 
-@login_required(login_url='/admin/')
-@csrf_protect
-def ProjectPage(request, id_number):
-    if Object.objects.filter(id=int(id_number)).exists():
-        project = Object.objects.get(id=int(id_number))
-    else:
-        return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
-
-    if not project.attributeassignment_set.filter(approval=True).exists():
-        return HttpResponse('Об’єкт не затверджений')
-
-    return_from_tc = False
-    getting_on_pc = False
-    wire_off = False
-    editing = False
-
-    i = project.attributeassignment_set.filter(approval=True).count()-1
-
-    while str(project.attributeassignment_set.filter(approval=True)[i].event_initiator) == 'Editing':
-        i -= 1
-
-    status = str(project.attributeassignment_set.filter(approval=True)[i].event_initiator)
-    print status
-    if status == 'Приймання на тимчасове зберігання':
-        return_from_tc = True
-        getting_on_pc = True
-        editing = True
-
-    if status == 'Приймання на постійне зберігання':
-        wire_off = True
-        editing = True
-
-    return render(request, 'ProjectPage.html', {'project': project,
-                                                'return_from_tc': return_from_tc,
-                                                'getting_on_pc': getting_on_pc,
-                                                'wire_off': wire_off,
-                                                'editing': editing})
-
 def get_attrib_assigns(act_type, project, attribute):
     act = Activity.objects.filter(type=act_type, approval=True)
     a = []
@@ -162,7 +126,7 @@ def AddOnPS(request, id_number):
         if id_number != '0':
             return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
         else:
-            project = Object()
+            project = Object(name='Новий')
     if request.method == 'POST':
         form = PersistentSaveForm(request.POST)
         if form.is_valid():
@@ -171,11 +135,12 @@ def AddOnPS(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
-                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:
-            return render(request, 'AddOnPS.html', {'form': form, 'errors': form.errors})
+            return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
         source = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'source')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
@@ -187,7 +152,7 @@ def AddOnPS(request, id_number):
                 'price': project.price,  'way_of_found': project.way_of_found,
                 'transport_possibility': project.transport_possibility, 'fond': project.collection}
         form = PersistentSaveForm(initial=data)
-    return render(request, 'AddOnPS.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form})
 
 @login_required(login_url='/admin/')
 def PrepareRet(request):
@@ -213,7 +178,7 @@ def PreparePS(request):
             return HttpResponseRedirect('/')
     else:
         form = PreparePSForm()
-        return render(request, 'AddOnPS.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form})
 
 @login_required(login_url='/admin/')
 def ActivityPage(request, id_number):
@@ -285,7 +250,7 @@ def PrepareInventory(request):
             return HttpResponseRedirect('/')
     else:
         form = PrepareInventoryForm()
-        return render(request, 'AddOnInventoryBook.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form})
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -296,7 +261,7 @@ def AddOnInventorySave(request, id_number):
         if id_number != '0':
             return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
         else:
-            project = Object()
+            project = Object(name='Новий')
     if request.method == 'POST':
         form = InventorySaveForm(request.POST)
         if form.is_valid():
@@ -305,11 +270,12 @@ def AddOnInventorySave(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
-                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:
-            return render(request, 'AddOnInventoryBook.html', {'form': form, 'errors': form.errors})
+            return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
         source = get_attrib_assigns('Приймання на постійне зберігання', project, 'source')
         old_registered_marks = get_attrib_assigns('Приймання на постійне зберігання', project, 'old_registered_marks')
@@ -324,7 +290,7 @@ def AddOnInventorySave(request, id_number):
                 'link_on_doc': project.link_on_doc, 'old_registered_marks': old_registered_marks,
                 'transport_possibility': project.transport_possibility, 'fond': project.collection}
         form = InventorySaveForm(initial=data)
-    return render(request, 'AddOnInventoryBook.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form})
 
 @login_required(login_url='/admin/')
 def PreparePSToTS(request):
@@ -355,7 +321,8 @@ def FromPSToTS(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
-                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:
@@ -402,7 +369,8 @@ def FromTSToPS(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
-                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:
@@ -457,7 +425,8 @@ def SendOnPS(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
-                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:
@@ -506,7 +475,8 @@ def WritingOff(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
-                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, event_initiator=act, aim=project)
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:

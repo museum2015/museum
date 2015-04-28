@@ -7,7 +7,7 @@ from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiW
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import xml.etree.ElementTree as et
-from django.forms.extras.widgets import SelectDateWidget
+from bootstrap3_datetime.widgets import DateTimePicker
 # Create your models here. test
 
 TECHNIQUE_CHOICES = (('', '--------'), ('Техніка 1', 'Техніка 1'),)
@@ -48,7 +48,7 @@ class Custom:
 
         def decompress(self, value):
             if value:
-                return value.split(',')
+                return value.split(', ')
             else:
                 res = []
                 for i in range(self.amo):
@@ -70,11 +70,8 @@ class Custom:
                                                              **kwargs)
 
         def compress(self, values):
-            res = ''
-            for value in values:
-                if value:
-                    res += value
-            return res
+            values = [x for x in values if x]
+            return ', '.join(values)
 
 
     class MultiMaterialSelectWidget(MultiWidget):
@@ -86,7 +83,7 @@ class Custom:
 
         def decompress(self, value):
             if value:
-                return value.split(';')
+                return value.split('; ')
             else:
                 return []
 
@@ -96,7 +93,9 @@ class Custom:
                    u'\n<p><label for="id_temp2_2_0">Не дорогоцінні: </label><br>' + rendered_widgets[2]
 
     class MultiMaterialSelectField(MultiValueField):
+
         def __init__(self, *args, **kwargs):
+            self.attrs = kwargs.copy()
             list_fields = [Custom.MaterialSelectField(choices=get_choice('materials', 'precious'), amount=100, label='Precious'),
                            Custom.MaterialSelectField(choices=get_choice('materials', 'semi-precious'), amount=100, label='Semi-precious'),
                            Custom.MaterialSelectField(choices=get_choice('materials', 'non-precious'), amount=100, label='Non-precious')]
@@ -105,8 +104,8 @@ class Custom:
                                                                   *args, **kwargs)
 
         def compress(self, values):
-            result = ';'
-            return result.join(values)
+            values = [x for x in values if x]
+            return '; '.join(values)
 
     class MaterialWidget(MultiWidget):
         def __init__(self, placeholder1='', placeholder2='', size1=10, size2=10):
@@ -176,8 +175,8 @@ class Custom:
 
         def decompress(self, value):
             if value:
-                res = value.split(':')
-                return res
+                res = value.split(' ')
+                return [x.strip("()") for x in res]
             else:
                 return [None, None]
 
@@ -197,7 +196,7 @@ class Custom:
 
         def compress(self, values):
             if values:
-                return values[0] + ':' + values[1]
+                return values[0] + ' (' + values[1] + ')'
             else:
                 return ''
 
@@ -213,7 +212,7 @@ class Custom:
 
         def compress(self, values):
             if values:
-                return values[0] + ':' + values[1] + ':' + values[2]
+                return values[0] + ': ' + values[1] + ' ' + values[2]
             else:
                 return ''
 
@@ -247,7 +246,7 @@ class Custom:
 
         def decompress(self, value):
             if value:
-                return value.split(';')
+                return value.split('; ')
             else:
                 return []
 
@@ -263,13 +262,9 @@ class Custom:
                                                                     widget=Custom.MultiChoiceTextChoiceWidget(number),
                                                                     *args,
                                                                     **kwargs)
-
         def compress(self, values):
-            res = ''
-            for value in values:
-                if value:
-                    res += value
-            return res
+            values = [x for x in values if x]
+            return '; '.join(values)
 
 
 class Object(models.Model):
@@ -321,7 +316,7 @@ class Object(models.Model):
     #doc_type = models.CharField(max_length=50)
     side_1 = models.CharField(max_length=200, default='', null=True)  #
     side_2 = models.CharField(max_length=200, default='', null=True)  #
-    term_back = models.DateTimeField(max_length=200, default='2000-02-12 00:00', null=True)  #
+    term_back = models.DateField(default='2000-01-01', null=True)  #
     aim_of_receiving_gen = models.CharField(max_length=200, default='', null=True)  #
     #aim_of_receiving = models.CharField(max_length=1000, default='', null=True)
     circumst_write_off = models.CharField(max_length=200, default='', null=True)  ##
@@ -329,7 +324,7 @@ class Object(models.Model):
     #source = models.CharField(max_length=200, default='', null=True)  #
 
     def __unicode__(self):
-        return self.name + ' (' + self.identifier + ')'
+        return self.name.split(' ')[0]
 
     def status(self):
         if not self.attributeassignment_set.filter(approval=True):
@@ -370,6 +365,7 @@ class Activity(models.Model):
 class AttributeAssignment(models.Model):
     attr_name = models.CharField(max_length=40)
     attr_value = models.CharField(max_length=200, default='None', null=True)
+    attr_label = models.CharField(max_length=200, default='default', null=True)
     actual = models.BooleanField(default=False)
     aim = models.ForeignKey(Object)
     event_initiator = models.ForeignKey(Activity)
@@ -415,7 +411,9 @@ class TempSaveForm(forms.Form):
     reason = forms.FileField(label='Підстава', required=False)
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
     collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=False)
-    term_back = forms.DateTimeField(widget=SelectDateWidget)
+    term_back = forms.DateField(label='Дата повернення', widget=DateTimePicker(options={"format": "YYYY-MM-DD",
+                                                                                        "pickTime": False},
+                                                                               attrs={'width': '300px'}))
     TS_code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
     mat_person_in_charge = forms.ModelChoiceField(queryset=User.objects.all(), label='Матеріально-відповідальна особа', required=False)
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=False) #
@@ -445,7 +443,9 @@ class TempRetForm(forms.Form):
                                       widget=forms.widgets.Textarea)
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 450px;"}))
     price = forms.CharField(max_length=200, label='Вартість', required=True)
-    term_back = forms.DateTimeField(widget=SelectDateWidget, label='Термін повернення')
+    term_back = forms.DateField(label='Дата повернення', widget=DateTimePicker(options={"format": "YYYY-MM-DD",
+                                                                                        "pickTime": False},
+                                                                               attrs={'width': '300px'}))
     note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': 'margin: 0px; height: 252px; width: 450px;'}))
     reason = forms.FileField(label='Підстава', required=False)
     side_1 = forms.CharField(max_length=100, label='Сторона 1 (акт повернення з ТЗ)', required=True)
@@ -493,7 +493,7 @@ class PersistentSaveForm(forms.Form):
     name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='') #
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
-    date_creation = forms.CharField(label='Дата створення предмета', required=True)
+    date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True) #
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
@@ -547,7 +547,7 @@ class InventorySaveForm(forms.Form):
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
-    date_creation = forms.CharField(label='Дата створення предмета', required=True)
+    date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     date_detection = forms.DateTimeField(input_formats=['%Y-%m-%d'], label='Дата знаходження', required=True)
     place_detection = forms.CharField(max_length=200, label='Місце виявлення')
@@ -659,7 +659,7 @@ class FromPStoTSForm(forms.Form):
     name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='') #
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
-    date_creation = forms.CharField(label='Дата створення предмета', required=True)
+    date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
@@ -679,7 +679,9 @@ class FromPStoTSForm(forms.Form):
     #aim_of_receiving = forms.CharField(max_length=2000, label='Мета передачі на ТЗ', required=True,
     #                                   widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     reason = forms.CharField(label='Підстава (посилання на документи: договір, наказ директора, наказ вищої інстанції тощо)', max_length=400, required=True)
-    term_back = forms.DateTimeField(widget=SelectDateWidget, label='Термін повернення')
+    term_back = forms.DateField(label='Дата повернення', widget=DateTimePicker(options={"format": "YYYY-MM-DD",
+                                                                                        "pickTime": False},
+                                                                               attrs={'width': '300px'}))
     PS_code = forms.CharField(max_length=200, label='Шифр та номер за книгою надходжень (ПЗ)', required=True)
     inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
     TS_code = forms.CharField(max_length=100, label='Шифр та номер ТЗ (актуальний)', required=True)
@@ -704,7 +706,7 @@ class FromTStoPSForm(forms.Form):
     name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='') #
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
-    date_creation = forms.CharField(label='Дата створення предмета', required=True)
+    date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
@@ -724,7 +726,9 @@ class FromTStoPSForm(forms.Form):
     #aim_of_receiving = forms.CharField(max_length=2000, label='Мета передачі на ТЗ', required=True,
     #                                   widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     reason = forms.CharField(label='Посилання на документи: акт видачі на ТЗ, договір, наказ директора, наказ вищої інстанції тощо', max_length=400, required=True)
-    term_back = forms.DateTimeField(widget=SelectDateWidget, label='Термін повернення')
+    term_back = forms.DateField(label='Дата повернення', widget=DateTimePicker(options={"format": "YYYY-MM-DD",
+                                                                                        "pickTime": False},
+                                                                               attrs={'width': '300px'}))
     PS_code = forms.CharField(max_length=200, label='Шифр та номер за книгою надходжень (ПЗ)', required=True)
     inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
     is_there = forms.ChoiceField(choices=PLACE[1:2], label='Фізичне місце збереження (топографія) – позначка про повернення у фонди', required=True)

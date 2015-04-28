@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'mainapp',
     'bootstrap3',
+    'bootstrap3_datetime',
 
 )
 

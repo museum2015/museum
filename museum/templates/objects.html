@@ -20,7 +20,7 @@
     </thead>
     <tbody>
     {% for a in objects %}
-    <tr><td>{{ a.id }}</td><td>{{ a.name }}</td><td>{{ a.amount }}</td><td>{{ a.status }}</td>
+    <tr><td>{{ a.id }}</td><td>{{ a }}</td><td>{{ a.amount }}</td><td>{{ a.status }}</td>
     {% endfor %}
     </tbody>
 </table>
@@ -138,17 +138,17 @@
         };
         var ps_ts = function() {
             var t = $(".highlight td:first-child").text();
-            var link = "staff/ps_to_ts/" + t;
+            var link = "/staff/ps_to_ts/" + t;
             window.location.replace(link);
         };
         var ts_ps = function() {
             var t = $(".highlight td:first-child").text();
-            var link = "staff/ts_to_ps/" + t;
+            var link = "/staff/ts_to_ps/" + t;
             window.location.replace(link);
         };
         var send_ps = function() {
             var t = $(".highlight td:first-child").text();
-            var link = "staff/send_on_ps/" + t;
+            var link = "/staff/send_on_ps/" + t;
             window.location.replace(link);
         };
         var ret = function() {
