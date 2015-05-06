@@ -637,8 +637,9 @@ class SpecInventorySaveForm(forms.Form):
 
 
 
-#class Passport(forms.Form):
-    #department = forms.ChoiceField(choices=get_choice('department'), label='Відомство')
+class Passport(forms.Form):
+    department = forms.ChoiceField(choices=get_choice('department'), label='Відомство')\
+    adm_submission = forms.
 
 
 class PreparePStoTSForm(forms.Form):
