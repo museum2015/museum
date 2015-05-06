@@ -451,7 +451,7 @@ class TempRetForm(forms.Form):
     side_1 = forms.CharField(max_length=100, label='Сторона 1 (акт повернення з ТЗ)', required=True)
     side_2 = forms.CharField(max_length=100, label='Сторона 2 (акт повернення з ТЗ)', required=True)
     return_mark = forms.ChoiceField(choices=choices, required=True, label='Позначка про повернення предмета або переведення до музейного зібрання (ПЗ) у книзі ТЗ')
-    save_place = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True) #
+    storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True) #
 
 
 class PrepareRetForm(forms.Form):
@@ -516,7 +516,7 @@ class PersistentSaveForm(forms.Form):
     collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=False)
     mat_person_in_charge = forms.ModelChoiceField(queryset=User.objects.all(), label='Матеріально-відповідальна особа',
                                                   required=True)
-    save_place = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
+    storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
     old_registered_marks = forms.CharField(max_length=200, label='Старі облікові позначення', required=True)
     inventory_number = forms.CharField(max_length=200, label='Інвентарний номер', required=True)
     spec_inventory_numb = forms.CharField(max_length=200, label='Спеціальний інвентарний номер', required=True)
@@ -528,8 +528,8 @@ class PrepareInventoryForm(forms.Form):
         objlist = []
         for project in Object.objects.all():
             if project.status() == 'Приймання на постійне зберігання'\
-                    and project.status() != 'Списання (втрата тощо)'\
-                    and project.status() != 'Пустий об’єкт':
+                    or project.status() == 'Пустий об’єкт'\
+                    and project.status() != 'Списання (втрата тощо)':
                 objlist.append(project)
         objects = [(0, 'Новий об’єкт')]
         for o in objlist:
@@ -576,7 +576,7 @@ class InventorySaveForm(forms.Form):
     spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер')
     collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=False)
     mat_person_in_charge = forms.ModelChoiceField(queryset=User.objects.all(), label='Матеріально-відповідальна особа', required=False)
-    save_place = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
+    storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
     old_registered_marks = forms.CharField(max_length=200, label='Старі облікові позначення', required=True)
 
 
@@ -586,15 +586,16 @@ class PrepareSpecInventoryForm(forms.Form):
         objlist = []
         for project in Object.objects.all():
             if project.status() == 'Інвентарний облік' or project.status() == 'Приймання на постійне зберігання'\
+                    or project.status() == 'Пустий об’єкт'\
                     and project.status() != 'Списання (втрата тощо)':
                 objlist.append(project)
-        objects = []
+        objects = [(0, 'Новий об’єкт')]
         for o in objlist:
             objects.append((o.id, o.__unicode__()))
         self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
 
 
-"""class SpecInventorySaveForm(forms.Form):
+class SpecInventorySaveForm(forms.Form):
     choices = (
         ('immediately', 'Термінова реставрація'),
         ('conservation', 'Консервація'),
@@ -605,19 +606,19 @@ class PrepareSpecInventoryForm(forms.Form):
     amount = forms.IntegerField(label='Кількість', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     date_creation = forms.CharField(label='Дата створення предмета', required=True)
-    place_of_creating = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
+    place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     fully_precious = forms.BooleanField(label='Предмет повністю складається з дорогоцінних'
                                               ' металів/дорогоцінного каміння?', required=True)
     name_prec_metal = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
                                                  label='Назва дорогоцінного металу', amount=1)
-    assay = Custom.MaterialSelectField(choices=get_choice('assay', str(name_prec_metal)),
+    assay = Custom.MaterialSelectField(choices=get_choice('assay'),
                                        label='Проба дорогоцінного металу', amount=1)
-    weight_prec_metal = Custom.TextChoiceField(choices=get_choice('dimension', 'measurement_unit', 'Вага'), amount=1,
+    weight_prec_metal = Custom.TextChoiceField(choices=get_choice('dimension', 'measurement_unit', 'weight'),
                                     label='Маса дорогоцінного металу в чистоті', placeholder1='')
     name_prec_stone = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
                                                  label='Назва дорогоцінного каміння', amount=1)
-    amount_prec_stone0 = forms.CharField(label='Кількість дорогоцінного каміння', amount=1)
-    weight_prec_stone = Custom.TextChoiceField(choices=get_choice('dimension', 'measurement_unit', 'Вага'), amount=1,
+    amount_prec_stone0 = forms.CharField(label='Кількість дорогоцінного каміння')
+    weight_prec_stone = Custom.TextChoiceField(choices=get_choice('dimension', 'measurement_unit', 'weight'),
                                     label='Маса дорогоцінного металу в чистоті', placeholder1='')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
@@ -632,12 +633,13 @@ class PrepareSpecInventoryForm(forms.Form):
     inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою')
     link_on_doc = forms.CharField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False)
     mat_person_in_charge = forms.ModelChoiceField(queryset=User.objects.all(), label='Матеріально-відповідальна особа', required=False)
-    save_place = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
-"""
+    storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
+
 
 
 #class Passport(forms.Form):
     #department = forms.ChoiceField(choices=get_choice('department'), label='Відомство')
+
 
 class PreparePStoTSForm(forms.Form):
     def __init__(self, *args, **kwargs):

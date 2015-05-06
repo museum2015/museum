@@ -19,29 +19,29 @@
         </non-precious>
     </materials>
     <assay>
-        <Золото>
+        <!-- <Золото> -->
             <choice>999</choice>
             <choice>958</choice>
             <choice>750</choice>
             <choice>585</choice>
             <choice>500</choice>
             <choice>375</choice>
-        </Золото>
-        <silver>
+        <!--</Золото>
+        <silver> -->
             <choice>960</choice>
             <choice>925</choice>
             <choice>875</choice>
             <choice>830</choice>
             <choice>800</choice>
-        </silver>
-        <platinum>
+        <!--</silver>
+        <platinum> -->
             <choice>950</choice>
             <choice>900</choice>
-        </platinum>
-        <palladium>
+        <!--</platinum>
+        <palladium>-->
             <choice>850</choice>
             <choice>500</choice>
-        </palladium>
+        <!--</palladium>-->
     </assay>
     <dimension>
         <type>
@@ -57,13 +57,13 @@
             <choice>Інші дані ...</choice>
         </type>
         <measurement_unit>
-            <!--<Вага>
+            <weight>
                 <choice>фунтів</choice>
                 <choice>г</choice>
                 <choice>кг</choice>
                 <choice>карат</choice>
-            </Вага>
-            <Довжина>
+            </weight>
+            <!--<Довжина>
                 <choice>Фунт</choice>
                 <choice>см</choice>
                 <choice>мм</choice>

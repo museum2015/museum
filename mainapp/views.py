@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelChoiceField
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
     PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
-    InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
+    InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
     PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
@@ -102,6 +102,7 @@ def ApproveProject(request, offset):
         return HttpResponse('Успішно затверджено<br><a href="/">На головну</a>')
     else:
         return HttpResponse('Вже затверджено ранiше<br><a href="/">На головну</a>')
+
 
 def get_attrib_assigns(act_type, project, attribute):
     act = Activity.objects.filter(type=act_type, approval=True)
@@ -205,6 +206,7 @@ def ObjectList(request):
                                             'change': change,
                                             'remove': remove})
 
+
 def aut(request):
     if not request.user.is_authenticated():
         if request.method == 'POST':
@@ -225,14 +227,17 @@ def aut(request):
     else:
         return render(request, 'index.html', {'user': request.user.username})
 
+
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
+
 
 class ObjectUpdate(UpdateView):
     model = Object
     form_class = ObjectEditForm
     template_name_suffix = '_update_form'
+
 
 class ObjectCreate(CreateView):
     model = Object
@@ -289,6 +294,60 @@ def AddOnInventorySave(request, id_number):
                 'price': project.price,  'way_of_found': project.way_of_found, 'PS_code': ps_code,
                 'link_on_doc': project.link_on_doc, 'old_registered_marks': old_registered_marks,
                 'transport_possibility': project.transport_possibility, 'fond': project.collection}
+        form = InventorySaveForm(initial=data)
+    return render(request, 'AddOnTs.html', {'form': form})
+
+@login_required(login_url='/admin/')
+def PrepareSpecInventory(request):
+    if request.method == 'POST':
+        form = PrepareSpecInventoryForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return HttpResponseRedirect(cd['obj'])
+        else:
+            return HttpResponseRedirect('/')
+    else:
+        form = PrepareSpecInventoryForm()
+        return render(request, 'AddOnTs.html', {'form': form})
+
+@login_required(login_url='/admin/')
+@csrf_protect
+def AddOnSpecInventorySave(request, id_number):
+    try:
+        project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist:
+        if id_number != '0':
+            return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
+        else:
+            project = Object(name='Новий')
+    if request.method == 'POST':
+        form = SpecInventorySaveForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            act = Activity(time_stamp=dt.now(), type='Спеціальний інвентарний облік', actor=request.user)
+            act.save()
+            project.save()
+            for (k, v) in cd.items():
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
+                attr_assign.save()
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
+    else:
+
+        ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
+        inventory_number = get_attrib_assigns('Інвентарний облік' or 'Приймання на постійне зберігання', project, 'inventory_number')
+        mat_person_in_charge = get_attrib_assigns('Інвентарний облік', project, 'mat_person_in_charge')
+        data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'author': project.author, 'size': project.size, 'description': project.description,
+                'condition': project.condition, 'condition_descr': project.condition_descr,
+                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
+                'place_of_creation': project.place_of_creation, 'note': project.note,
+                'price': project.price, 'PS_code': ps_code, 'inventory_number': inventory_number,
+                'link_on_doc': project.link_on_doc, 'mat_person_in_charge': mat_person_in_charge,
+                'storage':project.storage
+               }
         form = InventorySaveForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
 
