@@ -4,44 +4,176 @@
         <choice>Русский</choice>
         <choice>Українська</choice>
     </languages>
+    <type_name>
+        <choice>авторська</choice>
+        <choice>альтернативна</choice>
+        <choice>народна</choice>
+    </type_name>
+    <type_description>
+        <choice>загальний</choice>
+        <choice>історія побутування</choice>
+        <choice>обставини створення</choice>
+    </type_description>
+    <promitka>
+        <choice>офіційна</choice>
+        <choice>неофіційна примітка користувача</choice>
+    </promitka>
+    <type_class>
+        <choice>речові</choice>
+        <choice>письмові</choice>
+        <choice>образотворчі</choice>
+        <choice>фото</choice>
+    </type_class>
+    <type>
+        <choice>посуд</choice>
+            <посуд>
+                <choice>миска</choice>
+                    <миска>
+                        <choice>кружка</choice>
+                    </миска>
+            </посуд>
+    </type>
     <materials>
         <precious>
-            <choice>Золото</choice>
-            <choice>Брюлики</choice>
+            <one>
+                <choice>метал</choice>
+                <choice>камiння</choice>
+            </one>
+            <two>
+                <choice>кольоровий метал</choice>
+                <choice>велике камiння</choice>
+            </two>
+            <three>
+                <choice>Золото</choice>
+                <choice>Брюлики</choice>
+            </three>
         </precious>
         <semi-precious>
-            <choice>Серебро</choice>
-            <choice>Аквамарин</choice>
+            <one>
+                <choice>метал</choice>
+                <choice>камiння</choice>
+            </one>
+            <two>
+                <choice>кольоровий метал</choice>
+                <choice>велике камiння</choice>
+            </two>
+            <three>
+                <choice>Серебро</choice>
+                <choice>Аквамарин</choice>
+            </three>
         </semi-precious>
         <non-precious>
-            <choice>Олово</choice>
-            <choice>Фантики</choice>
+            <one>
+                <choice>метал</choice>
+                <choice>камiння</choice>
+            </one>
+            <two>
+                <choice>кольоровий метал</choice>
+                <choice>велике камiння</choice>
+            </two>
+            <three>
+                <choice>Олово</choice>
+                <choice>Фантики</choice>
+            </three>
         </non-precious>
     </materials>
+    <equipment>
+        <choice>гаптування</choice>
+        <choice>ліплення</choice>
+        <choice>гончарне коло</choice>
+        <choice>ангоб</choice>
+    </equipment>
+    <fund>
+        <choice>група зберігання</choice>
+            <група_зберігання>
+                <choice>кераміка</choice>
+                <choice>графіка</choice>
+                <choice>фото та негативи</choice>
+            </група_зберігання>
+        <choice>фонд</choice>
+            <фонд>
+                <choice>фонд Б.М. Лятошинського</choice>
+            </фонд>
+        <choice>колекція</choice>
+            <колекція>
+                <choice>«Княжа гора», археологічні дослідження, 1956–1961</choice>
+            </колекція>
+    </fund>
+    <type_number>
+        <choice>первинний облік</choice>
+            <первинний_облік>
+                <choice>книга надходжень основного фонду</choice>
+                    <книга_надходжень_основного_фонду>
+                        <choice>том книги</choice>
+                    </книга_надходжень_основного_фонду>
+            </первинний_облік>
+    </type_number>
+    <type_image>
+        <choice>основне зображення</choice>
+        <choice>аверс</choice>
+        <choice>реверс</choice>
+    </type_image>
+    <type_price>
+        <choice>страхова</choice>
+        <choice>оціночна</choice>
+        <choice>закупівлі</choice>
+    </type_price>
+    <status>
+        <choice>без пошкоджень</choice>
+        <choice>задовільний</choice>
+        <choice>незадовільний</choice>
+    </status>
+    <recommendation>
+        <choice>термінова реставрація</choice>
+        <choice>консервація</choice>
+    </recommendation>
+    <role>
+        <choice>автор/виробник</choice>
+        <choice>власник</choice>
+    </role>
+    <topography>
+        <choice>фондосховище 1</choice>
+            <фондосховище_1>
+                <choice>шафа 1</choice>
+                    <шафа_1>
+                        <choice> полиця 3</choice>
+                    </шафа_1>
+            </фондосховище_1>
+    </topography>
+    <way_the_getting>
+        <choice>закупка</choice>
+        <choice>дарунок</choice>
+    </way_the_getting>
+    <type_document>
+
+    </type_document>
+    <purpose>
+
+    </purpose>
     <assay>
-        <!-- <Золото> -->
+        <Золото>
             <choice>999</choice>
             <choice>958</choice>
             <choice>750</choice>
             <choice>585</choice>
             <choice>500</choice>
             <choice>375</choice>
-        <!--</Золото>
-        <silver> -->
+        </Золото>
+        <silver>
             <choice>960</choice>
             <choice>925</choice>
             <choice>875</choice>
             <choice>830</choice>
             <choice>800</choice>
-        <!--</silver>
-        <platinum> -->
+        </silver>
+        <platinum>
             <choice>950</choice>
             <choice>900</choice>
-        <!--</platinum>
-        <palladium>-->
+        </platinum>
+        <palladium>
             <choice>850</choice>
             <choice>500</choice>
-        <!--</palladium>-->
+        </palladium>
     </assay>
     <dimension>
         <type>
@@ -57,13 +189,13 @@
             <choice>Інші дані ...</choice>
         </type>
         <measurement_unit>
-            <weight>
+            <!--<Вага>
                 <choice>фунтів</choice>
                 <choice>г</choice>
                 <choice>кг</choice>
                 <choice>карат</choice>
-            </weight>
-            <!--<Довжина>
+            </Вага>
+            <Довжина>
                 <choice>Фунт</choice>
                 <choice>см</choice>
                 <choice>мм</choice>
@@ -121,4 +253,10 @@
     <department>
         <choice>Держбуд України</choice>
     </department>
+    <weight>
+        <choice>фунтів</choice>
+        <choice>г</choice>
+        <choice>кг</choice>
+        <choice>карат</choice>
+    </weight>
 </data>

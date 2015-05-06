@@ -28,7 +28,8 @@ def get_choice(*args):
     for table in args:
         root = root.find(table)
     for s in root:
-        choice += ((s.text, s.text),)
+        if not s.getchildren():
+            choice += ((s.text, s.text),)
     return choice
 
 
@@ -39,11 +40,16 @@ def get_image_path(self, filename):
 
 class Custom:
     class MaterialSelectWidget(MultiWidget):
-        def __init__(self, choices, amount):
-            widgets = [Select(choices=choices)]
+        def __init__(self, ch, amount):
+            widgets = [Select(choices=get_choice('materials', ch, 'one')),
+                       Select(choices=get_choice('materials', ch, 'two')),
+                       Select(choices=get_choice('materials', ch, 'three')),
+                        ]
             self.amo = amount
             for i in range(amount-1):
-                widgets.append(Select(choices=choices, attrs={'style': 'display:none;'}))
+                widgets.append(Select(choices=get_choice('materials', ch, 'one'), attrs={'style': 'display:none;'}))
+                widgets.append(Select(choices=get_choice('materials', ch, 'two'), attrs={'style': 'display:none;'}))
+                widgets.append(Select(choices=get_choice('materials', ch, 'three'), attrs={'style': 'display:none;'}))
             super(Custom.MaterialSelectWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -60,12 +66,14 @@ class Custom:
             return res
 
     class MaterialSelectField(MultiValueField):
-        def __init__(self, choices, amount, *args, **kwargs):
+        def __init__(self, ch, amount, *args, **kwargs):
             list_fields = []
             for i in range(amount):
-                list_fields.append(fields.ChoiceField(choices=choices))
+                list_fields.append(fields.ChoiceField(choices=get_choice('materials', ch, 'one')))
+                list_fields.append(fields.ChoiceField(choices=get_choice('materials', ch, 'two')))
+                list_fields.append(fields.ChoiceField(choices=get_choice('materials', ch, 'three')))
             super(Custom.MaterialSelectField, self).__init__(list_fields,
-                                                             widget=Custom.MaterialSelectWidget(choices, amount),
+                                                             widget=Custom.MaterialSelectWidget(ch, amount),
                                                              *args,
                                                              **kwargs)
 
@@ -76,9 +84,9 @@ class Custom:
 
     class MultiMaterialSelectWidget(MultiWidget):
         def __init__(self):
-            widgets = [Custom.MaterialSelectWidget(choices=get_choice('materials', 'precious'), amount=100),
-                       Custom.MaterialSelectWidget(choices=get_choice('materials', 'semi-precious'), amount=100),
-                       Custom.MaterialSelectWidget(choices=get_choice('materials', 'non-precious'), amount=100)]
+            widgets = [Custom.MaterialSelectWidget(ch='precious', amount=100),
+                       Custom.MaterialSelectWidget(ch='semi-precious', amount=100),
+                       Custom.MaterialSelectWidget(ch='non-precious', amount=100)]
             super(Custom.MultiMaterialSelectWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -96,9 +104,9 @@ class Custom:
 
         def __init__(self, *args, **kwargs):
             self.attrs = kwargs.copy()
-            list_fields = [Custom.MaterialSelectField(choices=get_choice('materials', 'precious'), amount=100, label='Precious'),
-                           Custom.MaterialSelectField(choices=get_choice('materials', 'semi-precious'), amount=100, label='Semi-precious'),
-                           Custom.MaterialSelectField(choices=get_choice('materials', 'non-precious'), amount=100, label='Non-precious')]
+            list_fields = [Custom.MaterialSelectField(ch='precious', amount=100, label='Precious'),
+                           Custom.MaterialSelectField(ch='semi-precious', amount=100, label='Semi-precious'),
+                           Custom.MaterialSelectField(ch='non-precious', amount=100, label='Non-precious')]
             super(Custom.MultiMaterialSelectField, self).__init__(list_fields,
                                                                   widget=Custom.MultiMaterialSelectWidget(),
                                                                   *args, **kwargs)
@@ -609,16 +617,16 @@ class SpecInventorySaveForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     fully_precious = forms.BooleanField(label='Предмет повністю складається з дорогоцінних'
                                               ' металів/дорогоцінного каміння?', required=True)
-    name_prec_metal = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
-                                                 label='Назва дорогоцінного металу', amount=1)
-    assay = Custom.MaterialSelectField(choices=get_choice('assay'),
-                                       label='Проба дорогоцінного металу', amount=1)
-    weight_prec_metal = Custom.TextChoiceField(choices=get_choice('dimension', 'measurement_unit', 'weight'),
+    #name_prec_metal = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
+    #                                             label='Назва дорогоцінного металу', amount=1)
+    #assay = Custom.MaterialSelectField(choices=get_choice('assay'),
+    #                                   label='Проба дорогоцінного металу', amount=1)
+    weight_prec_metal = Custom.TextChoiceField(choices=get_choice('weight'),
                                     label='Маса дорогоцінного металу в чистоті', placeholder1='')
-    name_prec_stone = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
-                                                 label='Назва дорогоцінного каміння', amount=1)
+    #name_prec_stone = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
+    #                                             label='Назва дорогоцінного каміння', amount=1)
     amount_prec_stone0 = forms.CharField(label='Кількість дорогоцінного каміння')
-    weight_prec_stone = Custom.TextChoiceField(choices=get_choice('dimension', 'measurement_unit', 'weight'),
+    weight_prec_stone = Custom.TextChoiceField(choices=get_choice('weight'),
                                     label='Маса дорогоцінного металу в чистоті', placeholder1='')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
