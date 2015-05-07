@@ -30,6 +30,7 @@ def TempSave(request, id_number=0):
             project = Object(name='Новий')
     if request.method == 'POST':
         form = TempSaveForm(request.POST)
+        form.errors['material'] = form['material'].error_class()
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Приймання на тимчасове зберігання', actor=request.user)
@@ -40,6 +41,8 @@ def TempSave(request, id_number=0):
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
+        else:
+            print form.errors
         return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,

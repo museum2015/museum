@@ -570,7 +570,7 @@ class PersistentSaveForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True) #
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
-    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали', widget=Select(attrs={'multiple': 'multiple'}))
+    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
