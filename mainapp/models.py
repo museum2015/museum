@@ -11,36 +11,45 @@ from bootstrap3_datetime.widgets import DateTimePicker
 # Create your models here. test
 
 
+ROOT = et.parse('museum/materials.xml').getroot()
+
+
+def get_symch(root, sym='', ch=(), *args):
+    for a in args:
+        root = root.find(a)
+    for s in root:
+        if s.getchildren():
+            ch += ((s.attrib['label'], sym), )
+            ch = get_symch(s, sym+'--', ch)
+        else:
+            if len(sym)>1:
+                ch += ((s.text, '|'+sym[2:]+'>'),)
+    return ch
+
+chm = get_symch(ROOT, '', (), 'materials')
+
+
 def get_choice(root, *args):
     choice = ()
     for a in args:
         root = root.find(a)
     for s in root:
         if s.getchildren():
-            choice += ((s.attrib['label'], get_choice(s)), )
+            temp=''
+            for a in chm:
+                if a[0]==s.attrib['label']:
+                    temp = a[1]
+            choice += ((temp+s.attrib['label'], get_choice(s)), )
         else:
-            choice += ((s.text, s.text),)
+            temp=''
+            for a in chm:
+                if a[0]==s.text:
+                    temp = a[1]
+            choice += ((s.text, temp+s.text),)
     return choice
 
-ROOT = et.parse('museum/materials.xml').getroot()
 
 MATERIAL_CHOICES = get_choice(ROOT, 'materials')
-
-MEDIA_CHOICES = (
- ('Audio', (
-     ('-- Audio', (
-        ('---- Audio', (
-            ('vinyl', '------ Vinyl'),
-            ('cd', '------ CD'),
-        ),),
-     )
- ),)),
- ('Video', (
-   ('vhs', 'VHS Tape'),
-   ('dvd', 'DVD'),
-  )
- ),
-)
 
 TECHNIQUE_CHOICES = (('', '--------'), ('Техніка 1', 'Техніка 1'),)
 WAY_OF_FOUND_CHOICES = (('', '--------'), ('Розкопки', 'Розкопки'),)
@@ -459,7 +468,7 @@ class TempSaveForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
-    material = forms.ChoiceField(choices=MEDIA_CHOICES)
+    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
@@ -499,7 +508,7 @@ class TempRetForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(label='Автор', required=True) #
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
-    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'))
+    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
@@ -560,7 +569,7 @@ class PersistentSaveForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True) #
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
-    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials'))
+    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
@@ -617,7 +626,7 @@ class InventorySaveForm(forms.Form):
     date_existence = forms.CharField(max_length=200, label='Дата побутування')
     place_existence = forms.CharField(max_length=200, label='Місце побутування')
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
-    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials'))
+    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     mark_on_object = Custom.TextChoiceField(choices=MARKS_ON_OBJECT, label='Позначки на предметі', placeholder1='')
     classification = forms.CharField(max_length=200, label='Класифікація', required=True)
@@ -786,7 +795,7 @@ class FromPStoTSForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
-    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials'))
+    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
@@ -833,7 +842,7 @@ class FromTStoPSForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
-    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials'))
+    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
@@ -879,7 +888,7 @@ class SendOnPSForm(forms.Form):
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
-    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials'))
+    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
