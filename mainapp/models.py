@@ -28,7 +28,8 @@ def get_choice(*args):
     for table in args:
         root = root.find(table)
     for s in root:
-        choice += ((s.text, s.text),)
+        if not s.getchildren():
+            choice += ((s.text, s.text),)
     return choice
 
 
@@ -39,11 +40,16 @@ def get_image_path(self, filename):
 
 class Custom:
     class MaterialSelectWidget(MultiWidget):
-        def __init__(self, choices, amount):
-            widgets = [Select(choices=choices)]
+        def __init__(self, ch, amount):
+            widgets = [Select(choices=get_choice('materials', ch, 'one')),
+                       Select(choices=get_choice('materials', ch, 'two')),
+                       Select(choices=get_choice('materials', ch, 'three')),
+                        ]
             self.amo = amount
             for i in range(amount-1):
-                widgets.append(Select(choices=choices, attrs={'style': 'display:none;'}))
+                widgets.append(Select(choices=get_choice('materials', ch, 'one'), attrs={'style': 'display:none;'}))
+                widgets.append(Select(choices=get_choice('materials', ch, 'two'), attrs={'style': 'display:none;'}))
+                widgets.append(Select(choices=get_choice('materials', ch, 'three'), attrs={'style': 'display:none;'}))
             super(Custom.MaterialSelectWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -60,12 +66,14 @@ class Custom:
             return res
 
     class MaterialSelectField(MultiValueField):
-        def __init__(self, choices, amount, *args, **kwargs):
+        def __init__(self, ch, amount, *args, **kwargs):
             list_fields = []
             for i in range(amount):
-                list_fields.append(fields.ChoiceField(choices=choices))
+                list_fields.append(fields.ChoiceField(choices=get_choice('materials', ch, 'one')))
+                list_fields.append(fields.ChoiceField(choices=get_choice('materials', ch, 'two')))
+                list_fields.append(fields.ChoiceField(choices=get_choice('materials', ch, 'three')))
             super(Custom.MaterialSelectField, self).__init__(list_fields,
-                                                             widget=Custom.MaterialSelectWidget(choices, amount),
+                                                             widget=Custom.MaterialSelectWidget(ch, amount),
                                                              *args,
                                                              **kwargs)
 
@@ -76,9 +84,9 @@ class Custom:
 
     class MultiMaterialSelectWidget(MultiWidget):
         def __init__(self):
-            widgets = [Custom.MaterialSelectWidget(choices=get_choice('materials', 'precious'), amount=100),
-                       Custom.MaterialSelectWidget(choices=get_choice('materials', 'semi-precious'), amount=100),
-                       Custom.MaterialSelectWidget(choices=get_choice('materials', 'non-precious'), amount=100)]
+            widgets = [Custom.MaterialSelectWidget(ch='precious', amount=100),
+                       Custom.MaterialSelectWidget(ch='semi-precious', amount=100),
+                       Custom.MaterialSelectWidget(ch='non-precious', amount=100)]
             super(Custom.MultiMaterialSelectWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -96,9 +104,9 @@ class Custom:
 
         def __init__(self, *args, **kwargs):
             self.attrs = kwargs.copy()
-            list_fields = [Custom.MaterialSelectField(choices=get_choice('materials', 'precious'), amount=100, label='Precious'),
-                           Custom.MaterialSelectField(choices=get_choice('materials', 'semi-precious'), amount=100, label='Semi-precious'),
-                           Custom.MaterialSelectField(choices=get_choice('materials', 'non-precious'), amount=100, label='Non-precious')]
+            list_fields = [Custom.MaterialSelectField(ch='precious', amount=100, label='Precious'),
+                           Custom.MaterialSelectField(ch='semi-precious', amount=100, label='Semi-precious'),
+                           Custom.MaterialSelectField(ch='non-precious', amount=100, label='Non-precious')]
             super(Custom.MultiMaterialSelectField, self).__init__(list_fields,
                                                                   widget=Custom.MultiMaterialSelectWidget(),
                                                                   *args, **kwargs)
@@ -557,8 +565,8 @@ class InventorySaveForm(forms.Form):
     material = Custom.MultiMaterialSelectField(label='Матеріал')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     mark_on_object = Custom.TextChoiceField(choices=MARKS_ON_OBJECT, label='Позначки на предметі', placeholder1='')
-    classification = forms.CharField(max_length=200, label='Класифікація')
-    typology = forms.CharField(max_length=200, label='Типологія')
+    classification = forms.CharField(max_length=200, label='Класифікація', required=True)
+    typology = forms.CharField(max_length=200, label='Типологія', required=True)
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     bibliography = forms.CharField(max_length=200, label='Бібліографія')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
@@ -609,16 +617,16 @@ class SpecInventorySaveForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     fully_precious = forms.BooleanField(label='Предмет повністю складається з дорогоцінних'
                                               ' металів/дорогоцінного каміння?', required=True)
-    name_prec_metal = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
-                                                 label='Назва дорогоцінного металу', amount=1)
-    assay = Custom.MaterialSelectField(choices=get_choice('assay'),
-                                       label='Проба дорогоцінного металу', amount=1)
-    weight_prec_metal = Custom.TextChoiceField(choices=get_choice('dimension', 'measurement_unit', 'weight'),
+    #name_prec_metal = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
+    #                                             label='Назва дорогоцінного металу', amount=1)
+    #assay = Custom.MaterialSelectField(choices=get_choice('assay'),
+    #                                   label='Проба дорогоцінного металу', amount=1)
+    weight_prec_metal = Custom.TextChoiceField(choices=get_choice('weight'),
                                     label='Маса дорогоцінного металу в чистоті', placeholder1='')
-    name_prec_stone = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
-                                                 label='Назва дорогоцінного каміння', amount=1)
+    #name_prec_stone = Custom.MaterialSelectField(choices=get_choice('materials', 'precious'),
+    #                                             label='Назва дорогоцінного каміння', amount=1)
     amount_prec_stone0 = forms.CharField(label='Кількість дорогоцінного каміння')
-    weight_prec_stone = Custom.TextChoiceField(choices=get_choice('dimension', 'measurement_unit', 'weight'),
+    weight_prec_stone = Custom.TextChoiceField(choices=get_choice('weight'),
                                     label='Маса дорогоцінного металу в чистоті', placeholder1='')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
@@ -628,18 +636,45 @@ class SpecInventorySaveForm(forms.Form):
     recommandation_rest = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     price = forms.CharField(max_length=40, label='Вартість', required=True)
     note = forms.CharField(max_length=1000, label='Примітка', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
-    spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер')
+    spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер', required=True)
     PS_code = forms.CharField(max_length=200, label='Шифр і номер за книгою надходжень (ПЗ)', required=True)
-    inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою')
+    inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
     link_on_doc = forms.CharField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False)
     mat_person_in_charge = forms.ModelChoiceField(queryset=User.objects.all(), label='Матеріально-відповідальна особа', required=False)
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
 
 
-
 class Passport(forms.Form):
-    department = forms.ChoiceField(choices=get_choice('department'), label='Відомство')\
-    adm_submission = forms.
+    department = forms.ChoiceField(choices=get_choice('department'), label='Відомство', required=True)
+    adm_submission = forms.ChoiceField(choices=get_choice('department'), label='Адміністративне підпорядкування', required=True)
+    museum = forms.ChoiceField(choices=get_choice('museum'), label='Музей', required=True)
+    address = forms.CharField(label='Адреса', required=True, max_length=50 )
+    section = forms.ChoiceField(choices=get_choice('section'), label='Відділ', required=True)
+    collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=False)
+    PS_code = forms.CharField(label='Книга надходжень (номер)', max_length=50, required=True)
+    inventory_number = forms.CharField(max_length=100, label='Інвентарний номер', required=True)
+    spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер', required=True)
+    old_inventory_numbers = forms.CharField(max_length=500, label='Старі інвентарні номери', required=True)
+    collection_descr = forms.CharField(max_length=50, label='Колекційний опис (номер)', required=True)
+    identifier = forms.CharField(label='Унікальний номер в інформаційній системі', max_length=50, required=True)
+    negative = forms.CharField(label='Негатив (номер)', max_length=50, required=True)
+    image = forms.ImageField(label='Фото', required=True)
+    storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
+    name = Custom.TextChoiceField(choices=get_choice('languages'), label='Назва', placeholder1='')
+    author = forms.CharField(max_length=200, label='Автор або виробник', required=True)
+    date_place_creation = forms.CharField(max_length=20, label='Час і місце створення (виготовлення)', required=True)
+    date_place_detection = forms.CharField(max_length=200, label='Час і місце виявлення', required=True)
+    date_place_existence = forms.CharField(max_length=200, label='Час і місце побутування', required=True)
+    source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
+    way_of_found = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження (закупка, замовлення, дарунок, передача)', required=False)
+    documents = forms.CharField(max_length=50, label='Документи', required=False)
+    classification = forms.CharField(max_length=200, label='Класифікація')
+    typology = forms.CharField(max_length=200, label='Типологія')
+    amount = forms.IntegerField(label='Кількість', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Розміри (см/мм)')
+    material = Custom.MultiMaterialSelectField(label='Матеріал')
+    
+
 
 
 class PreparePStoTSForm(forms.Form):
