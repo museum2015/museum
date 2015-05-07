@@ -10,18 +10,40 @@ import xml.etree.ElementTree as et
 from bootstrap3_datetime.widgets import DateTimePicker
 # Create your models here. test
 
+ROOT = et.parse('museum/materials.xml').getroot()
+
+def get_symch(root, sym='', ch=(), *args):
+    for a in args:
+        root = root.find(a)
+    for s in root:
+        if s.getchildren():
+            ch += ((s.attrib['label'], sym), )
+            ch = get_symch(s, sym+'--', ch)
+        else:
+            if len(sym)>1:
+                ch += ((s.text, '|'+sym[2:]+'>'),)
+    return ch
+
+chm = get_symch(ROOT, '', (), 'materials')
 def get_choice(root, *args):
     choice = ()
     for a in args:
         root = root.find(a)
     for s in root:
         if s.getchildren():
-            choice += ((s.attrib['label'], get_choice(s)), )
+            temp=''
+            for a in chm:
+                if a[0]==s.attrib['label']:
+                    temp = a[1]
+            choice += ((temp+s.attrib['label'], get_choice(s)), )
         else:
-            choice += ((s.text, s.text),)
+            temp=''
+            for a in chm:
+                if a[0]==s.text:
+                    temp = a[1]
+            choice += ((s.text, temp+s.text),)
     return choice
 
-ROOT = et.parse('museum/materials.xml').getroot()
 
 MATERIAL_CHOICES = get_choice(ROOT, 'materials')
 
