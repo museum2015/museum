@@ -139,26 +139,26 @@
 
     </purpose>
     <assay>
-        <Золото>
+        <gold label="Золото">
             <choice>999</choice>
             <choice>958</choice>
             <choice>750</choice>
             <choice>585</choice>
             <choice>500</choice>
             <choice>375</choice>
-        </Золото>
-        <silver>
+        </gold>
+        <silver label="Срібло">
             <choice>960</choice>
             <choice>925</choice>
             <choice>875</choice>
             <choice>830</choice>
             <choice>800</choice>
         </silver>
-        <platinum>
+        <platinum label="Платина">
             <choice>950</choice>
             <choice>900</choice>
         </platinum>
-        <palladium>
+        <palladium label="Палладій">
             <choice>850</choice>
             <choice>500</choice>
         </palladium>
@@ -177,13 +177,13 @@
             <choice>Інші дані ...</choice>
         </type>
         <measurement_unit>
-            <!--<Вага>
+            <weight label="Вага">
                 <choice>фунтів</choice>
                 <choice>г</choice>
                 <choice>кг</choice>
                 <choice>карат</choice>
-            </Вага>
-            <Довжина>
+            </weight>
+            <length label="Довжина">
                 <choice>Фунт</choice>
                 <choice>см</choice>
                 <choice>мм</choice>
@@ -191,51 +191,19 @@
                 <choice>дм</choice>
                 <choice>км</choice>
                 <choice>миля</choice>
-            </Довжина>
-            <Щільність>
+            </length>
+            <density label="Щільність">
                 <choice>г/см^2</choice>
-            </Щільність>
-            <Освітленість>
+            </density>
+            <illumination label="Освітленість">
                 <choice>люменів ISO</choice>
-            </Освітленість>
-            <Вміст>
+            </illumination>
+            <percentage label="Вміст">
                 <choice>%</choice>
-            </Вміст>
-            <Висота>
-                <choice>Фунт</choice>
-                <choice>см</choice>
-                <choice>мм</choice>
-                <choice>м</choice>
-                <choice>дм</choice>
-                <choice>км</choice>
-                <choice>миля</choice>
-            </Висота>
-            <Ширина>
-                <choice>Фунт</choice>
-                <choice>см</choice>
-                <choice>мм</choice>
-                <choice>м</choice>
-                <choice>дм</choice>
-                <choice>км</choice>
-                <choice>миля</choice>
-            </Ширина>
-            <Інші>
+            </percentage>
+            <others label="Інші">
                 <choice>років</choice>
-            </Інші>-->
-                <choice>фунтів</choice>
-                <choice>г</choice>
-                <choice>кг</choice>
-                <choice>карат</choice>
-                <choice>Фунт</choice>
-                <choice>см</choice>
-                <choice>мм</choice>
-                <choice>м</choice>
-                <choice>дм</choice>
-                <choice>км</choice>
-                <choice>миля</choice>
-                <choice>г/см^2</choice>
-                <choice>люменів ISO</choice>
-                <choice>%</choice>
+            </others>
         </measurement_unit>
     </dimension>
     <department><!--Відомство в паспорті-->
@@ -247,7 +215,9 @@
     <issue><!--Розділ в паспорті-->
         <choice>Образотворчого і декоративно-прикладного мистецтва</choice>
     </issue>
+    <museum>
 
+    </museum>
     <weight>
         <choice>фунтів</choice>
         <choice>г</choice>

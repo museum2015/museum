@@ -10,6 +10,7 @@ import xml.etree.ElementTree as et
 from bootstrap3_datetime.widgets import DateTimePicker
 # Create your models here. test
 
+
 def get_choice(root, *args):
     choice = ()
     for a in args:
@@ -158,6 +159,146 @@ class Custom:
 
         def format_output(self, rendered_widgets):
             return u''.join(rendered_widgets)
+
+    class ChoiceTextTextChoiceField(MultiValueField):
+        def __init__(self, choices1, choices2, placeholder1, placeholder2):
+            list_fields = [fields.ChoiceField(choices=choices1),
+                           fields.CharField(max_length=30),
+                           fields.CharField(max_length=30),
+                           fields.ChoiceField(choices=choices2)]
+            super(Custom.ChoiceTextTextChoiceField, self).__init__(list_fields,
+                                                                   widget=Custom.ChoiceTextTextChoiceWidget(choices1=choices1,
+                                                                                                            choices2=choices2,
+                                                                                                            placeholder1=placeholder1,
+                                                                                                            placeholder2=placeholder2))
+
+        def compress(self, values):
+            if values:
+                return values[0] + ': ' + values[1] + ' ' + values[2]
+            else:
+                return ''
+
+    class ChoiceTextTextChoiceWidget(MultiWidget):
+        def __init__(self, choices1, choices2, placeholder1='', placeholder2='', invisible=True, **kwargs):
+            if invisible:
+                attrs = {'max_length': 10, 'placeholder1': placeholder1, 'placeholder2': placeholder2, 'style': 'display:none;'}
+            else:
+                attrs = {'max_length': 10, 'placeholder1': placeholder1, 'placeholder2': placeholder2}
+            widgets = [Select(choices=choices1, **kwargs),
+                       TextInput(attrs),
+                       TextInput(attrs),
+                       Select(choices=choices2, **kwargs)]
+            super(Custom.ChoiceTextTextChoiceWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                res = value.split(':')
+                return res
+            else:
+                return [None, None, None]
+
+        def format_output(self, rendered_widgets):
+            return u''.join(rendered_widgets)
+
+    class MultiChoiceTextTextChoiceWidget(MultiWidget):
+        def __init__(self, number):
+            widgets = [Custom.ChoiceTextTextChoiceWidget(placeholder1='', choices1=get_choice(et.parse('museum/materials.xml').getroot(), 'materials', 'precious', 'two'), choices2=get_choice(et.parse('museum/materials.xml').getroot(), 'dimension', 'measurement_unit', 'weight'), invisible=False)]
+            for i in range(number-1):
+                widgets.append(Custom.ChoiceTextTextChoiceWidget(placeholder1='', choices1=get_choice(et.parse('museum/materials.xml').getroot(), 'materials', 'precious', 'two'), choices2=get_choice(et.parse('museum/materials.xml').getroot(), 'dimension', 'measurement_unit', 'weight'), attrs={'style': 'display:none;'}))
+            super(Custom.MultiChoiceTextTextChoiceWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                return value.split('; ')
+            else:
+                return []
+
+        def format_output(self, rendered_widgets):
+            return '<br/>' + ''.join(rendered_widgets)
+
+    class MultiChoiceTextTextChoiceField(MultiValueField):
+        def __init__(self, number=10, *args, **kwargs):
+            list_fields = [Custom.ChoiceTextTextChoiceField(choices1=get_choice(et.parse('museum/materials.xml').getroot(), 'materials', 'precious', 'two'), choices2=get_choice(et.parse('museum/materials.xml').getroot(), 'dimension', 'measurement_unit', 'weight'), placeholder1='Кількість', placeholder2='2')]
+            for i in range(number-1):
+                list_fields.append(Custom.ChoiceTextTextChoiceField(choices1=get_choice(et.parse('museum/materials.xml').getroot(), 'materials', 'precious', 'two'), choices2=get_choice(et.parse('museum/materials.xml').getroot(), 'dimension', 'measurement_unit', 'weight'), placeholder1='', placeholder2=''))
+            super(Custom.MultiChoiceTextTextChoiceField, self).__init__(list_fields,
+                                                                        widget=Custom.MultiChoiceTextTextChoiceWidget(number),
+                                                                        *args,
+                                                                        **kwargs)
+
+        def compress(self, values):
+            values = [x for x in values if x]
+            return '; '.join(values)
+
+    class ChoiceChoiceTextChoiceField(MultiValueField):
+        def __init__(self, choices1, choices2, choices3, placeholder1):
+            list_fields = [fields.ChoiceField(choices=choices1),
+                           fields.ChoiceField(choices=choices2),
+                           fields.CharField(max_length=30),
+                           fields.ChoiceField(choices=choices3)]
+            super(Custom.ChoiceChoiceTextChoiceField, self).__init__(list_fields,
+                                                                     widget=Custom.ChoiceChoiceTextChoiceWidget(choices1=choices1,
+                                                                                                                choices2=choices2,
+                                                                                                                placeholder1=placeholder1,
+                                                                                                                choices3=choices3))
+
+        def compress(self, values):
+            if values:
+                return values[0] + ': ' + values[1] + ' ' + values[2]
+            else:
+                return ''
+
+    class ChoiceChoiceTextChoiceWidget(MultiWidget):
+        def __init__(self, choices1, choices2, choices3, placeholder1='', invisible=True, **kwargs):
+            if invisible:
+                attrs = {'max_length': 10, 'placeholder': placeholder1, 'style': 'display:none;'}
+            else:
+                attrs = {'max_length': 10, 'placeholder': placeholder1}
+            widgets = [Select(choices=choices1, **kwargs),
+                       Select(choices=choices2, **kwargs),
+                       TextInput(attrs),
+                       Select(choices=choices3, **kwargs)]
+            super(Custom.ChoiceChoiceTextChoiceWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                res = value.split(':')
+                return res
+            else:
+                return [None, None, None]
+
+        def format_output(self, rendered_widgets):
+            return u''.join(rendered_widgets)
+
+    class MultiChoiceChoiceTextChoiceWidget(MultiWidget):
+        def __init__(self, number):
+            widgets = [Custom.ChoiceChoiceTextChoiceWidget(placeholder1='0,2', choices1=get_choice(et.parse('museum/materials.xml').getroot(), 'materials', 'precious', 'one'), choices2=get_choice(et.parse('museum/materials.xml').getroot(), 'assay'), choices3=get_choice(et.parse('museum/materials.xml').getroot(),'dimension', 'measurement_unit', 'weight'), invisible=False)]
+            for i in range(number-1):
+                widgets.append(Custom.ChoiceChoiceTextChoiceWidget(placeholder1='', choices1=get_choice(et.parse('museum/materials.xml').getroot(), 'materials', 'precious', 'one'), choices2=get_choice(et.parse('museum/materials.xml').getroot(), 'assay'), choices3=get_choice(et.parse('museum/materials.xml').getroot(),'dimension', 'measurement_unit', 'weight'), attrs={'style': 'display:none;'}))
+            super(Custom.MultiChoiceChoiceTextChoiceWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                return value.split('; ')
+            else:
+                return []
+
+        def format_output(self, rendered_widgets):
+            return '<br/>' + ''.join(rendered_widgets)
+
+    class MultiChoiceChoiceTextChoiceField(MultiValueField):
+        def __init__(self, number=10, *args, **kwargs):
+            list_fields = [Custom.ChoiceChoiceTextChoiceField(choices1=get_choice(et.parse('museum/materials.xml').getroot(), 'materials', 'precious', 'one'), choices2=get_choice(et.parse('museum/materials.xml').getroot(), 'assay'), choices3=get_choice(et.parse('museum/materials.xml').getroot(),'dimension', 'measurement_unit', 'weight'), placeholder1='0.2')]
+            for i in range(number-1):
+                list_fields.append(Custom.ChoiceChoiceTextChoiceField(choices1=get_choice(et.parse('museum/materials.xml').getroot(), 'materials', 'precious', 'one'), choices2=get_choice(et.parse('museum/materials.xml').getroot(), 'assay'), choices3=get_choice(et.parse('museum/materials.xml').getroot(),'dimension', 'measurement_unit', 'weight'), placeholder1=''))
+            super(Custom.MultiChoiceChoiceTextChoiceField, self).__init__(list_fields,
+                                                                          widget=Custom.MultiChoiceChoiceTextChoiceWidget(number),
+                                                                          *args,
+                                                                          **kwargs)
+
+        def compress(self, values):
+            values = [x for x in values if x]
+            return '; '.join(values)
 
     class MultiChoiceTextChoiceWidget(MultiWidget):
         def __init__(self, number):
@@ -530,18 +671,21 @@ class SpecInventorySaveForm(forms.Form):
     date_creation = forms.CharField(label='Дата створення предмета', required=True)
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     fully_precious = forms.BooleanField(label='Предмет повністю складається з дорогоцінних'
-                                              ' металів/дорогоцінного каміння?', required=True)
-    #name_prec_metal = Custom.MaterialSelectField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials', 'precious'),
-    #                                             label='Назва дорогоцінного металу', amount=1)
-    #assay = Custom.MaterialSelectField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'assay'),
-    #                                   label='Проба дорогоцінного металу', amount=1)
-    weight_prec_metal = Custom.TextChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'weight'),
-                                    label='Маса дорогоцінного металу в чистоті', placeholder1='')
-    #name_prec_stone = Custom.MaterialSelectField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials', 'precious'),
-    #                                             label='Назва дорогоцінного каміння', amount=1)
-    amount_prec_stone0 = forms.CharField(label='Кількість дорогоцінного каміння')
-    weight_prec_stone = Custom.TextChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'weight'),
-                                    label='Маса дорогоцінного металу в чистоті', placeholder1='')
+                                              ' металів/дорогоцінного каміння?', required=False)
+    metals = Custom.MultiChoiceChoiceTextChoiceField(label='Дорогоцінні метали')
+    #name_prec_metal = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials', 'precious', 'one'),
+    #                                             label='Назва дорогоцінного металу')
+    #assay = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'assay'), label='Проба дорогоцінного металу')
+#
+    #weight_prec_metal = Custom.TextChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'weight'),
+    #                                           label='Маса дорогоцінного металу в чистоті', placeholder1='')
+    stones = Custom.MultiChoiceTextTextChoiceField(label='Дорогоцінне каміння')
+    #name_prec_stone = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials', 'precious', 'two'),
+    #                                             label='Назва дорогоцінного каміння')
+    #amount_prec_stone0 = forms.CharField(label='Кількість дорогоцінного каміння')
+    #weight_prec_stone = Custom.TextChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'weight'),
+    #                                           label='Маса дорогоцінного металу в чистоті', placeholder1='')
+
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
@@ -559,11 +703,16 @@ class SpecInventorySaveForm(forms.Form):
 
 
 class Passport(forms.Form):
-    department = forms.ChoiceField(choices=get_choice('department'), label='Відомство', required=True)
-    adm_submission = forms.ChoiceField(choices=get_choice('department'), label='Адміністративне підпорядкування', required=True)
-    museum = forms.ChoiceField(choices=get_choice('museum'), label='Музей', required=True)
+    choices = (
+        ('immediately', 'Термінова реставрація'),
+        ('conservation', 'Консервація'),
+        ('preventive', 'Профілактичний огляд')
+    )
+    department = forms.ChoiceField(choices=get_choice(ROOT, 'department'), label='Відомство', required=True)
+    adm_submission = forms.ChoiceField(choices=get_choice(ROOT, 'department'), label='Адміністративне підпорядкування', required=True)
+    museum = forms.ChoiceField(choices=get_choice(ROOT, 'museum'), label='Музей', required=True)
     address = forms.CharField(label='Адреса', required=True, max_length=50 )
-    section = forms.ChoiceField(choices=get_choice('section'), label='Відділ', required=True)
+    section = forms.ChoiceField(choices=get_choice(ROOT, 'section'), label='Відділ', required=True)
     collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=False)
     PS_code = forms.CharField(label='Книга надходжень (номер)', max_length=50, required=True)
     inventory_number = forms.CharField(max_length=100, label='Інвентарний номер', required=True)
@@ -588,6 +737,29 @@ class Passport(forms.Form):
     size = Custom.MultiChoiceTextChoiceField(label='Розміри (см/мм)')
     material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'))
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
+    metals = Custom.MultiChoiceChoiceTextChoiceField(label='Дорогоцінні метали')
+    stones = Custom.MultiChoiceTextTextChoiceField(label='Дорогоцінне каміння')
+    description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    person_or_actions = forms.CharField(max_length=2000, label='Особи чи події, пов’язані з предметом', required=True,
+                                        widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    memorial_subject = forms.CharField(max_length=200, label='Зв’язок з іншими пам’ятками (історичний, мистецтвознавчий, культурологічний аспект)', required=True)
+    extra_list = forms.CharField(max_length=2000, label='Додаткові відомості', required=True,
+                                 widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+    condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    recommandation_rest = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
+    restoration = forms.CharField(max_length=2000, label='Реставрація (історія реставрації, зв’язок із журналом реставрації)', required=True,
+                                  widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
+    transport_possibility = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
+    image_amount = forms.IntegerField(label='Кількість фотографій', min_value=0)
+    price = forms.CharField(max_length=40, label='Оціночна вартість', required=True)
+    attachment_amount = forms.IntegerField(label='Кількість додатків', min_value=0)
+    exposition = forms.CharField(max_length=100, label='Експонування', required=False)
+    existence_check = forms.CharField(max_length=100, label='Звіряння наявності (документ, дата)', required=False)
+    bibliography = forms.CharField(max_length=200, label='Бібліографія')
+    archive_materials = forms.CharField(max_length=200, label='Архівні матеріали')
+    #person_in_charge =
 
 
 class PreparePStoTSForm(forms.Form):

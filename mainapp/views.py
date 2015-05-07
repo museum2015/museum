@@ -348,7 +348,7 @@ def AddOnSpecInventorySave(request, id_number):
                 'link_on_doc': project.link_on_doc, 'mat_person_in_charge': mat_person_in_charge,
                 'storage':project.storage
                }
-        form = InventorySaveForm(initial=data)
+        form = SpecInventorySaveForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
 
 @login_required(login_url='/admin/')
