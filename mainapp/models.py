@@ -3,7 +3,8 @@ import datetime
 import os
 from django import forms
 from django.db import models
-from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select, ModelForm
+from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select, ModelForm, \
+    CheckboxSelectMultiple, RadioSelect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import xml.etree.ElementTree as et
@@ -468,7 +469,7 @@ class TempSaveForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
-    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
+    material = forms.MultipleChoiceField(widget=CheckboxSelectMultiple, choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
@@ -569,7 +570,7 @@ class PersistentSaveForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True) #
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
-    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали')
+    material = forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials'), label='Матеріали', widget=Select(attrs={'multiple': 'multiple'}))
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
