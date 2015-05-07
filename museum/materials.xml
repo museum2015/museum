@@ -34,47 +34,35 @@
             </посуд>
     </type>
     <materials>
-        <precious>
-            <one>
-                <choice>метал</choice>
-                <choice>камiння</choice>
-            </one>
-            <two>
-                <choice>кольоровий метал</choice>
-                <choice>велике камiння</choice>
-            </two>
-            <three>
+        <precious label="Дорогоцінні">
+            <one label="Метал">
                 <choice>Золото</choice>
-                <choice>Брюлики</choice>
-            </three>
+                <choice>Срібло</choice>
+            </one>
+            <two label="Каміння">
+                <choice>Діамант</choice>
+                <choice>Сапфір</choice>
+            </two>
         </precious>
-        <semi-precious>
-            <one>
-                <choice>метал</choice>
-                <choice>камiння</choice>
+        <semi-precious label="Напівдорогоцінні">
+            <one label="Метал">
+                <choice>Золото</choice>
+                <choice>Срібло</choice>
             </one>
-            <two>
-                <choice>кольоровий метал</choice>
-                <choice>велике камiння</choice>
+            <two label="Каміння">
+                <choice>Діамант</choice>
+                <choice>Сапфір</choice>
             </two>
-            <three>
-                <choice>Серебро</choice>
-                <choice>Аквамарин</choice>
-            </three>
         </semi-precious>
-        <non-precious>
-            <one>
-                <choice>метал</choice>
-                <choice>камiння</choice>
+        <non-precious label="Недорогоцінні">
+            <one label="Метал">
+                <choice>Золото</choice>
+                <choice>Срібло</choice>
             </one>
-            <two>
-                <choice>кольоровий метал</choice>
-                <choice>велике камiння</choice>
+            <two label="Каміння">
+                <choice>Діамант</choice>
+                <choice>Сапфір</choice>
             </two>
-            <three>
-                <choice>Олово</choice>
-                <choice>Фантики</choice>
-            </three>
         </non-precious>
     </materials>
     <equipment>

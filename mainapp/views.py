@@ -2,10 +2,11 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelChoiceField
+from django.utils import encoding
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
     PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
     InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
-    PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm
+    PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm, get_choice
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView, CreateView
@@ -14,10 +15,9 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import auth
-
+import xml.etree.ElementTree as et
 
 # Create your views here.
-
 @csrf_protect
 @login_required(login_url='/admin/')
 def TempSave(request, id_number=0):
