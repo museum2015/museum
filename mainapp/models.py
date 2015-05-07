@@ -47,22 +47,6 @@ def get_choice(root, *args):
 
 MATERIAL_CHOICES = get_choice(ROOT, 'materials')
 
-MEDIA_CHOICES = (
- ('Audio', (
-     ('-- Audio', (
-        ('---- Audio', (
-            ('vinyl', '------ Vinyl'),
-            ('cd', '------ CD'),
-        ),),
-     )
- ),)),
- ('Video', (
-   ('vhs', 'VHS Tape'),
-   ('dvd', 'DVD'),
-  )
- ),
-)
-
 TECHNIQUE_CHOICES = (('', '--------'), ('Техніка 1', 'Техніка 1'),)
 WAY_OF_FOUND_CHOICES = (('', '--------'), ('Розкопки', 'Розкопки'),)
 AIMS = (('', '--------'),)
