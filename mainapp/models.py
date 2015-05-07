@@ -10,6 +10,21 @@ import xml.etree.ElementTree as et
 from bootstrap3_datetime.widgets import DateTimePicker
 # Create your models here. test
 
+def get_choice(root, *args):
+    choice = ()
+    for a in args:
+        root = root.find(a)
+    for s in root:
+        if s.getchildren():
+            choice += ((s.attrib['label'], get_choice(s)), )
+        else:
+            choice += ((s.text, s.text),)
+    return choice
+
+ROOT = et.parse('museum/materials.xml').getroot()
+
+MATERIAL_CHOICES = get_choice(ROOT, 'materials')
+
 MEDIA_CHOICES = (
  ('Audio', (
      ('-- Audio', (
@@ -26,8 +41,6 @@ MEDIA_CHOICES = (
  ),
 )
 
-
-
 TECHNIQUE_CHOICES = (('', '--------'), ('Техніка 1', 'Техніка 1'),)
 WAY_OF_FOUND_CHOICES = (('', '--------'), ('Розкопки', 'Розкопки'),)
 AIMS = (('', '--------'),)
@@ -40,17 +53,6 @@ CONDITIONS = (('', '--------'), ('Без пошкоджень', 'Без пошк
               ('Незадовільний', 'Незадовільний'))
 
 
-def get_choice(root, *args):
-    choice = ()
-    for a in args:
-        root = root.find(a)
-    for s in root:
-        if s.getchildren():
-            choice += ((s.attrib['label'], get_choice(s)), )
-        else:
-            choice += ((s.text, s.text),)
-    return choice
-
 
 def get_image_path(self, filename):
     path = ''.join(["/", filename])
@@ -58,141 +60,34 @@ def get_image_path(self, filename):
 
 
 class Custom:
-    # class MaterialSelectWidget(MultiWidget):
-    #     def __init__(self, ch, amount):
-    #         widgets = [Select(choices=get_choice('materials', ch, 'one')),
-    #                    Select(choices=get_choice('materials', ch, 'two')),
-    #                    Select(choices=get_choice('materials', ch, 'three')),
-    #                     ]
-    #         self.amo = amount
-    #         for i in range(amount-1):
-    #             widgets.append(Select(choices=get_choice('materials', ch, 'one'), attrs={'style': 'display:none;'}))
-    #             widgets.append(Select(choices=get_choice('materials', ch, 'two'), attrs={'style': 'display:none;'}))
-    #             widgets.append(Select(choices=get_choice('materials', ch, 'three'), attrs={'style': 'display:none;'}))
-    #         super(Custom.MaterialSelectWidget, self).__init__(widgets)
-    # 
-    #     def decompress(self, value):
-    #         if value:
-    #             return value.split(', ')
-    #         else:
-    #             res = []
-    #             for i in range(self.amo):
-    #                 res.append(None)
-    #             return res
-    # 
-    #     def format_output(self, rendered_widgets):
-    #         res = u''.join(rendered_widgets)
-    #         return res
-    # 
-    # class MaterialSelectField(MultiValueField):
-    #     def __init__(self, ch, amount, *args, **kwargs):
-    #         list_fields = []
-    #         for i in range(amount):
-    #             list_fields.append(fields.ChoiceField(choices=get_choice('materials', ch, 'one')))
-    #             list_fields.append(fields.ChoiceField(choices=get_choice('materials', ch, 'two')))
-    #             list_fields.append(fields.ChoiceField(choices=get_choice('materials', ch, 'three')))
-    #         super(Custom.MaterialSelectField, self).__init__(list_fields,
-    #                                                          widget=Custom.MaterialSelectWidget(ch, amount),
-    #                                                          *args,
-    #                                                          **kwargs)
-    # 
-    #     def compress(self, values):
-    #         values = [x for x in values if x]
-    #         return ', '.join(values)
-    # 
-    # 
-    # class MultiMaterialSelectWidget(MultiWidget):
-    #     def __init__(self):
-    #         widgets = [Custom.MaterialSelectWidget(ch='precious', amount=100),
-    #                    Custom.MaterialSelectWidget(ch='semi-precious', amount=100),
-    #                    Custom.MaterialSelectWidget(ch='non-precious', amount=100)]
-    #         super(Custom.MultiMaterialSelectWidget, self).__init__(widgets)
-    # 
-    #     def decompress(self, value):
-    #         if value:
-    #             return value.split('; ')
-    #         else:
-    #             return []
-    # 
-    #     def format_output(self, rendered_widgets):
-    #         return u'\n<p><label for="id_temp2_0_0">Дорогоцінні: </label><br>' + rendered_widgets[0] + \
-    #                u'\n<p><label for="id_temp2_1_0">Напів дорогоцінні: </label><br>' + rendered_widgets[1] + \
-    #                u'\n<p><label for="id_temp2_2_0">Не дорогоцінні: </label><br>' + rendered_widgets[2]
-    # 
-    # class MultiMaterialSelectField(MultiValueField):
-    # 
-    #     def __init__(self, *args, **kwargs):
-    #         self.attrs = kwargs.copy()
-    #         list_fields = [Custom.MaterialSelectField(ch='precious', amount=100, label='Precious'),
-    #                        Custom.MaterialSelectField(ch='semi-precious', amount=100, label='Semi-precious'),
-    #                        Custom.MaterialSelectField(ch='non-precious', amount=100, label='Non-precious')]
-    #         super(Custom.MultiMaterialSelectField, self).__init__(list_fields,
-    #                                                               widget=Custom.MultiMaterialSelectWidget(),
-    #                                                               *args, **kwargs)
-    # 
-    #     def compress(self, values):
-    #         values = [x for x in values if x]
-    #         return '; '.join(values)
 
-    class MaterialWidget(MultiWidget):
-        def __init__(self, placeholder1='', placeholder2='', size1=10, size2=10):
-            widgets = [TextInput(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1}),
-                       TextInput(attrs={'size': size2, 'max_length': 10, 'placeholder': placeholder2})]
-            super(Custom.MaterialWidget, self).__init__(widgets)
+    class MultiMaterialSelectWidget(MultiWidget):
+        def __init__(self, amount):
+            widgets = [Select(choices=MATERIAL_CHOICES)]
+            for i in range(amount-1):
+                widgets.append(Select(choices=MATERIAL_CHOICES, attrs={'style': 'display:none;'}))
+            super(Custom.MultiMaterialSelectWidget, self).__init__(widgets)
 
         def decompress(self, value):
             if value:
-                res = value.split(':')
-                return res
-            else:
-                return [None, None]
-
-        def format_output(self, rendered_widgets):
-            dd = '<br>'
-            res = u''.join(rendered_widgets)
-            return dd+res
-
-    class MaterialField(MultiValueField):
-        def __init__(self, size1=10, size2=30, *args, **kwargs):
-            list_fields = [fields.CharField(max_length=30),
-                           fields.CharField(max_length=30)]
-            super(Custom.MaterialField, self).__init__(list_fields, widget=Custom.MaterialWidget(size1, size2), *args,
-                                                       **kwargs)
-
-        def compress(self, values):
-            if values:
-                return values[0] + ':' + values[1]
-            else:
-                return ''
-
-    class MultiMaterialWidget(MultiWidget):
-        def __init__(self, placeholder1, placeholder2, number=5):
-            widgets = [Custom.MaterialWidget(placeholder1=placeholder1, placeholder2=placeholder2)]
-            for i in range(number-1):
-                widgets.append(Custom.MaterialWidget())
-            super(Custom.MultiMaterialWidget, self).__init__(widgets)
-
-        def decompress(self, value):
-            if value:
-                return value.split(';')
+                return value.split(', ')
             else:
                 return []
 
-        def format_output(self, rendered_widgets):
-            res = u''.join(rendered_widgets)
-            return res+'<br>'
+    class MultiMaterialSelectField(MultiValueField):
 
-    class MultiMaterialField(MultiValueField):
-        def __init__(self, placeholder1='Золото', placeholder2='10г', number=5, *args, **kwargs):
-            list_fields = [Custom.MaterialField(required=True)]
-            for i in range(number-1):
-                list_fields.append(Custom.MaterialField())
-            super(Custom.MultiMaterialField, self).__init__(list_fields, widget=Custom.MultiMaterialWidget(number=number, placeholder1=placeholder1, placeholder2=placeholder2),
-                                                            *args, **kwargs)
+        def __init__(self, amount=10, *args, **kwargs):
+            self.attrs = kwargs.copy()
+            list_fields = []
+            for i in range(amount):
+                list_fields.append(forms.ChoiceField(choices=get_choice(et.parse('museum/materials.xml').getroot(), 'materials')))
+            super(Custom.MultiMaterialSelectField, self).__init__(list_fields,
+                                                                  widget=Custom.MultiMaterialSelectWidget(amount=amount),
+                                                                  *args, **kwargs)
 
         def compress(self, values):
-            result = ';'
-            return result.join(values)
+            values = [x for x in values if x]
+            return ', '.join(values)
 
     class TextChoiceWidget(MultiWidget):
         def __init__(self, choices, placeholder1='', size1=10):
@@ -838,15 +733,15 @@ class WritingOffForm(forms.Form):
 class ObjectEditForm(ModelForm):
     class Meta:
         model = Object
-    material = Custom.MultiMaterialField()
-    size = Custom.MultiMaterialField(number=3)
+    #material = Custom.MultiMaterialField()
+    #size = Custom.MultiMaterialField(number=3)
 
 
 class ObjectCreateForm(ModelForm):
     class Meta:
         model = Object
-    material = Custom.MultiMaterialField()
-    size = Custom.MultiMaterialField(number=3)
+    #material = Custom.MultiMaterialField()
+    #size = Custom.MultiMaterialField(number=3)
 
 
 class AutForm(forms.Form):
