@@ -30,7 +30,6 @@ def TempSave(request, id_number=0):
             project = Object(name='Новий')
     if request.method == 'POST':
         form = TempSaveForm(request.POST)
-        form.errors['material'] = form['material'].error_class()
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Приймання на тимчасове зберігання', actor=request.user)
