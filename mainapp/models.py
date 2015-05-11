@@ -64,7 +64,6 @@ CONDITIONS = (('', '--------'), ('Без пошкоджень', 'Без пошк
               ('Незадовільний', 'Незадовільний'))
 
 
-
 def get_image_path(self, filename):
     path = ''.join(["/", filename])
     return path
@@ -126,6 +125,41 @@ class Custom:
                                                          widget=Custom.TextChoiceWidget(choices=choices, size1=size1, placeholder1=placeholder1),
                                                          *args,
                                                          **kwargs)
+
+        def compress(self, values):
+            if values:
+                return values[0] + ' (' + values[1] + ')'
+            else:
+                return ''
+
+    class TextChoiceDateWidget(MultiWidget):
+        def __init__(self, choices, placeholder1='', size1=40):
+            widgets = [TextInput(attrs={'size': size1, 'max_length': 50, 'placeholder': placeholder1}),
+                       Select(choices=choices),
+                       DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}, attrs={'width': '300px'})]
+            super(Custom.TextChoiceDateWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                res = value.split(' ')
+                return [x.strip("()") for x in res]
+            else:
+                return [None, None]
+
+        def format_output(self, rendered_widgets):
+            dd = '<br>'
+            res = u''.join(rendered_widgets)
+            return dd+res
+
+    class TextChoiceDateField(MultiValueField):
+        def __init__(self, choices, placeholder1, size1=40, *args, **kwargs):
+            list_fields = [fields.CharField(max_length=30),
+                           fields.ChoiceField(choices=choices),
+                           fields.DateTimeField(DateTimePicker(options={"format": "YYYY-MM-DD", "pickTime": False}, attrs={'width': '300px'}))]
+            super(Custom.TextChoiceDateField, self).__init__(list_fields,
+                                                             widget=Custom.TextChoiceDateWidget(choices=choices, size1=size1, placeholder1=placeholder1),
+                                                             *args,
+                                                             **kwargs)
 
         def compress(self, values):
             if values:
@@ -712,7 +746,21 @@ class SpecInventorySaveForm(forms.Form):
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
 
 
-class Passport(forms.Form):
+class PreparePassportForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(PreparePassportForm, self).__init__(*args, **kwargs)
+        objlist = []
+        for project in Object.objects.all():
+            if project.status() != 'Пустий об’єкт'\
+                    or project.status() != 'Списання (втрата тощо)':
+                objlist.append(project)
+        objects = [(0, 'Новий об’єкт')]
+        for o in objlist:
+            objects.append((o.id, o.__unicode__()))
+        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
+
+
+class PassportForm(forms.Form):
     choices = (
         ('immediately', 'Термінова реставрація'),
         ('conservation', 'Консервація'),
@@ -740,7 +788,7 @@ class Passport(forms.Form):
     date_place_existence = forms.CharField(max_length=200, label='Час і місце побутування', required=True)
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
     way_of_found = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження (закупка, замовлення, дарунок, передача)', required=False)
-    documents = forms.CharField(max_length=50, label='Документи', required=False)
+    link_on_doc = forms.CharField(max_length=50, label='Документи', required=False)
     classification = forms.CharField(max_length=200, label='Класифікація')
     typology = forms.CharField(max_length=200, label='Типологія')
     amount = forms.IntegerField(label='Кількість', required=True)
@@ -769,7 +817,7 @@ class Passport(forms.Form):
     existence_check = forms.CharField(max_length=100, label='Звіряння наявності (документ, дата)', required=False)
     bibliography = forms.CharField(max_length=200, label='Бібліографія')
     archive_materials = forms.CharField(max_length=200, label='Архівні матеріали')
-    #person_in_charge =
+    person_in_charge = Custom.TextChoiceDateField(choices=User.objects.all(), placeholder1='Ваша посада', label='Відповідальні особи')
 
 
 class PreparePStoTSForm(forms.Form):

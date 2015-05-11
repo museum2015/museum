@@ -6,7 +6,8 @@ from django.utils import encoding
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
     PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
     InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
-    PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm, get_choice
+    PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm, get_choice, PreparePassportForm,\
+    PassportForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView, CreateView
@@ -117,6 +118,26 @@ def get_attrib_assigns(act_type, project, attribute):
         return a[0][0].attr_value
     except IndexError:
         return ''
+
+
+def get_all_attrib_assigns(act_type, project, attribute):
+    act = Activity.objects.filter(type=act_type, approval=True)
+    a = []
+    for i in act:
+            b = AttributeAssignment.objects.filter(event_initiator=i, aim=project, attr_name=attribute, actual=True)
+            if not b:
+                continue
+            else:
+                a.append(b)
+    i = 0
+    c = []
+    while i < len(a):
+        c.append(a[0][i].attr_value)
+    try:
+        return c
+    except IndexError:
+        return ''
+
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -349,6 +370,63 @@ def AddOnSpecInventorySave(request, id_number):
                 'storage':project.storage
                }
         form = SpecInventorySaveForm(initial=data)
+    return render(request, 'AddOnTs.html', {'form': form})
+
+@login_required(login_url='/admin/')
+def PreparePassport(request):
+    if request.method == 'POST':
+        form = PreparePassportForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return HttpResponseRedirect(cd['obj'])
+        else:
+            return HttpResponseRedirect('/')
+    else:
+        form = PreparePassportForm()
+        return render(request, 'AddOnTs.html', {'form': form})
+
+@login_required(login_url='/admin/')
+@csrf_protect
+def Passport(request, id_number):
+    try:
+        project = Object.objects.get(id=int(id_number))
+    except ObjectDoesNotExist:
+        if id_number != '0':
+            return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
+        else:
+            project = Object(name='Новий')
+    if request.method == 'POST':
+        form = PassportForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            act = Activity(time_stamp=dt.now(), type='Науково-уніфікований паспорт', actor=request.user)
+            act.save()
+            project.save()
+            for (k, v) in cd.items():
+                attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
+                                                  event_initiator=act, aim=project)
+                attr_assign.save()
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
+    else:
+        collection = get_attrib_assigns('Інвентарний облік', project, 'collection')
+        ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
+        inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
+        spec_inventory_numb = get_attrib_assigns('Спеціальний інвентарний облік', project, 'spec_inventory_numb')
+        mat_person_in_charge = get_attrib_assigns('Інвентарний облік', project, 'mat_person_in_charge')
+        data = {'collection': collection, 'PS_code': ps_code, 'inventory_number': inventory_number,
+                'spec_inventory_numb': spec_inventory_numb,
+                'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'author': project.author, 'size': project.size, 'description': project.description,
+                'condition': project.condition, 'condition_descr': project.condition_descr,
+                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
+                'place_of_creation': project.place_of_creation, 'note': project.note,
+                'price': project.price,
+                'link_on_doc': project.link_on_doc, 'mat_person_in_charge': mat_person_in_charge,
+                'storage':project.storage
+               }
+        form = PassportForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
 
 @login_required(login_url='/admin/')
