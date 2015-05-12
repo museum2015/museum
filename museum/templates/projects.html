@@ -3,45 +3,65 @@
 {% load staticfiles %}
 <head lang="en">
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="{% static "static/table.css" %}"/>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script type="text/javascript" language="javascript" src="{% static "js/TF_Modules/tablefilter.js" %}"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css"/>
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/jquery.webui-popover.css">
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.webui-popover.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+    <style>
+        .container {
+            width: 80%;
+        }
+        .highlight {
+            background-color: #cccccc !important;
+        }
+        .menu {
+            position: absolute;
+            height: 50%;
+            width: 5%;
+            right: 2%;
+            top: 25%;
+        }
+
+    </style>
 </head>
 <body>
-
-<table id="table1">
-    <thead>
-    <tr>
-							<th>ID</th>
-							<th>Об’єкт</th>
-                            <th>Подія</th>
-                            <th>Час</th>
-                            <th>Особа</th>
-                            <th>Підтверджено</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for a in acts %}
-    <tr><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"d/m/Y H:m:s" }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="container">
+    <div class="content">
+    <table id="table1" cellspacing="0" width="100%">
+        <thead>
+        <tr>
+                                <th>ID</th>
+                                <th>Об’єкт</th>
+                                <th>Подія</th>
+                                <th>Час</th>
+                                <th>Особа</th>
+                                <th>Підтверджено</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for a in acts %}
+            <tr id="{{ a.id }}"><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"Y/m/d H:m:s" }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+<div class="menu">
+    <i onclick='' title='Затвердити' class='button0 fa fa-check fa-4x'></i>
+    <i onclick='' title='Відхилити' class='button1 fa fa-close fa-4x'></i>
+    <i onclick='' title='Редагувати' class='button2 fa fa-cog fa-4x'></i>
+</div>
 <script type="text/javascript">
+        {% for a in acts %}
+        $text = "{% for b in a.set %}<b>{{ b.attr_label }}:</b> {{ b.attr_value }} <br> {% endfor %}"
+
+        $("#{{ a.id }}").webuiPopover({title:'{{ a.type }}',content:$text, trigger:'hover', width: '75%'});
+        {% endfor %}
         var $table = $('table'),
         $bodyCells = $table.find('tbody tr:first').children(),
         colWidth;
-
-        $bodyCells.each(function(i, v) {
-            $(v).width($(v).width() + 50);
-        });
-
-        colWidth = $bodyCells.map(function() {
-            return $(this).width();
-        }).get();
-
-        $table.find('thead tr').children().each(function(i, v) {
-            $(v).width(colWidth[i]);
-        });
 
         var rows = $('tr').not(':first');
 
@@ -54,36 +74,52 @@
             rows.removeClass('highlight');
             row.addClass('highlight');
 
-
         });
 
+        var approve = function() {
+            if (!($(".button0").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/activities/approve" + t;
+                window.location.href = link;
+            }
+        };
 
-
-
-        var table_props =  {
-                    col_0: "none",
-                    col_5: "select",
-                    display_all_text: " [ Show all ] ",
-                    sort_select: true,
-                    paging: true,
-                    paging_length: 20,
-                    rows_counter: true,
-                    rows_counter_text: "Рядки:",
-                    btn_reset: false,
-                    btn_next_page_html: '<a href="javascript:;" style="margin:3px;">Наступна ></a>',
-                    btn_prev_page_html: '<a href="javascript:;" style="margin:3px;">< Попередня</a>',
-                    btn_last_page_html: '<a href="javascript:;" style="margin:3px;"> Остання >|</a>',
-                    btn_first_page_html: '<a href="javascript:;" style="margin:3px;"><| Перша</a>',
-                    loader: true,
-                    loader_html: '<h4 style="color:red;">Завантаження, будь ласка зачекайте...</h4>',
-                    sort: true,
-                    sort_config: {
-                        sort_types: ['Number', 'String', 'String', 'None', 'String', 'String'],
+        $(document).ready(function() {
+            $('#table1').dataTable( {
+                "columns": [
+                    { "type": "num" },
+                    { "type": "html" },
+                    { "type": "html" },
+                    { "type": "date" },
+                    { "type": "html" },
+                    { "type": "html" },
+                ],
+                "language": {
+                    "emptyTable":     "Нема доступних записів у таблиці",
+                    "info":           "Відображеня _START_ - _END_ з _TOTAL_ записів",
+                    "infoEmpty":      "Відображення 0-0 з 0 записів",
+                    "infoFiltered":   "(фільтровано з _MAX_ записів)",
+                    "infoPostFix":    "",
+                    "thousands":      ",",
+                    "lengthMenu":     "Відображати _MENU_ записів",
+                    "loadingRecords": "Завантаження...",
+                    "processing":     "Обробка...",
+                    "search":         "Пошук:",
+                    "zeroRecords":    "Не знайдено записів",
+                    "paginate": {
+                        "first":      "Перша",
+                        "last":       "Остання",
+                        "next":       "Наступна",
+                        "previous":   "Попередня"
+                    },
+                    "aria": {
+                        "sortAscending":  ": сортування за зростанням",
+                        "sortDescending": ": сортування за спаданням",
                     }
-    };
+                },
 
-
-        var tf = setFilterGrid("table1", table_props);
+            });
+        } );
 </script>
 </body>
 </html>

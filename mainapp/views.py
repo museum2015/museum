@@ -42,15 +42,13 @@ def TempSave(request, id_number=0):
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:
-            print form.errors
-        return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
+            return render(request, 'AddOnTs.html', {'form': form})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
                 'author': project.author, 'technique': project.technique, 'material': project.material,
                 'size': project.size, 'condition': project.condition, 'condition_descr': project.condition_descr, 'description': project.description,
                 'price': project.price}
         form = TempSaveForm(initial=data)
-
         return render(request, 'AddOnTs.html', {'form': form})
 
 @csrf_protect
