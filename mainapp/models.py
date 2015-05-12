@@ -4,11 +4,9 @@ import os
 from django import forms
 from django.db import models
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select, ModelForm, SelectMultiple
-from djangular.forms import NgFormValidationMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils.html import mark_safe
-from djangular.styling.bootstrap3.forms import Bootstrap3Form
 from django.core.exceptions import ValidationError
 import lxml.etree as et
 from bootstrap3_datetime.widgets import DateTimePicker
