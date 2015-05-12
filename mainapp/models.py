@@ -830,7 +830,7 @@ class PassportForm(forms.Form):
     existence_check = forms.CharField(max_length=100, label='Звіряння наявності (документ, дата)', required=False)
     bibliography = forms.CharField(max_length=200, label='Бібліографія')
     archive_materials = forms.CharField(max_length=200, label='Архівні матеріали')
-    person_in_charge = Custom.TextChoiceDateField(choices=User.objects.all(), placeholder1='Ваша посада', label='Відповідальні особи')
+    person_in_charge = forms.ModelMultipleChoiceField(queryset=User.objects.all(), widget=SelectMultiple(), label='Відповідальні особи')
 
 
 class PreparePStoTSForm(forms.Form):
