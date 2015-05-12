@@ -43,7 +43,6 @@ INSTALLED_APPS = (
     'mainapp',
     'bootstrap3',
     'bootstrap3_datetime',
-    'djangular',
 
 )
 
