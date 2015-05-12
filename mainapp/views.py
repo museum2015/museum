@@ -41,6 +41,8 @@ def TempSave(request, id_number=0):
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
             return HttpResponseRedirect('/')
+        else:
+            print form.errors
         return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
@@ -138,6 +140,25 @@ def get_all_attrib_assigns(act_type, project, attribute):
     except IndexError:
         return ''
 
+
+def appendlists(list_from, list_to):
+    for i in list_from:
+        list_to.append(i)
+    return list_to
+
+
+def get_old_attributes(project, attribute):
+    ps = get_all_attrib_assigns('Приймання на постійне зберігання', project, attribute)
+    inv = get_all_attrib_assigns('Інвентарний облік', project, attribute)
+    spec_inv = get_all_attrib_assigns('Спеціальний інвентарний облік', project, attribute)
+    res = []
+    appendlists(ps, res)
+    appendlists(inv, res)
+    appendlists(spec_inv, res)
+    old_attributes = ''
+    for i in res:
+        old_attributes.join(',').join(str(i))
+    return old_attributes
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -414,18 +435,29 @@ def Passport(request, id_number):
         ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
         inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
         spec_inventory_numb = get_attrib_assigns('Спеціальний інвентарний облік', project, 'spec_inventory_numb')
-        mat_person_in_charge = get_attrib_assigns('Інвентарний облік', project, 'mat_person_in_charge')
+        #old_inventory_numbers = get_old_attributes(project, 'inventory_number')
+        date_place_creation = project.date_creation.join(['', project.place_of_creation])
+        date_place_detection = project.date_detection.join(['', project.place_detection])
+        date_place_existence = project.date_existence.join(['', project.place_existence])
+        source = get_attrib_assigns('Приймання на постійне зберігання', project, 'source')
+        classification = get_attrib_assigns('Інвентарний облік', project, 'classification')
+        typology = get_attrib_assigns('Інвентарний облік', project, 'typology')
+        metals = get_attrib_assigns('Спеціальний інвентарний облік', project, 'metals')
+        stones = get_attrib_assigns('Спеціальний інвентарний облік', project, 'stones')
+        bibliography = get_attrib_assigns('Інвентарний облік', project, 'bibliography   ')
         data = {'collection': collection, 'PS_code': ps_code, 'inventory_number': inventory_number,
-                'spec_inventory_numb': spec_inventory_numb,
-                'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'author': project.author, 'size': project.size, 'description': project.description,
+                'spec_inventory_numb': spec_inventory_numb, #'old_inventory_numbers': old_inventory_numbers,
+                'identifier': project.identifier, 'storage': project.storage,
+                'name': project.name, 'author': project.author, 'date_place_creation': date_place_creation,
+                'date_place_detection': date_place_detection, 'date_place_existence': date_place_existence,
+                'source': source, 'way_of_found': project.way_of_found, 'link_on_doc': project.link_on_doc,
+                'classification': classification, 'typology': typology, 'amount': project.amount,
+                'size': project.size, 'material': project.material, 'technique': project.technique,
+                'metals': metals, 'stones': stones, 'description': project.description,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
-                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
-                'place_of_creation': project.place_of_creation, 'note': project.note,
-                'price': project.price,
-                'link_on_doc': project.link_on_doc, 'mat_person_in_charge': mat_person_in_charge,
-                'storage':project.storage
-               }
+                'recomm_for_restauration': project.recomm_for_restauration,
+                'transport_possibility': project.transport_possibility, 'price': project.price,
+                'bibliography': bibliography}
         form = PassportForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
 
