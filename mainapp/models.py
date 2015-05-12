@@ -3,10 +3,13 @@ import datetime
 import os
 from django import forms
 from django.db import models
-from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select, ModelForm
+from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select, ModelForm, SelectMultiple
+from djangular.forms import NgFormValidationMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils.html import mark_safe
+from djangular.styling.bootstrap3.forms import Bootstrap3Form
+from django.core.exceptions import ValidationError
 import lxml.etree as et
 from bootstrap3_datetime.widgets import DateTimePicker
 # Create your models here. test
@@ -60,30 +63,26 @@ class Custom:
 
     class MultiMaterialSelectWidget(MultiWidget):
         def __init__(self, amount):
-            widgets = [Select(choices=MATERIAL_CHOICES)]
-            for i in range(amount-1):
-                widgets.append(Select(choices=MATERIAL_CHOICES, attrs={'style': 'display:none;'}))
+            widgets = [SelectMultiple(choices=MATERIAL_CHOICES)]
             super(Custom.MultiMaterialSelectWidget, self).__init__(widgets)
 
         def decompress(self, value):
-            if value:
-                return value.split(', ')
-            else:
-                return []
+            return [value]
+
+        def format_output(self, rendered_widgets):
+            return '<br/>'+rendered_widgets[0]+'<br/>'
 
     class MultiMaterialSelectField(MultiValueField):
 
         def __init__(self, amount=10, *args, **kwargs):
             self.attrs = kwargs.copy()
-            list_fields = []
-            for i in range(amount):
-                list_fields.append(forms.CharField())
+            list_fields = [forms.CharField()]
             super(Custom.MultiMaterialSelectField, self).__init__(list_fields,
                                                                   widget=Custom.MultiMaterialSelectWidget(amount=amount),
                                                                   *args, **kwargs)
         def compress(self, values):
-            values = [x for x in values if x]
-            return ', '.join(values)
+            return values[0]
+
 
     class TextChoiceWidget(MultiWidget):
         def __init__(self, choices, placeholder1='', size1=10):
@@ -283,6 +282,9 @@ class Activity(models.Model):
     def aim(self):
         return self.attributeassignment_set.all()[:1].get().aim
 
+    def set(self):
+        return self.attributeassignment_set.all()
+
 
 class AttributeAssignment(models.Model):
     attr_name = models.CharField(max_length=40)
@@ -311,13 +313,14 @@ class AttributeAssignment(models.Model):
 
 
 class TempSaveForm(forms.Form):
+    error_css_class = 'error'
     name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=1000, label='Кількість', required=True)
     date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
-    technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
+    technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     material = Custom.MultiMaterialSelectField(label = 'Матеріал')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
@@ -340,7 +343,9 @@ class TempSaveForm(forms.Form):
     mat_person_in_charge = forms.ModelChoiceField(queryset=User.objects.all(), label='Матеріально-відповідальна особа', required=False)
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=False) #
     #return_mark = forms.BooleanField(label='Is it returned?')
-
+    def clean_material(self):
+        if not self.cleaned_data['material']:
+            raise ValidationError('Обязательное поле')
 
 class InitialTempSaveForm(forms.Form):
     obj = forms.ModelChoiceField(queryset=Object.objects.all())

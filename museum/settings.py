@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'mainapp',
     'bootstrap3',
     'bootstrap3_datetime',
+    'djangular',
 
 )
 
@@ -90,11 +91,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     ('css', os.path.join(BASE_DIR, 'museum/static/css/')),
+    ('font-awesome', os.path.join(BASE_DIR, 'museum/static/font-awesome/')),
     ('img', os.path.join(BASE_DIR, 'museum/static/img/')),
-    ('static', os.path.join(BASE_DIR, 'museum/static/css/')),
-    ('fonts', os.path.join(BASE_DIR, 'museum/static/font-awesome/')),
+    ('fonts', os.path.join(BASE_DIR, 'museum/static/fonts/')),
     ('js', os.path.join(BASE_DIR, 'museum/static/js/')),
+    ('bootstrap3_datetime', os.path.join(BASE_DIR, 'museum/static/bootstrap3_datetime/')),
 )
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'museum/static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'museum')

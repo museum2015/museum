@@ -3,44 +3,68 @@
 {% load staticfiles %}
 <head lang="en">
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="{% static "static/table.css" %}"/>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script type="text/javascript" language="javascript" src="{% static "js/TF_Modules/tablefilter.js" %}"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css"/>
+    <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+    <style>
+        .container {
+            width: 85%;
+        }
+        .highlight {
+            background-color: #cccccc !important;
+        }
+        .menu {
+            position: absolute;
+            height: 50%;
+            width: 10%;
+            right: 2%;
+            top: 25%;
+        }
+
+    </style>
 </head>
 <body>
-<div>
-<table id="table1">
-    <thead>
-    <tr>
-							<th id="number0">ID</th>
-							<th>Назва</th>
-							<th id="number1">Кількість</th>
-                            <th>Статус</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for a in objects %}
-    <tr><td>{{ a.id }}</td><td>{{ a }}</td><td>{{ a.amount }}</td><td>{{ a.status }}</td>
-    {% endfor %}
-    </tbody>
-</table>
-<input type='button' onclick='ret()' value='Повернення з тимчасового зберігання' class='button0'>
-<input type='button' onclick='ts_ps()' value='Прийняти на постійне зберігання' class='button1'>
-<input type='button' onclick='io()' value='Поставити на інвентарний облік' class='button2'>
-<input type='button' onclick='ps_ts()' value='Повернення предмета з ПЗ на ТЗ' class='button3'>
-<input type='button' onclick='ts_ps()' value='Повернення предмета з ТЗ на ПЗ' class='button4'>
-<input type='button' onclick='send_ps()' value='Передача на постійне зберігання' class='button5'>
-<input type='button' onclick='writing_off()' value='Списати' class='button6'>
-{% if add %}
-    <input type='button' onclick='' value='Створити' class='button7'>
-{% endif %}
-{% if change %}
-    <input type='button' onclick='' value='Редагувати' class='button8'>
-{% endif %}
-{% if remove %}
-    <input type='button' onclick='' value='Видалити' class='button9'>
-{% endif %}
+<div class="container">
+    <div class="content">
+    <table id="table1" cellspacing="0" width="100%">
+        <thead>
+        <tr>
+                                <th>ID</th>
+                                <th>Назва</th>
+                                <th>Кількість</th>
+                                <th>Статус</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for a in objects %}
+        <tr><td>{{ a.id }}</td><td>{{ a }}</td><td>{{ a.amount }}</td><td>{{ a.status }}</td>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
 </div>
+<div class="menu">
+    <i onclick='ret()' title='Повернення з тимчасового зберігання' class='button0 fa fa-arrow-circle-o-right fa-4x'></i>
+    <i onclick='ts()' title='Прийняти на тимчасове зберігання' class='button10 disabled fa fa-arrow-circle-o-left fa-4x'></i>
+    <i onclick='ps()' title='Прийняти на постійне зберігання' class='button1 fa fa-arrow-circle-left fa-4x'></i>
+    <i onclick='io()' title='Поставити на інвентарний облік' class='button2 fa fa-check fa-4x'></i>
+    <i onclick='spec_io()' title='Поставити на спец. інвентарний облік' class='button11 fa fa-check-square-o fa-4x'></i>
+    <i onclick='ps_ts()' title='Повернення предмета з ПЗ на ТЗ' class='button3 fa fa-exchange fa-4x'></i>
+    <i onclick='ts_ps()' title='Повернення предмета з ТЗ на ПЗ' class='button4 fa fa-exchange fa-flip-horizontal fa-4x'></i>
+    <i onclick='send_ps()' title='Передача на постійне зберігання' class='button5 fa fa-envelope fa-4x'></i>
+    <i onclick='writing_off()' title='Списати' class='button6 fa fa-send fa-4x'></i>
+    {% if add %}
+        <i onclick='' title='Створити' class='button7 fa fa-plus fa-4x'></i>
+    {% endif %}
+    {% if change %}
+        <i onclick='' title='Редагувати' class='button8 fa fa-cog fa-4x'></i>
+    {% endif %}
+    {% if remove %}
+        <i onclick='' title='Видалити' class='button9 fa fa-close fa-4x'></i>
+    {% endif %}
+</div>
+
 <script type="text/javascript">
         var remove_attr = function() {
             i = 0;
@@ -51,25 +75,6 @@
                 but = $(".button"+i);
             };
         };
-
-        $( document ).ready(remove_attr());
-
-        var $table = $('table'),
-        $bodyCells = $table.find('tbody tr:first').children(),
-        colWidth;
-
-        $bodyCells.each(function(i, v) {
-            $(v).width($(v).width() + 50);
-        });
-
-        colWidth = $bodyCells.map(function() {
-            return $(this).width();
-        }).get();
-
-        $table.find('thead tr').children().each(function(i, v) {
-            $(v).width(colWidth[i]);
-        });
-
         var rows = $('tr').not(':first');
 
         /* Create 'click' event handler for rows */
@@ -92,69 +97,103 @@
 
         });
 
-
-        $(document).bind('selectstart dragstart', function(e) {
-            e.preventDefault(); return false;
-        });
-
-        var table_props =  {
-                    col_0: "none",
-                    col_5: "select",
-                    display_all_text: " [ Show all ] ",
-                    sort_select: true,
-                    paging: true,
-                    paging_length: 20,
-                    rows_counter: true,
-                    rows_counter_text: "Рядки:",
-                    btn_reset: false,
-                    btn_next_page_html: '<a href="javascript:;" style="margin:3px;">Наступна ></a>',
-                    btn_prev_page_html: '<a href="javascript:;" style="margin:3px;">< Попередня</a>',
-                    btn_last_page_html: '<a href="javascript:;" style="margin:3px;"> Остання >|</a>',
-                    btn_first_page_html: '<a href="javascript:;" style="margin:3px;"><| Перша</a>',
-                    loader: true,
-                    loader_html: '<h4 style="color:red;">Завантаження, будь ласка зачекайте...</h4>',
-                    sort: true,
-                    sort_config: {
-                        sort_types:['Number', 'String', 'Number', 'String'],
+        $(document).ready(function() {
+            $('#table1').dataTable( {
+                "columns": [
+                    { "type": "num" },
+                    { "type": "html" },
+                    { "type": "num" },
+                    { "type": "html" },
+                ],
+                "language": {
+                    "emptyTable":     "Нема доступних записів у таблиці",
+                    "info":           "Відображеня _START_ - _END_ з _TOTAL_ записів",
+                    "infoEmpty":      "Відображення 0-0 з 0 записів",
+                    "infoFiltered":   "(фільтровано з _MAX_ записів)",
+                    "infoPostFix":    "",
+                    "thousands":      ",",
+                    "lengthMenu":     "Відображати _MENU_ записів",
+                    "loadingRecords": "Завантаження...",
+                    "processing":     "Обробка...",
+                    "search":         "Пошук:",
+                    "zeroRecords":    "Не знайдено записів",
+                    "paginate": {
+                        "first":      "Перша",
+                        "last":       "Остання",
+                        "next":       "Наступна",
+                        "previous":   "Попередня"
+                    },
+                    "aria": {
+                        "sortAscending":  ": сортування за зростанням",
+                        "sortDescending": ": сортування за спаданням",
                     }
-    };
+                },
 
+            });
+        } );
 
-        var tf = setFilterGrid("table1", table_props);
-        var ts_ps = function() {
-            var t = $(".highlight td:first-child").text();
-            var link = "/staff/add_on_ps/" + t;
-            window.location.replace(link);
+        var ps = function() {
+            if (!($(".button1").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/add_on_ps/" + t;
+                window.location.href = link;
+            }
+        };
+        var ts = function() {
+            if (!($(".button10").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/add_on_ts/" + t;
+                window.location.href = link;
+            }
         };
         var writing_off = function() {
-            var t = $(".highlight td:first-child").text();
-            var link = "/staff/writing_off/" + t;
-            window.location.replace(link);
+            if (!($(".button6").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/writing_off/" + t;
+                window.location.href = link;
+            }
         };
         var io = function() {
-            var t = $(".highlight td:first-child").text();
-            var link = "/staff/inventory_save/" + t;
-            window.location.replace(link);
+            if (!($(".button2").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/inventory_save/" + t;
+                window.location.href = link;
+            }
+        };
+        var spec_io = function() {
+            if (!($(".button11").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/spec_inventory_save/" + t;
+                window.location.href = link;
+            }
         };
         var ps_ts = function() {
-            var t = $(".highlight td:first-child").text();
-            var link = "/staff/ps_to_ts/" + t;
-            window.location.replace(link);
+            if (!($(".button3").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/ps_to_ts/" + t;
+                window.location.href = link;
+            }
         };
         var ts_ps = function() {
-            var t = $(".highlight td:first-child").text();
-            var link = "/staff/ts_to_ps/" + t;
-            window.location.replace(link);
+            if (!($(".button4").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/ts_to_ps/" + t;
+                window.location.href = link;
+            }
         };
         var send_ps = function() {
-            var t = $(".highlight td:first-child").text();
-            var link = "/staff/send_on_ps/" + t;
-            window.location.replace(link);
+            if (!($(".button5").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/send_on_ps/" + t;
+                window.location.href = link;
+            }
         };
         var ret = function() {
-            var t = $(".highlight td:first-child").text();
-            var link = "/staff/return/" + t;
-            window.location.replace(link);
+            if (!($(".button0").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/return/" + t;
+                window.location.href = link;
+            }
         };
 
 
