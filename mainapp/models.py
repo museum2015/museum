@@ -82,7 +82,10 @@ class Custom:
                                                                   *args, **kwargs)
 
         def compress(self, values):
-            return values[0]
+            if values:
+                return values[0]
+            else:
+                return None
 
     class TextChoiceWidget(MultiWidget):
         def __init__(self, choices, placeholder1='', size1=10):
@@ -546,6 +549,7 @@ class InitialTempSaveForm(forms.Form):
 
 
 class TempRetForm(forms.Form):
+    error_css_class = 'error'
     choices = (
         ('returned', 'Повернутий з тимчасового збереження'),
         ('add on PS', 'Поставити об’єкт на постійне збереження ')
@@ -606,6 +610,7 @@ class PreparePSForm(forms.Form):
 
 
 class PersistentSaveForm(forms.Form):
+    error_css_class = 'error'
     choices = (
         ('immediately', 'Термінова реставрація'),
         ('conservation', 'Консервація'),
@@ -659,6 +664,7 @@ class PrepareInventoryForm(forms.Form):
 
 
 class InventorySaveForm(forms.Form):
+    error_css_class = 'error'
     choices = (
         ('immediately', 'Термінова реставрація'),
         ('conservation', 'Консервація'),
@@ -717,6 +723,7 @@ class PrepareSpecInventoryForm(forms.Form):
 
 
 class SpecInventorySaveForm(forms.Form):
+    error_css_class = 'error'
     choices = (
         ('immediately', 'Термінова реставрація'),
         ('conservation', 'Консервація'),
@@ -760,6 +767,7 @@ class SpecInventorySaveForm(forms.Form):
 
 
 class PreparePassportForm(forms.Form):
+    error_css_class = 'error'
     def __init__(self, *args, **kwargs):
         super(PreparePassportForm, self).__init__(*args, **kwargs)
         objlist = []
@@ -774,6 +782,7 @@ class PreparePassportForm(forms.Form):
 
 
 class PassportForm(forms.Form):
+    error_css_class = 'error'
     choices = (
         ('immediately', 'Термінова реставрація'),
         ('conservation', 'Консервація'),
@@ -850,6 +859,7 @@ class PreparePStoTSForm(forms.Form):
 
 
 class FromPStoTSForm(forms.Form):
+    error_css_class = 'error'
     name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
@@ -897,6 +907,7 @@ class PrepareTStoPSForm(forms.Form):
 
 
 class FromTStoPSForm(forms.Form):
+    error_css_class = 'error'
     name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
@@ -946,6 +957,7 @@ class PrepareSendOnPSForm(forms.Form):
 
 
 class SendOnPSForm(forms.Form):
+    error_css_class = 'error'
     name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
@@ -984,6 +996,7 @@ class PrepareWritingOffForm(forms.Form):
 
 
 class WritingOffForm(forms.Form):
+    error_css_class = 'error'
     name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='')
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True)
