@@ -75,19 +75,17 @@ def TempRet(request, id_number=0):
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:
-            print form.errors
-        return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
-
+            return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
         reason = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'reason')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                 'author': project.author, 'technique': project.technique, 'material': project.material,
-                 'size': project.size, 'description': project.description, 'condition': project.condition,
-                 'condition_descr': project.condition_descr, 'date_creation': project.date_creation,
-                 'place_of_creation': project.place_of_creation, 'term_back': project.term_back,
-                 'reason': reason, 'side_1': project.side_1, 'side_2': project.side_2,
-                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
-                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
+                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'size': project.size, 'description': project.description, 'condition': project.condition,
+                'condition_descr': project.condition_descr, 'date_creation': project.date_creation,
+                'place_of_creation': project.place_of_creation, 'term_back': project.term_back,
+                'reason': reason, 'side_1': project.side_1, 'side_2': project.side_2,
+                'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
+                'transport_possibility': project.transport_possibility, 'collection': project.collection}
         form = TempRetForm(initial=data)
         return render(request, 'AddOnTs.html', {'form': form})
 
