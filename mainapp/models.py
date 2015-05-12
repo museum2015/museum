@@ -80,9 +80,9 @@ class Custom:
             super(Custom.MultiMaterialSelectField, self).__init__(list_fields,
                                                                   widget=Custom.MultiMaterialSelectWidget(amount=amount),
                                                                   *args, **kwargs)
+
         def compress(self, values):
             return values[0]
-
 
     class TextChoiceWidget(MultiWidget):
         def __init__(self, choices, placeholder1='', size1=10):
@@ -129,7 +129,7 @@ class Custom:
                 res = value.split(' ')
                 return [x.strip("()") for x in res]
             else:
-                return [None, None]
+                return [None, None, None]
 
         def format_output(self, rendered_widgets):
             dd = '<br>'
@@ -164,7 +164,7 @@ class Custom:
 
         def compress(self, values):
             if values:
-                return values[0] + ': ' + values[1] + ' ' + values[2]
+                return values[0] + ': ' + values[1] + ': ' + values[2]
             else:
                 return ''
 
@@ -203,7 +203,7 @@ class Custom:
 
         def compress(self, values):
             if values:
-                return values[0] + ': ' + values[1] + ' ' + values[2]
+                return values[0] + ': ' + values[1] + ': ' + values[2] + ': ' + values[3]
             else:
                 return ''
 
@@ -224,7 +224,7 @@ class Custom:
                 res = value.split(':')
                 return res
             else:
-                return [None, None, None]
+                return [None, None, None, None]
 
         def format_output(self, rendered_widgets):
             return u''.join(rendered_widgets)
@@ -279,7 +279,7 @@ class Custom:
 
         def compress(self, values):
             if values:
-                return values[0] + ': ' + values[1] + ' ' + values[2]
+                return values[0] + ': ' + values[1] + ': ' + values[2] + ': ' + values[3]
             else:
                 return ''
 
@@ -300,7 +300,7 @@ class Custom:
                 res = value.split(':')
                 return res
             else:
-                return [None, None, None]
+                return [None, None, None, None]
 
         def format_output(self, rendered_widgets):
             return u''.join(rendered_widgets)
@@ -729,7 +729,7 @@ class SpecInventorySaveForm(forms.Form):
     date_creation = forms.CharField(label='Дата створення предмета', required=True)
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     fully_precious = forms.BooleanField(label='Предмет повністю складається з дорогоцінних'
-                                              ' металів/дорогоцінного каміння?', required=True)
+                                              ' металів/дорогоцінного каміння?', required=False)
     metals = Custom.MultiChoiceChoiceTextChoiceField(label='Дорогоцінні метали')
     stones = Custom.MultiChoiceTextTextChoiceField(label='Дорогоцінне каміння')
     #name_prec_metal = Custom.MaterialSelectField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials', 'precious'),
@@ -740,9 +740,9 @@ class SpecInventorySaveForm(forms.Form):
     #                                label='Маса дорогоцінного металу в чистоті', placeholder1='')
     #name_prec_stone = Custom.MaterialSelectField(choices=get_choice(et.parse('museum/materials.xml').getroot(),'materials', 'precious'),
     #                                             label='Назва дорогоцінного каміння', amount=1)
-    amount_prec_stone0 = forms.CharField(label='Кількість дорогоцінного каміння')
-    weight_prec_stone = Custom.TextChoiceField(choices=WEIGHT_CHOICES,
-                                               label='Маса дорогоцінного металу в чистоті', placeholder1='')
+    #amount_prec_stone0 = forms.CharField(label='Кількість дорогоцінного каміння')
+    #weight_prec_stone = Custom.TextChoiceField(choices=WEIGHT_CHOICES,
+    #                                           label='Маса дорогоцінного металу в чистоті', placeholder1='')
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     description = forms.CharField(max_length=2000, label='Опис предмета', required=True, widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 520px;"}))
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
@@ -792,7 +792,7 @@ class PassportForm(forms.Form):
     collection_descr = forms.CharField(max_length=50, label='Колекційний опис (номер)', required=True)
     identifier = forms.CharField(label='Унікальний номер в інформаційній системі', max_length=50, required=True)
     negative = forms.CharField(label='Негатив (номер)', max_length=50, required=True)
-    image = forms.ImageField(label='Фото', required=True)
+    image = forms.ImageField(label='Фото', required=False)
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
     name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='')
     author = forms.CharField(max_length=200, label='Автор або виробник', required=True)

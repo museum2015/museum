@@ -206,17 +206,17 @@
             </others>
         </measurement_unit>
     </dimension>
-    <department><!--Відомство в паспорті-->
+    <department>
         <choice>Держбуд України</choice>
     </department>
-    <section><!--Відділ в паспорті-->
+    <section>
         <choice>Науково -фондовий</choice>
     </section>
-    <issue><!--Розділ в паспорті-->
+    <issue>
         <choice>Образотворчого і декоративно-прикладного мистецтва</choice>
     </issue>
     <museum>
-
+        <choice>краєзнавчий музей</choice>
     </museum>
     <weight>
         <choice>фунтів</choice>
