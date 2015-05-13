@@ -403,7 +403,7 @@ class Object(models.Model):
     technique = models.CharField(max_length=200, default='', null=True)  #
     description = models.TextField(max_length=1000, default='', null=True)  #
     identifier = models.CharField(max_length=50, default='', null=True)
-    image = models.ImageField(upload_to=get_image_path, default='default.jpg', null=True)
+    image = models.ImageField(upload_to=get_image_path, default='home/valeriy/photo0005.jpg')
     #image_type = models.CharField(max_length=50, default='', null=True)
     author = models.CharField(max_length=100, default='', null=True)  #
     price = models.CharField(max_length=50, default='', null=True)  #
@@ -773,7 +773,8 @@ class PreparePassportForm(forms.Form):
         objlist = []
         for project in Object.objects.all():
             if project.status() != 'Пустий об’єкт'\
-                    or project.status() != 'Списання (втрата тощо)':
+                    and project.status() != 'Науково-уніфікований паспорт'\
+                    and project.status() != 'Списання (втрата тощо)':
                 objlist.append(project)
         objects = [(0, 'Новий об’єкт')]
         for o in objlist:
