@@ -96,6 +96,8 @@ STATICFILES_DIRS = (
     ('js', os.path.join(BASE_DIR, 'museum/static/js/')),
     ('bootstrap3_datetime', os.path.join(BASE_DIR, 'museum/static/bootstrap3_datetime/')),
 )
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'museum/static/')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'museum/media/')

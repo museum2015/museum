@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from mainapp import views
+from django.conf.urls.static import static
+from django.conf import settings
 admin.autodiscover()
 
 
@@ -36,4 +38,4 @@ urlpatterns = patterns('',
     url(r'^staff/send_on_ps/(?P<id_number>[0-9]+)/$', views.SendOnPS),
     url(r'^staff/writing_off/$', views.PrepareWritingOff),
     url(r'^staff/writing_off/(?P<id_number>[0-9]+)/$', views.WritingOff),
-)
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,20 +1,23 @@
 <!DOCTYPE HTML>
+<html>
 {% load staticfiles %}
 <head lang="en">
     <meta charset="UTF-8">
     <title>Автоматизоване робоче місце для співробітників музею</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<!-- Bootstrap -->
-	<link rel="stylesheet" type="text/css" href="{% static "css/bootstrap.css" %}" >
-    <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap-theme.css" %}" >
-	<link rel="stylesheet" type="text/css"  href="{% static "fonts/css/font-awesome.css" %}" >
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css" >
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.css"  >
+	<link rel="stylesheet" type="text/css"  href="/static/fonts/css/font-awesome.css"  >
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="{% static "js/bootstrap.js" %}"> </script>
+    <script src="/static/js/bootstrap.js"> </script>
     <link rel="stylesheet" href="/static/font-awesome/css/font-awesome.css">
     {{ form.media }}
-	<link rel="stylesheet" href="{% static "css/mycss.css" %}"  >
+	<link rel="stylesheet" href="/static/css/mycss.css"  >
     <script type="text/javascript">
         var size = 1;
+        var metals = 1;
+        var stones=1;
         var prec = 3;
         var nonprec = 3;
         var semiprec = 3;
@@ -29,6 +32,36 @@
             $("<br/>").insertBefore("#"+size0);
             size = size + 1
         }
+        function add_prec_metal() {
+            var br = document.createTextNode('<br />');
+            var metals0 = "id_metals_" + metals + "_0";
+            var metals1 = "id_metals_" + metals+ "_1";
+            var metals2 = "id_metals_" + metals + "_2";
+            var metals3 = "id_metals_" + metals + "_3";
+            document.getElementById(metals0).removeAttribute("style");
+            document.getElementById(metals1).removeAttribute("style");
+            document.getElementById(metals2).removeAttribute("style");
+            document.getElementById(metals3).removeAttribute("style");
+            $("<br/>").insertBefore("#"+metals0);
+            metals = metals + 1
+        }
+        function add_prec_stone() {
+            var br = document.createTextNode('<br />');
+            var stones0 = "id_stones_" + stones + "_0";
+            var stones1 = "id_stones_" + stones + "_1";
+            var stones2 = "id_stones_" + stones + "_2";
+            var stones3 = "id_stones_" + stones + "_3";
+            document.getElementById(stones0).removeAttribute("style");
+            document.getElementById(stones1).removeAttribute("style");
+            document.getElementById(stones2).removeAttribute("style");
+            document.getElementById(stones3).removeAttribute("style");
+            $("<br/>").insertBefore("#"+stones0);
+            stones = stones + 1
+        }
+        //function al() {
+           // var el = document.getElementById('id_material');
+         //   alert(el.value);
+       // }
         function add_prec() {
             var br = document.createTextNode('<br />');
             var i=0;
@@ -72,8 +105,8 @@
 <body>
 <div class="container">
     <div class="row">
-        <div class="col-md-6 col-md-offset-3 panel panel-default">
-            <form method="post" class="margin-base-vertical form-control">
+        <div class="col-md-8 col-md-offset-2 panel panel-default">
+            <form method="post" class="margin-base-vertical form-control" enctype="multipart/form-data" accept-charset="UTF-8">
                 {{ form.as_p }}
                 {% csrf_token %}
                 <button type="submit" class="btn btn-success btn-block">
@@ -83,12 +116,53 @@
             <script type="text/javascript">
                  var sizebutton = "<i class='fa fa-plus fa-2x' title='Додати вимір' onclick='add_size()'></i>";
                  $(sizebutton).insertAfter('#id_size_0_2');
+                 var precmetalsbutton = "<i class='fa fa-plus fa-2x' title='Додати вимір' onclick='add_prec_metal()'></i>";
+                 $(precmetalsbutton).insertAfter('#id_metals_0_3');
+                 var precstonesbutton = "<i class='fa fa-plus fa-2x' title='Додати вимір' onclick='add_prec_stone()'></i>";
+                 $(precstonesbutton).insertAfter('#id_stones_0_3');
                  var precbutton = "<input type='button' onclick='add_prec()' value='Додати'/>";
                  var semiprecbutton = "<input type='button' onclick='add_semiprec()' value='Додати'/>";
                  var nonprecbutton = "<input type='button' onclick='add_nonprec()' value='Додати'/>";
                  $(precbutton).insertAfter('#id_material_0_2');
                  $(semiprecbutton).insertAfter('#id_material_1_2');
                  $(nonprecbutton).insertAfter('#id_material_2_2');
+                 var i;
+                 for (i=0; i<10; i++) {
+                    var size0 = "id_size_" + i + "_0";
+                    var size1 = "id_size_" + i + "_1";
+                    var size2 = "id_size_" + i + "_2";
+                    if (document.getElementById(size0).value != '') {
+                        document.getElementById(size0).removeAttribute("style");
+                        document.getElementById(size1).removeAttribute("style");
+                        document.getElementById(size2).removeAttribute("style");
+                    }
+                 }
+
+                for (i=0; i<10; i++) {
+                    var metal0 = "id_metals_" + i + "_0";
+                    var metal1 = "id_metals_" + i + "_1";
+                    var metal2 = "id_metals_" + i + "_2";
+                    var metal3 = "id_metals_" + i + "_3";
+                    if (document.getElementById(metal0).value != '') {
+                        document.getElementById(metal0).removeAttribute("style");
+                        document.getElementById(metal1).removeAttribute("style");
+                        document.getElementById(metal2).removeAttribute("style");
+                        document.getElementById(metal3).removeAttribute("style");
+                    }
+                 }
+
+                for (i=0; i<10; i++) {
+                    var stones0 = "id_stones_" + i + "_0";
+                    var stones1 = "id_stones_" + i + "_1";
+                    var stones2 = "id_stones_" + i + "_2";
+                    var stones3 = "id_stones_" + i + "_3";
+                    if (document.getElementById(stones0).value != '') {
+                        document.getElementById(stones0).removeAttribute("style");
+                        document.getElementById(stones1).removeAttribute("style");
+                        document.getElementById(stones2).removeAttribute("style");
+                        document.getElementById(stones3).removeAttribute("style");
+                    }
+                 }
             </script>
         </div>
     </div>
