@@ -665,9 +665,9 @@ class PrepareInventoryForm(forms.Form):
         super(PrepareInventoryForm, self).__init__(*args, **kwargs)
         objlist = []
         for project in Object.objects.all():
-            if project.status() == 'Приймання на постійне зберігання'\
-                    or project.status() == 'Пустий об’єкт'\
-                    and project.status() != 'Списання (втрата тощо)':
+            if project.status() != 'Пустий об’єкт'\
+                    and project.status() != 'Списання (втрата тощо)'\
+                    and project.status() != 'Інвентарний облік':
                 objlist.append(project)
         objects = [(0, 'Новий об’єкт')]
         for o in objlist:
@@ -725,7 +725,7 @@ class PrepareSpecInventoryForm(forms.Form):
         objlist = []
         for project in Object.objects.all():
             if project.status() == 'Інвентарний облік' or project.status() == 'Приймання на постійне зберігання'\
-                    or project.status() == 'Пустий об’єкт'\
+                    and project.status() != 'Пустий об’єкт'\
                     and project.status() != 'Списання (втрата тощо)'\
                     and project.status() != 'Спеціальний інвентарний облік':
                 objlist.append(project)
@@ -865,7 +865,8 @@ class PreparePStoTSForm(forms.Form):
             if project.status() == 'Приймання на постійне зберігання'\
                     and project.status() != 'Списання (втрата тощо)'\
                     and project.status() != 'Передача на постійне зберігання'\
-                    and project.status() != 'Видача предметів з Постійного зберігання на Тимчасове зберігання':
+                    and project.status() != 'Видача предметів з Постійного зберігання на Тимчасове зберігання'\
+                    and project.status() != 'Пустий об’єкт':
                 objlist.append(project)
         objects = []
         for o in objlist:
@@ -913,7 +914,8 @@ class PrepareTStoPSForm(forms.Form):
         objlist = []
         for project in Object.objects.all():
             if project.status() == 'Видача предметів з Постійного зберігання на Тимчасове зберігання'\
-                    and project.status() != 'Списання (втрата тощо)':
+                    and project.status() != 'Списання (втрата тощо)'\
+                    and project.status() != 'Пустий об’єкт':
                 objlist.append(project)
         objects = []
         for o in objlist:
