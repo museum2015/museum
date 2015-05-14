@@ -43,7 +43,7 @@ INSTALLED_APPS = (
     'mainapp',
     'bootstrap3',
     'bootstrap3_datetime',
-
+    'wkhtmltopdf',
 )
 
 MIDDLEWARE_CLASSES = (

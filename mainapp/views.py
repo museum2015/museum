@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms import ModelChoiceField
-from django.utils import encoding
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
     PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
     InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
     PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm, get_choice, PreparePassportForm,\
     PassportForm
-
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.views.generic.edit import UpdateView, CreateView
-import ast
-from django.contrib.auth.models import User, Permission
-from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import auth
-import xml.etree.ElementTree as et
+from django.views.generic.base import View
+from wkhtmltopdf.views import PDFTemplateResponse
+import cStringIO as StringIO
+import xhtml2pdf.pisa as pisa
+from django.template.loader import get_template
+from django.template import Context
+
+
 
 # Create your views here.
 @csrf_protect
@@ -39,6 +40,8 @@ def TempSave(request, id_number=0):
             project.reason = cd['reason']
             project.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -47,7 +50,7 @@ def TempSave(request, id_number=0):
             return render(request, 'AddOnTs.html', {'form': form})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
                 'size': project.size, 'condition': project.condition, 'condition_descr': project.condition_descr, 'description': project.description,
                 'price': project.price}
         form = TempSaveForm(initial=data)
@@ -73,6 +76,8 @@ def TempRet(request, id_number=0):
                            actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -82,13 +87,13 @@ def TempRet(request, id_number=0):
     else:
         reason = str(get_attrib_assigns('Приймання на тимчасове зберігання', project, 'reason'))
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'author': project.author, 'technique': project.technique, 'material': project.material,
-                'size': project.size, 'description': project.description, 'condition': project.condition,
-                'condition_descr': project.condition_descr, 'date_creation': project.date_creation,
-                'place_of_creation': project.place_of_creation, 'term_back': project.term_back,
-                'reason': reason, 'side_1': project.side_1, 'side_2': project.side_2,
-                'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
-                'transport_possibility': project.transport_possibility, 'collection': project.collection}
+                 'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
+                 'size': project.size, 'description': project.description, 'condition': project.condition,
+                 'condition_descr': project.condition_descr, 'date_creation': project.date_creation,
+                 'place_of_creation': project.place_of_creation, 'term_back': project.term_back,
+                 'reason': reason, 'side_1': project.side_1, 'side_2': project.side_2,
+                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
+                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
         form = TempRetForm(initial=data)
         return render(request, 'AddOnTs.html', {'form': form})
 
@@ -179,6 +184,8 @@ def AddOnPS(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -188,7 +195,7 @@ def AddOnPS(request, id_number):
     else:
         source = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'source')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
                 'size': project.size, 'description': project.description, 'can_transport': project.transport_possibility,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
                 'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
@@ -318,6 +325,8 @@ def AddOnInventorySave(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -329,7 +338,7 @@ def AddOnInventorySave(request, id_number):
         old_registered_marks = get_attrib_assigns('Приймання на постійне зберігання', project, 'old_registered_marks')
         ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
                 'size': project.size, 'description': project.description,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
                 'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
@@ -371,6 +380,8 @@ def AddOnSpecInventorySave(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -418,14 +429,15 @@ def Passport(request, id_number):
         else:
             project = Object(name='Новий')
     if request.method == 'POST':
-        form = PassportForm(request.POST, request.FILES)
+        form = PassportForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), type='Науково-уніфікований паспорт', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
-            project.image = cd['image']
             project.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -438,9 +450,9 @@ def Passport(request, id_number):
         inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
         spec_inventory_numb = get_attrib_assigns('Спеціальний інвентарний облік', project, 'spec_inventory_numb')
         #old_inventory_numbers = get_old_attributes(project, 'inventory_number')
-        date_place_creation = project.date_creation.join(['', project.place_of_creation])
-        date_place_detection = project.date_detection.join(['', project.place_detection])
-        date_place_existence = project.date_existence.join(['', project.place_existence])
+        date_place_creation = ', '.join([project.date_creation, project.place_of_creation])
+        date_place_detection = ', '.join([project.date_detection, project.place_detection])
+        date_place_existence = ', '.join([project.date_existence, project.place_existence])
         source = get_attrib_assigns('Приймання на постійне зберігання', project, 'source')
         classification = get_attrib_assigns('Інвентарний облік', project, 'classification')
         typology = get_attrib_assigns('Інвентарний облік', project, 'typology')
@@ -454,7 +466,7 @@ def Passport(request, id_number):
                 'date_place_detection': date_place_detection, 'date_place_existence': date_place_existence,
                 'source': source, 'way_of_found': project.way_of_found, 'link_on_doc': project.link_on_doc,
                 'classification': classification, 'typology': typology, 'amount': project.amount,
-                'size': project.size, 'material': project.material, 'technique': project.technique,
+                'size': project.size, 'material': project.material.decode('unicode-escape').split(', '), 'technique': project.technique,
                 'metals': metals, 'stones': stones, 'description': project.description,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
                 'recomm_for_restauration': project.recomm_for_restauration,
@@ -492,6 +504,8 @@ def FromPSToTS(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -502,7 +516,7 @@ def FromPSToTS(request, id_number):
         ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
         inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
                 'size': project.size, 'description': project.description, 'note': project.note,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
                 'date_creation': project.date_creation, 'place_of_creation': project.place_of_creation,
@@ -524,6 +538,7 @@ def PrepareTSToPS(request):
         form = PrepareTStoPSForm()
         return render(request, 'AddOnTs.html', {'form': form})
 
+
 @login_required(login_url='/admin/')
 @csrf_protect
 def FromTSToPS(request, id_number):
@@ -540,6 +555,8 @@ def FromTSToPS(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -555,7 +572,7 @@ def FromTSToPS(request, id_number):
         side_2_person_in_charge = get_attrib_assigns('Видача предметів з Постійного зберігання на Тимчасове зберігання', project, 'side_2_person_in_charge')
         reason = get_attrib_assigns('Видача предметів з Постійного зберігання на Тимчасове зберігання', project, 'reason')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'author': project.author, 'technique': project.technique, 'material': project.material,
+                'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
                 'size': project.size, 'description': project.description, 'note': project.note,
                 'condition': project.condition, 'condition_descr': project.condition_descr, 'side_1': project.side_1,
                 'side_2': project.side_2, 'side_1_person_in_charge': side_1_person_in_charge,
@@ -596,6 +613,8 @@ def SendOnPS(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -608,7 +627,7 @@ def SendOnPS(request, id_number):
         spec_inventory_numb = get_attrib_assigns('Спеціальний інвентарний облік', project, 'spec_inventory_numb')
         ts_code = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'TS_code')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'technique': project.technique, 'material': project.material,
+                'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
                 'size': project.size, 'description': project.description, 'note': project.note,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
                 'PS_code': ps_code, 'inventory_number': inventory_number, 'spec_inventory_numb': spec_inventory_numb,
@@ -646,6 +665,8 @@ def WritingOff(request, id_number):
             act.save()
             project.save()
             for (k, v) in cd.items():
+                if k=='material':
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -663,3 +684,29 @@ def WritingOff(request, id_number):
                 }
         form = WritingOffForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form})
+
+class MyPDFView(View):
+    template = 'asshole.html'
+
+    def get(self, request, id_number):
+        try:
+            project = Object.objects.get(pk=id_number)
+        except:
+            return HttpResponse('Не існує об\'єкта с таким номером')
+        act = Activity.objects.filter(type='Науково-уніфікований паспорт', approval=True).order_by('-time_stamp')
+        act = [a for a in act if a.aim().pk == project.pk]
+        if not act:
+            return HttpResponse('У даного об\'єкта паспорт не заповнений')
+        else:
+            act = act[0]
+        queryset = act.attributeassignment_set.all()
+        context = {}
+        for query in queryset:
+            context[query.attr_name] = query.attr_value
+        response = PDFTemplateResponse(request=request,
+                                       template=self.template,
+                                       filename="passport.pdf",
+                                       show_content_in_browser=True,
+                                       context=context,
+                                       )
+        return response

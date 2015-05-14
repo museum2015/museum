@@ -1,5 +1,4 @@
 <!DOCTYPE HTML>
-<html>
 {% load staticfiles %}
 <head lang="en">
     <meta charset="UTF-8">
@@ -16,8 +15,6 @@
 	<link rel="stylesheet" href="/static/css/mycss.css"  >
     <script type="text/javascript">
         var size = 1;
-        var metals = 1;
-        var stones=1;
         var prec = 3;
         var nonprec = 3;
         var semiprec = 3;
@@ -105,21 +102,17 @@
 <body>
 <div class="container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2 panel panel-default">
-            <form method="post" class="margin-base-vertical form-control" enctype="multipart/form-data" accept-charset="UTF-8">
+        <div class="col-md-6 col-md-offset-3 panel panel-default">
+            <form method="post" class="margin-base-vertical form-control" enctype="multipart/form-data">
                 {{ form.as_p }}
                 {% csrf_token %}
-                <button type="submit" class="btn btn-success btn-block">
+                <button onclick="al()" class="btn btn-success btn-block">
                 <span class="glyphicon glyphicon-star"></span>  Submit
                 </button>
             </form>
             <script type="text/javascript">
                  var sizebutton = "<i class='fa fa-plus fa-2x' title='Додати вимір' onclick='add_size()'></i>";
                  $(sizebutton).insertAfter('#id_size_0_2');
-                 var precmetalsbutton = "<i class='fa fa-plus fa-2x' title='Додати вимір' onclick='add_prec_metal()'></i>";
-                 $(precmetalsbutton).insertAfter('#id_metals_0_3');
-                 var precstonesbutton = "<i class='fa fa-plus fa-2x' title='Додати вимір' onclick='add_prec_stone()'></i>";
-                 $(precstonesbutton).insertAfter('#id_stones_0_3');
                  var precbutton = "<input type='button' onclick='add_prec()' value='Додати'/>";
                  var semiprecbutton = "<input type='button' onclick='add_semiprec()' value='Додати'/>";
                  var nonprecbutton = "<input type='button' onclick='add_nonprec()' value='Додати'/>";
@@ -138,31 +131,6 @@
                     }
                  }
 
-                for (i=0; i<10; i++) {
-                    var metal0 = "id_metals_" + i + "_0";
-                    var metal1 = "id_metals_" + i + "_1";
-                    var metal2 = "id_metals_" + i + "_2";
-                    var metal3 = "id_metals_" + i + "_3";
-                    if (document.getElementById(metal0).value != '') {
-                        document.getElementById(metal0).removeAttribute("style");
-                        document.getElementById(metal1).removeAttribute("style");
-                        document.getElementById(metal2).removeAttribute("style");
-                        document.getElementById(metal3).removeAttribute("style");
-                    }
-                 }
-
-                for (i=0; i<10; i++) {
-                    var stones0 = "id_stones_" + i + "_0";
-                    var stones1 = "id_stones_" + i + "_1";
-                    var stones2 = "id_stones_" + i + "_2";
-                    var stones3 = "id_stones_" + i + "_3";
-                    if (document.getElementById(stones0).value != '') {
-                        document.getElementById(stones0).removeAttribute("style");
-                        document.getElementById(stones1).removeAttribute("style");
-                        document.getElementById(stones2).removeAttribute("style");
-                        document.getElementById(stones3).removeAttribute("style");
-                    }
-                 }
             </script>
         </div>
     </div>

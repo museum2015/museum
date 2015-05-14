@@ -469,7 +469,7 @@ class Activity(models.Model):
         permissions = (('only_personal_activity', 'бачити тiльки своi'),
                        ('all_activity', 'бачити все'))
     time_stamp = models.DateTimeField(default='2000-02-12 00:00')
-    type = models.CharField(max_length=30)
+    type = models.CharField(max_length=50)
     actor = models.ForeignKey(Custom.myUser)
     approval = models.BooleanField(default=False)
 
@@ -486,7 +486,7 @@ class Activity(models.Model):
         self.save()
 
     def aim(self):
-        return self.attributeassignment_set.all()[:1].get().aim
+        return self.attributeassignment_set.get(attr_name = 'material').aim
 
     def set(self):
         return self.attributeassignment_set.all()
@@ -527,7 +527,7 @@ class TempSaveForm(forms.Form):
     place_of_creation = forms.CharField(max_length=200, label='Місце створення предмета', required=True)
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
-    material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
+    material = forms.CharField(label = 'Матеріали', required=False, widget=SelectMultiple(choices=MATERIAL_CHOICES))
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
@@ -551,8 +551,9 @@ class TempSaveForm(forms.Form):
     #return_mark = forms.BooleanField(label='Is it returned?')
 
     def clean_material(self):
-        if not self.cleaned_data['material']:
+        if self.cleaned_data['material'] == '[u\'\']':
             raise ValidationError('Обязательное поле')
+        return self.cleaned_data['material']
 
 
 class InitialTempSaveForm(forms.Form):

@@ -42,7 +42,7 @@
         </thead>
         <tbody>
             {% for a in acts %}
-            <tr id="{{ a.id }}"><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"Y/m/d H:m:s" }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td></tr>
+            <tr id="{{ a.id }}"><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"Y/m/d H:i:s" }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td></tr>
             {% endfor %}
         </tbody>
     </table>
