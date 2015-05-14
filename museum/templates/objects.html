@@ -17,11 +17,62 @@
         .menu {
             position: absolute;
             height: 50%;
-            width: 10%;
+            width: 13%;
             right: 2%;
-            top: 25%;
+            top: 10%;
         }
 
+        .ts_ps{
+            position: relative;
+            top: 0;
+        }
+
+        .inv {
+            position: relative;
+            top: 15%;
+        }
+
+        .from_ps_to_ts {
+            position: relative;
+            top: 30%;
+        }
+
+        .write_off {
+            position: relative;
+            top: 45%;
+        }
+
+        .actions {
+            position: relative;
+            top: 60%;
+        }
+
+        figure.img {
+          max-width: 100%;
+        }
+        figure.izo {
+          width: min-content;
+          margin: 0 auto;
+        }
+        figure.tri figure {
+          width: 100%;
+          margin: 0;
+          letter-spacing: 6px;
+          white-space: nowrap;
+        }
+        figure.img img {
+          height: auto;
+          margin: 0 auto;
+        }
+        figure.tri img {
+          display: inline-block;
+          max-width: 50px;  /* с учётом того, что фото одинаковой ширины, иначе JavaScript */
+        }
+        figure.img figcaption {
+          max-width: 100%;
+          padding: 0 1%;
+          font: italic 90% Georgia,serif;
+        }
     </style>
 </head>
 <body>
@@ -45,24 +96,60 @@
     </div>
 </div>
 <div class="menu">
-    <i onclick='ret()' title='Повернення з тимчасового зберігання' class='button0 fa fa-arrow-circle-o-right fa-4x'></i>
-    <i onclick='ts()' title='Прийняти на тимчасове зберігання' class='button10 disabled fa fa-arrow-circle-o-left fa-4x'></i>
-    <i onclick='ps()' title='Прийняти на постійне зберігання' class='button1 fa fa-arrow-circle-left fa-4x'></i>
-    <i onclick='io()' title='Поставити на інвентарний облік' class='button2 fa fa-check fa-4x'></i>
-    <i onclick='spec_io()' title='Поставити на спец. інвентарний облік' class='button11 fa fa-check-square-o fa-4x'></i>
-    <i onclick='ps_ts()' title='Повернення предмета з ПЗ на ТЗ' class='button3 fa fa-exchange fa-4x'></i>
-    <i onclick='ts_ps()' title='Повернення предмета з ТЗ на ПЗ' class='button4 fa fa-exchange fa-flip-horizontal fa-4x'></i>
-    <i onclick='send_ps()' title='Передача на постійне зберігання' class='button5 fa fa-envelope fa-4x'></i>
-    <i onclick='writing_off()' title='Списати' class='button6 fa fa-send fa-4x'></i>
-    {% if add %}
-        <i onclick='' title='Створити' class='button7 fa fa-plus fa-4x'></i>
-    {% endif %}
-    {% if change %}
-        <i onclick='' title='Редагувати' class='button8 fa fa-cog fa-4x'></i>
-    {% endif %}
-    {% if remove %}
-        <i onclick='' title='Видалити' class='button9 fa fa-close fa-4x'></i>
-    {% endif %}
+    <div class="ts_ps">
+        <figure class="img izo tri">
+            <figure>
+                <i onclick='ret()' title='Повернення з тимчасового зберігання' class='button0 fa fa-arrow-circle-o-right fa-3x'></i>
+                <i onclick='ts()' title='Прийняти на тимчасове зберігання' class='button10 disabled fa fa-arrow-circle-o-left fa-3x'></i>
+                <i onclick='ps()' title='Прийняти на постійне зберігання' class='button1 fa fa-arrow-circle-left fa-3x'></i>
+            </figure>
+            <figcaption>Операції з ТЗ та ПЗ</figcaption>
+        </figure>
+    </div>
+    <div class="inv">
+        <figure class="img izo tri">
+            <figure>
+                <i onclick='io()' title='Поставити на інвентарний облік' class='button2 fa fa-check fa-3x'></i>
+                <i onclick='spec_io()' title='Поставити на спец. інвентарний облік' class='button11 fa fa-check-square-o fa-3x'></i>
+                <i onclick="passport()" title="Науково-уніфікований паспорт" class="button12 fa fa-newspaper-o fa-3x"></i>
+            </figure>
+            <figcaption>Облікові процедури</figcaption>
+        </figure>
+    </div>
+    <div class="from_ps_to_ts">
+        <figure class="img izo tri">
+            <figure>
+                <i onclick='ps_ts()' title='Повернення предмета з ПЗ на ТЗ' class='button3 fa fa-exchange fa-3x'></i>
+                <i onclick='ts_ps()' title='Повернення предмета з ТЗ на ПЗ' class='button4 fa fa-exchange fa-flip-horizontal fa-3x'></i>
+            </figure>
+            <figcaption>З ПЗ на ТЗ і навпаки</figcaption>
+        </figure>
+    </div>
+    <div class="write_off">
+        <figure class="img izo tri">
+            <figure>
+                <i onclick='send_ps()' title='Передача на постійне зберігання' class='button5 fa fa-envelope fa-3x'></i>
+                <i onclick='writing_off()' title='Списати' class='button6 fa fa-send fa-3x'></i>
+            </figure>
+            <figcaption>Вилучуння з колекції</figcaption>
+        </figure>
+    </div>
+    <div class="actions">
+     <figure class="img izo tri">
+            <figure>
+                {% if add %}
+                    <i onclick='' title='Створити' class='button7 fa fa-plus fa-3x'></i>
+                {% endif %}
+                {% if change %}
+                    <i onclick='' title='Редагувати' class='button8 fa fa-cog fa-3x'></i>
+                {% endif %}
+                {% if remove %}
+                    <i onclick='' title='Видалити' class='button9 fa fa-close fa-3x'></i>
+                {% endif %}
+            </figure>
+            <figcaption>Дії з об'єктами(видалити, редагувати, додати)</figcaption>
+        </figure>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -195,7 +282,13 @@
                 window.location.href = link;
             }
         };
-
+        var passport = function() {
+            if (!($(".button12").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/passport/" + t;
+                window.location.href = link;
+            }
+        };
 
 </script>
 </body>
