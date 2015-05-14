@@ -414,7 +414,7 @@ class Object(models.Model):
     technique = models.CharField(max_length=200, default='', null=True)  #
     description = models.TextField(max_length=1000, default='', null=True)  #
     identifier = models.CharField(max_length=50, default='', null=True)
-    image = models.ImageField(default='default.jpg', null=True)
+    image = models.ImageField(default='default.jpg', null=True, upload_to='images/')
     #image_type = models.CharField(max_length=50, default='', null=True)
     author = models.CharField(max_length=100, default='', null=True)  #
     price = models.CharField(max_length=50, default='', null=True)  #
@@ -447,7 +447,7 @@ class Object(models.Model):
     aim_of_receiving_gen = models.CharField(max_length=200, default='', null=True)  #
     #aim_of_receiving = models.CharField(max_length=1000, default='', null=True)
     circumst_write_off = models.CharField(max_length=200, default='', null=True)  ##
-    reason = models.FileField(default='default.txt', null=True)  #
+    reason = models.FileField(default='default.txt', null=True, upload_to='docs/')  #
     #source = models.CharField(max_length=200, default='', null=True)  #
 
     def __unicode__(self):
