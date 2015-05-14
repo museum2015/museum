@@ -141,10 +141,10 @@
                     <i onclick='' title='Створити' class='button7 fa fa-plus fa-3x'></i>
                 {% endif %}
                 {% if change %}
-                    <i onclick='' title='Редагувати' class='button8 fa fa-cog fa-3x'></i>
+                    <i onclick='editing()' title='Редагувати' class='button8 fa fa-cog fa-3x'></i>
                 {% endif %}
                 {% if remove %}
-                    <i onclick='' title='Видалити' class='button9 fa fa-close fa-3x'></i>
+                    <i onclick='del()' title='Видалити' class='button9 fa fa-close fa-3x'></i>
                 {% endif %}
             </figure>
             <figcaption>Дії з об'єктами(видалити, редагувати, додати)</figcaption>
@@ -226,6 +226,13 @@
                 window.location.href = link;
             }
         };
+        var editing = function() {
+            if (!($(".button8").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/edit/" + t;
+                window.location.href = link;
+            }
+        };
         var ts = function() {
             if (!($(".button10").hasClass('disabled'))) {
                 var t = $(".highlight td:first-child").text();
@@ -235,6 +242,13 @@
         };
         var writing_off = function() {
             if (!($(".button6").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/staff/writing_off/" + t;
+                window.location.href = link;
+            }
+        };
+        var del = function() {
+            if (!($(".button9").hasClass('disabled'))) {
                 var t = $(".highlight td:first-child").text();
                 var link = "/staff/writing_off/" + t;
                 window.location.href = link;
