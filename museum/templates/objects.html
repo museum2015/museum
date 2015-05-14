@@ -229,8 +229,12 @@
         var editing = function() {
             if (!($(".button8").hasClass('disabled'))) {
                 var t = $(".highlight td:first-child").text();
+                if (t != '') {
                 var link = "/staff/edit/" + t;
-                window.location.href = link;
+                    window.location.href = link;
+                }
+                else { alert('Виберіть об’єкт для редагування!')}
+
             }
         };
         var ts = function() {

@@ -1027,18 +1027,6 @@ class WritingOffForm(forms.Form):
     is_there = forms.ChoiceField(choices=PLACE[2:4], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
 
 
-class PrepareEditForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(PrepareEditForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() != 'Пустий об’єкт' and project.status() != 'Списання (втрата тощо)' :
-                objlist.append(project)
-        objects = []
-        for o in objlist:
-            objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
-
 class ObjectEditForm(ModelForm):
     class Meta:
         model = Object
