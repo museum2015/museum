@@ -14,7 +14,7 @@ from django.contrib import auth
 from django.views.generic.base import View
 from wkhtmltopdf.views import PDFTemplateResponse
 import cStringIO as StringIO
-import xhtml2pdf.pisa as pisa
+#import xhtml2pdf.pisa as pisa
 from django.template.loader import get_template
 from django.template import Context
 
