@@ -60,10 +60,13 @@ select[multiple="multiple"] {
     width: 40%;
     font-size: 13px;
 }
+
 textarea {
   margin: 0;
   font: inherit;
   color: inherit;
+  width: 550px; !important
+  height: 252px; !important
 }
 
 output {
