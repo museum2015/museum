@@ -11,17 +11,10 @@ from django.utils.html import mark_safe, escape, format_html
 from django.core.exceptions import ValidationError
 from django.views.generic.edit import DeleteView
 import lxml.etree as et
-from xml.dom import minidom
-from xml.etree import ElementTree
 from bootstrap3_datetime.widgets import DateTimePicker
 # Create your models here. test
 
 ROOT = et.parse('museum/materials.xml').getroot()
-def show(elem):
-    rough_string = ElementTree.tostring(elem, 'utf-8')
-    reparsed = minidom.parseString(rough_string)
-    return reparsed.toprettyxml(indent="  ")
-
 
 def validate_all_choices(value):
     pass
@@ -49,6 +42,11 @@ def get_choice(root, level=0, *args):
 WEIGHT_CHOICES = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
 MATERIAL_CHOICES = get_choice(ROOT, 0, 'materials')
 LANGUAGE_CHOICES = get_choice(ROOT, 0, 'languages')
+
+def updatechoices():
+    WEIGHT_CHOICES = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
+    MATERIAL_CHOICES = get_choice(ROOT, 0, 'materials')
+    LANGUAGE_CHOICES = get_choice(ROOT, 0, 'languages')
 
 TECHNIQUE_CHOICES = (('', ''), ('Техніка 1', 'Техніка 1'),)
 WAY_OF_FOUND_CHOICES = (('', ''), ('Розкопки', 'Розкопки'),)
