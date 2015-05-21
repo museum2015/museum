@@ -21,7 +21,9 @@
             right: 2%;
             top: 10%;
         }
-
+        .disabled {
+            color: gray;
+        }
         .ts_ps{
             position: relative;
             top: 0;
@@ -83,13 +85,16 @@
         <tr>
                                 <th>ID</th>
                                 <th>Назва</th>
-                                <th>Кількість</th>
                                 <th>Статус</th>
         </tr>
         </thead>
         <tbody>
         {% for a in objects %}
-        <tr><td>{{ a.id }}</td><td>{{ a }}</td><td>{{ a.amount }}</td><td>{{ a.status }}</td>
+        {% if not a.empty %}
+        <tr class='{% if a.scio %} scio {% endif %} {% if a.passport %} passport {% endif %} {% if a.io %} io {% endif %} {% if a.ts %} ts {% endif %} {% if a.ps %} ps {% endif %} {% if a.wo %} wo {% endif %} {% if a.ret %} ret {% endif %}'>
+            <td>{{ a.id }}</td><td>{{ a }}</td><td>{{ a.stat }}</td>
+        </tr>
+        {% endif %}
         {% endfor %}
         </tbody>
     </table>
@@ -99,8 +104,8 @@
     <div class="ts_ps">
         <figure class="img izo tri">
             <figure>
-                <i onclick='ret()' title='Повернення з тимчасового зберігання' class='button0 fa fa-arrow-circle-o-right fa-3x'></i>
-                <i onclick='ts()' title='Прийняти на тимчасове зберігання' class='button10 disabled fa fa-arrow-circle-o-left fa-3x'></i>
+                <i onclick='ret()' title='Повернення з тимчасового зберігання' class='button0 disabled fa fa-arrow-circle-o-right fa-3x'></i>
+                <i onclick='ts()' title='Прийняти на тимчасове зберігання' class='button10 fa fa-arrow-circle-o-left fa-3x'></i>
                 <i onclick='ps()' title='Прийняти на постійне зберігання' class='button1 fa fa-arrow-circle-left fa-3x'></i>
             </figure>
             <figcaption>Операції з ТЗ та ПЗ</figcaption>
@@ -109,8 +114,8 @@
     <div class="inv">
         <figure class="img izo tri">
             <figure>
-                <i onclick='io()' title='Поставити на інвентарний облік' class='button2 fa fa-check fa-3x'></i>
-                <i onclick='spec_io()' title='Поставити на спец. інвентарний облік' class='button11 fa fa-check-square-o fa-3x'></i>
+                <i onclick='io()' title='Поставити на інвентарний облік' class='disabled button2 fa fa-check fa-3x'></i>
+                <i onclick='spec_io()' title='Поставити на спец. інвентарний облік' class=' disabled button11 fa fa-check-square-o fa-3x'></i>
                 <i onclick="passport()" title="Науково-уніфікований паспорт" class="button12 fa fa-newspaper-o fa-3x"></i>
             </figure>
             <figcaption>Облікові процедури</figcaption>
@@ -119,8 +124,8 @@
     <div class="from_ps_to_ts">
         <figure class="img izo tri">
             <figure>
-                <i onclick='ps_ts()' title='Повернення предмета з ПЗ на ТЗ' class='button3 fa fa-exchange fa-3x'></i>
-                <i onclick='ts_ps()' title='Повернення предмета з ТЗ на ПЗ' class='button4 fa fa-exchange fa-flip-horizontal fa-3x'></i>
+                <i onclick='ps_ts()' title='Повернення предмета з ПЗ на ТЗ' class='button3 disabled fa fa-exchange fa-3x'></i>
+                <i onclick='ts_ps()' title='Повернення предмета з ТЗ на ПЗ' class='button4 disabled fa fa-exchange fa-flip-horizontal fa-3x'></i>
             </figure>
             <figcaption>З ПЗ на ТЗ і навпаки</figcaption>
         </figure>
@@ -128,59 +133,76 @@
     <div class="write_off">
         <figure class="img izo tri">
             <figure>
-                <i onclick='send_ps()' title='Передача на постійне зберігання' class='button5 fa fa-envelope fa-3x'></i>
-                <i onclick='writing_off()' title='Списати' class='button6 fa fa-send fa-3x'></i>
+                <i onclick='send_ps()' title='Передача на постійне зберігання' class='disabled button5 fa fa-envelope fa-3x'></i>
+                <i onclick='writing_off()' title='Списати' class='disabled button9 fa fa-send fa-3x'></i>
             </figure>
-            <figcaption>Вилучуння з колекції</figcaption>
+            <figcaption>Вилучення з колекції</figcaption>
         </figure>
     </div>
     <div class="actions">
      <figure class="img izo tri">
             <figure>
-                {% if add %}
-                    <i onclick='' title='Створити' class='button7 fa fa-plus fa-3x'></i>
-                {% endif %}
-                {% if change %}
-                    <i onclick='editing()' title='Редагувати' class='button8 fa fa-cog fa-3x'></i>
-                {% endif %}
                 {% if remove %}
-                    <i onclick='del()' title='Видалити' class='button9 fa fa-close fa-3x'></i>
+                    <i onclick='del()' title='Видалити' class='disabled button7 fa fa-close fa-3x'></i>
                 {% endif %}
             </figure>
-            <figcaption>Дії з об'єктами(видалити, редагувати, додати)</figcaption>
+            <figcaption>Дії з об'єктами</figcaption>
         </figure>
     </div>
 </div>
 
 <script type="text/javascript">
-        var remove_attr = function() {
-            i = 0;
-            but = $(".button"+i);
-            while(but.length > 0) {
-                but.removeAttr("disabled");
-                i++;
-                but = $(".button"+i);
-            };
-        };
+        document.body.innerHTML = document.body.innerHTML.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
         var rows = $('tr').not(':first');
-
+        var buttons = $('i');
         /* Create 'click' event handler for rows */
         rows.on('click', function(e) {
-
+            $.each(buttons, function(k, v) {
+                $(this).removeClass("disabled");
+            })
             /* Get current row */
             var row = $(this);
-
             rows.removeClass('highlight');
             row.addClass('highlight');
 
-            remove_attr();
-
-            if ($(".highlight td:nth-child(4)").text() == "Приймання на тимчасове зберігання") $(".button3").attr("disabled", "");
-
-            if ($(".highlight td:nth-child(4)").text() == "Приймання на постійне зберігання"){
-                $(".button0").attr("disabled", "");
-                $(".button4").attr("disabled", "");
-                };
+            if (row.hasClass("io")) {
+                $(".button2").addClass("disabled");
+            }
+            if (row.hasClass("scio")) {
+                $(".button11").addClass("disabled");
+            }
+            if (row.hasClass("ts")) {
+                $(".button10").addClass("disabled");
+                $(".button1").addClass("disabled");
+                $(".button3").addClass("disabled");
+            }
+            if (row.hasClass("ps")) {
+                $(".button5").addClass("disabled");
+                $(".button4").addClass("disabled");
+                $(".button1").addClass("disabled");
+                $(".button0").addClass("disabled");
+                $(".button10").addClass("disabled");
+            }
+            if (row.hasClass("wo")) {
+                $(".button0").addClass("disabled");
+                $(".button1").addClass("disabled");
+                $(".button2").addClass("disabled");
+                $(".button3").addClass("disabled");
+                $(".button4").addClass("disabled");
+                $(".button5").addClass("disabled");
+                $(".button6").addClass("disabled");
+                $(".button7").addClass("disabled");
+                $(".button8").addClass("disabled");
+                $(".button10").addClass("disabled");
+                $(".button11").addClass("disabled");
+            }
+            if (row.hasClass("ret")) {
+                $(".button0").addClass("disabled");
+                $(".button3").addClass("disabled");
+                $(".button4").addClass("disabled");
+                $(".button5").addClass("disabled");
+                $(".button6").addClass("disabled");
+            }
 
         });
 
@@ -189,7 +211,6 @@
                 "columns": [
                     { "type": "num" },
                     { "type": "html" },
-                    { "type": "num" },
                     { "type": "html" },
                 ],
                 "language": {

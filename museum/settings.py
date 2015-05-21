@@ -98,6 +98,7 @@ STATICFILES_DIRS = (
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'museum/static/')
+WKHTMLTOPDF_CMD_OPTIONS = {'disable-javascript': True}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'museum/media/')

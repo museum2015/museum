@@ -42,16 +42,15 @@
         </thead>
         <tbody>
             {% for a in acts %}
-            <tr id="{{ a.id }}"><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"Y/m/d H:i:s" }}</td><td>{{ a.actor }}</td><td>{{ a.approval }}</td></tr>
+            <tr id="{{ a.id }}"><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"Y/m/d H:i:s" }}</td><td>{{ a.actor }}</td><td>{% if a.approval %} Так {% elif a.approval == False %} Ні {% else %} Очікується {% endif %}</td></tr>
             {% endfor %}
         </tbody>
     </table>
     </div>
 </div>
 <div class="menu">
-    <i onclick='' title='Затвердити' class='button0 fa fa-check fa-4x'></i>
-    <i onclick='' title='Відхилити' class='button1 fa fa-close fa-4x'></i>
-    <i onclick='' title='Редагувати' class='button2 fa fa-cog fa-4x'></i>
+    <i onclick='approve()' title='Затвердити' class='button0 fa fa-check fa-4x'></i>
+    <i onclick='reject()' title='Відхилити' class='button1 fa fa-close fa-4x'></i>
 </div>
 <script type="text/javascript">
         {% for a in acts %}
@@ -79,7 +78,14 @@
         var approve = function() {
             if (!($(".button0").hasClass('disabled'))) {
                 var t = $(".highlight td:first-child").text();
-                var link = "/staff/activities/approve" + t;
+                var link = "/activities/approve" + t;
+                window.location.href = link;
+            }
+        };
+        var reject = function() {
+            if (!($(".button1").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/activities/reject" + t;
                 window.location.href = link;
             }
         };
