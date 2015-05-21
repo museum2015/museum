@@ -135,7 +135,7 @@ class Custom:
 
     class TextAreaChoiceWidget(MultiWidget):
         def __init__(self, choices, placeholder1='', size1=10):
-            widgets = [TextInput(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1, 'style': "margin: 0px; height: 252px; width: 550px;"}),
+            widgets = [forms.widgets.Textarea(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1, 'style': "margin: 0px; height: 252px; width: 550px;"}),
                        Select(choices=choices)]
             super(Custom.TextAreaChoiceWidget, self).__init__(widgets)
 
@@ -148,12 +148,12 @@ class Custom:
 
         def format_output(self, rendered_widgets):
             dd = '<br>'
-            res = u''.join(rendered_widgets)
+            res = u'<br>'.join(rendered_widgets)
             return dd+res
 
     class TextAreaChoiceField(MultiValueField):
             def __init__(self, choices, placeholder1, size1=10, *args, **kwargs):
-                list_fields = [fields.CharField(max_length=30),
+                list_fields = [fields.CharField(max_length=3000),
                                fields.ChoiceField(choices=choices)]
                 super(Custom.TextAreaChoiceField, self).__init__(list_fields,
                                                                  widget=Custom.TextAreaChoiceWidget(choices=choices, size1=size1, placeholder1=placeholder1),
@@ -258,20 +258,24 @@ class Custom:
 
     class ChoiceTextTextChoiceWidget(MultiWidget):
         def __init__(self, choices1, choices2, placeholder1='', placeholder2='', invisible=True, **kwargs):
+            self.choices1 = choices1
+            self.choices2 = choices2
             if invisible:
-                attrs = {'max_length': 10, 'placeholder1': placeholder1, 'placeholder2': placeholder2, 'style': 'display:none;'}
+                self.a = {'max_length': 10, 'placeholder': placeholder1, 'style': 'display:none;'}
+                self.b = {'max_length': 10,'placeholder': placeholder2, 'style': 'display:none;'}
             else:
-                attrs = {'max_length': 10, 'placeholder1': placeholder1, 'placeholder2': placeholder2}
+                self.a = {'max_length': 10, 'placeholder': placeholder1}
+                self.b = {'max_length': 10, 'placeholder': placeholder2}
             widgets = [Select(choices=choices1, **kwargs),
-                       TextInput(attrs),
-                       TextInput(attrs),
+                       TextInput(attrs=self.a),
+                       TextInput(attrs=self.b),
                        Select(choices=choices2, **kwargs)]
             super(Custom.ChoiceTextTextChoiceWidget, self).__init__(widgets)
 
         def decompress(self, value):
             if value:
-                res = value.split(':')
-                return res
+                return value.split(':')
+
             else:
                 return [None, None, None, None]
 
@@ -283,14 +287,14 @@ class Custom:
         MES_UNIT_WEIGHT = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
 
         def __init__(self, number):
-            widgets = [Custom.ChoiceTextTextChoiceWidget(placeholder1='Кількість', placeholder2='2', choices1=self.PREC_ST_CHOICES, choices2=self.MES_UNIT_WEIGHT, invisible=False)]
+            widgets = [Custom.ChoiceTextTextChoiceWidget(placeholder1='Кількість', placeholder2='Загальна маса', choices1=self.PREC_ST_CHOICES, choices2=self.MES_UNIT_WEIGHT, invisible=False)]
             for i in range(number-1):
                 widgets.append(Custom.ChoiceTextTextChoiceWidget(placeholder1='', choices1=self.PREC_ST_CHOICES, choices2=self.MES_UNIT_WEIGHT, attrs={'style': 'display:none;'}))
             super(Custom.MultiChoiceTextTextChoiceWidget, self).__init__(widgets)
 
         def decompress(self, value):
             if value:
-                return value.split('; ')
+                return value.split(', ')
             else:
                 return []
 
@@ -312,18 +316,16 @@ class Custom:
 
         def compress(self, values):
             values = [x for x in values if x]
-            return '; '.join(values)
+            return ', '.join(values)
 
     class ChoiceChoiceTextChoiceField(MultiValueField):
-        def __init__(self, choices1, choices2, choices3, placeholder1):
+        def __init__(self, choices1, choices3):
             list_fields = [fields.ChoiceField(choices=choices1),
-                           fields.ChoiceField(choices=choices2),
+                           fields.CharField(max_length=10),
                            fields.CharField(max_length=30),
                            fields.ChoiceField(choices=choices3)]
             super(Custom.ChoiceChoiceTextChoiceField, self).__init__(list_fields,
                                                                      widget=Custom.ChoiceChoiceTextChoiceWidget(choices1=choices1,
-                                                                                                                choices2=choices2,
-                                                                                                                placeholder1=placeholder1,
                                                                                                                 choices3=choices3))
 
         def compress(self, values):
@@ -333,15 +335,17 @@ class Custom:
                 return ''
 
     class ChoiceChoiceTextChoiceWidget(MultiWidget):
-        def __init__(self, choices1, choices2, choices3, placeholder1='', invisible=True, **kwargs):
+        def __init__(self, choices1, choices3, invisible=True, **kwargs):
             if invisible:
-                attrs = {'max_length': 10, 'placeholder': placeholder1, 'style': 'display:none;'}
+                self.a = {'max_length': 10, 'placeholder': 'Проба', 'style': 'display:none;'}
+                self.b = {'max_length': 10, 'placeholder': 'Загальна маса', 'style': 'display:none;'}
             else:
-                attrs = {'max_length': 10, 'placeholder': placeholder1}
-            widgets = [Select(choices=choices1, **kwargs),
-                       Select(choices=choices2, **kwargs),
-                       TextInput(attrs),
-                       Select(choices=choices3, **kwargs)]
+                self.a = {'max_length': 10, 'placeholder': 'Проба'}
+                self.b = {'max_length': 10, 'placeholder': 'Загальна маса'}
+            widgets = [Select(choices=choices1, attrs=self.a),
+                       TextInput(attrs=self.a),
+                       TextInput(attrs=self.b),
+                       Select(choices=choices3, attrs=self.b)]
             super(Custom.ChoiceChoiceTextChoiceWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -360,14 +364,14 @@ class Custom:
         ASSAY_CHOICES = get_choice(ROOT, 0, 'assay')
 
         def __init__(self, number):
-            widgets = [Custom.ChoiceChoiceTextChoiceWidget(placeholder1='0,2', choices1=self.PREC_MAT_CHOICES, choices2=self.ASSAY_CHOICES, choices3=self.MES_UNIT_WEIGHT, invisible=False)]
+            widgets = [Custom.ChoiceChoiceTextChoiceWidget(choices1=self.PREC_MAT_CHOICES,choices3=self.MES_UNIT_WEIGHT, invisible=False)]
             for i in range(number-1):
-                widgets.append(Custom.ChoiceChoiceTextChoiceWidget(placeholder1='', choices1=self.PREC_MAT_CHOICES, choices2=self.ASSAY_CHOICES, choices3=self.MES_UNIT_WEIGHT, attrs={'style': 'display:none;'}))
+                widgets.append(Custom.ChoiceChoiceTextChoiceWidget(choices1=self.PREC_MAT_CHOICES, choices3=self.MES_UNIT_WEIGHT, invisible=True))
             super(Custom.MultiChoiceChoiceTextChoiceWidget, self).__init__(widgets)
 
         def decompress(self, value):
             if value:
-                return value.split('; ')
+                return value.split(', ')
             else:
                 return []
 
@@ -380,9 +384,9 @@ class Custom:
         ASSAY_CHOICES = get_choice(ROOT, 0, 'assay')
 
         def __init__(self, number=10, *args, **kwargs):
-            list_fields = [Custom.ChoiceChoiceTextChoiceField(choices1=self.PREC_MAT_CHOICES, choices2=self.ASSAY_CHOICES, choices3=self.MES_UNIT_WEIGHT, placeholder1='0.2')]
+            list_fields = [Custom.ChoiceChoiceTextChoiceField(choices1=self.PREC_MAT_CHOICES, choices3=self.MES_UNIT_WEIGHT)]
             for i in range(number-1):
-                list_fields.append(Custom.ChoiceChoiceTextChoiceField(choices1=self.PREC_MAT_CHOICES, choices2=self.ASSAY_CHOICES, choices3=self.MES_UNIT_WEIGHT, placeholder1=''))
+                list_fields.append(Custom.ChoiceChoiceTextChoiceField(choices1=self.PREC_MAT_CHOICES, choices3=self.MES_UNIT_WEIGHT))
             super(Custom.MultiChoiceChoiceTextChoiceField, self).__init__(list_fields,
                                                                           widget=Custom.MultiChoiceChoiceTextChoiceWidget(number),
                                                                           *args,
@@ -390,7 +394,7 @@ class Custom:
 
         def compress(self, values):
             values = [x for x in values if x]
-            return '; '.join(values)
+            return ', '.join(values)
 
     class MultiChoiceTextChoiceWidget(MultiWidget):
         TYPE_CHOICES = get_choice(ROOT, 0, 'dimension', 'type')
@@ -623,7 +627,7 @@ class TempSaveForm(forms.Form):
     size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
-                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     price = forms.CharField(max_length=200, label='Вартість', required=True)
@@ -669,7 +673,7 @@ class TempRetForm(forms.Form):
     size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
-                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     price = forms.CharField(max_length=200, label='Вартість', required=True)
     term_back = forms.DateField(label='Дата повернення', widget=DateTimePicker(options={"format": "YYYY-MM-DD",
@@ -734,7 +738,7 @@ class PersistentSaveForm(forms.Form):
     transport_possibility = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
     recomm_for_restauration = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
-                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     price = forms.CharField(max_length=40, label='Вартість', required=True)
     note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     PS_code = forms.CharField(max_length=200, label='Шифр ПЗ (номер за книгою ПЗ)', required=True)
@@ -794,7 +798,7 @@ class InventorySaveForm(forms.Form):
     bibliography = forms.CharField(max_length=200, label='Бібліографія', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
-                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     transport_possibility = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
     recomm_for_restauration = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     price = forms.CharField(max_length=40, label='Вартість', required=True)
@@ -859,7 +863,7 @@ class SpecInventorySaveForm(forms.Form):
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
-                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     recomm_for_restauration = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     price = forms.CharField(max_length=40, label='Вартість', required=True)
     note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
@@ -928,16 +932,16 @@ class PassportForm(forms.Form):
     stones = Custom.MultiChoiceTextTextChoiceField(label='Дорогоцінне каміння')
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     person_or_actions = forms.CharField(max_length=2000, label='Особи чи події, пов’язані з предметом', required=True,
-                                        widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                        widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     memorial_subject = forms.CharField(max_length=200, label='Зв’язок з іншими пам’ятками (історичний, мистецтвознавчий, культурологічний аспект)', required=True)
     extra_list = forms.CharField(max_length=2000, label='Додаткові відомості', required=True,
-                                 widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                 widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
-                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     recomm_for_restauration = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     restoration = forms.CharField(max_length=2000, label='Реставрація (історія реставрації, зв’язок із журналом реставрації)', required=True,
-                                  widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                  widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     transport_possibility = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
     image_amount = forms.IntegerField(label='Кількість фотографій', min_value=0)
     price = forms.CharField(max_length=40, label='Оціночна вартість', required=True)
@@ -979,7 +983,7 @@ class FromPStoTSForm(forms.Form):
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
-                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     insurable_value = forms.CharField(max_length=30, label='Страхова вартість', required=True)
     note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
@@ -1028,7 +1032,7 @@ class FromTStoPSForm(forms.Form):
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
-                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     insurable_value = forms.CharField(max_length=30, label='Страхова вартість', required=True)
     note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
@@ -1075,7 +1079,7 @@ class SendOnPSForm(forms.Form):
     size = Custom.MultiChoiceTextChoiceField(label='Розміри')
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
-                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 720px;"}))
+                                      widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     side_1 = forms.CharField(max_length=200, label='Сторона 1 юридична особа', required=True)
