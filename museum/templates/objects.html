@@ -248,17 +248,6 @@
                 window.location.href = link;
             }
         };
-        var editing = function() {
-            if (!($(".button8").hasClass('disabled'))) {
-                var t = $(".highlight td:first-child").text();
-                if (t != '') {
-                var link = "/staff/edit/" + t;
-                    window.location.href = link;
-                }
-                else { alert('Виберіть об’єкт для редагування!')}
-
-            }
-        };
         var ts = function() {
             if (!($(".button10").hasClass('disabled'))) {
                 var t = $(".highlight td:first-child").text();
@@ -267,14 +256,14 @@
             }
         };
         var writing_off = function() {
-            if (!($(".button6").hasClass('disabled'))) {
+            if (!($(".button9").hasClass('disabled'))) {
                 var t = $(".highlight td:first-child").text();
                 var link = "/staff/writing_off/" + t;
                 window.location.href = link;
             }
         };
         var del = function() {
-            if (!($(".button9").hasClass('disabled'))) {
+            if (!($(".button7").hasClass('disabled'))) {
                 var t = $(".highlight td:first-child").text();
                 var link = "/staff/writing_off/" + t;
                 window.location.href = link;
