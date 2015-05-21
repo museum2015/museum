@@ -4,7 +4,7 @@
         <choice>Английский</choice>
         <choice>Русский</choice>
         <choice>Українська</choice>
-    <choice>bestt</choice><choice>bestt</choice></languages>
+    </languages>
     <type_name label="тип назви">
         <choice>авторська</choice>
         <choice>альтернативна</choice>
