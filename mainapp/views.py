@@ -2,22 +2,18 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
-    PersistentSaveForm, ObjectEditForm, ObjectCreateForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
+    PersistentSaveForm, ObjectEditForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
     InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
     PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm, get_choice, PreparePassportForm,\
     PassportForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
-from django.views.generic.edit import UpdateView, CreateView
+from django.utils.html import escape
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import auth
 from django.views.generic.base import View
 from wkhtmltopdf.views import PDFTemplateResponse
-import cStringIO as StringIO
-#import xhtml2pdf.pisa as pisa
-from django.template.loader import get_template
-from django.template import Context
-
+from django.views.generic.edit import DeleteView
 
 
 # Create your views here.
@@ -35,7 +31,7 @@ def TempSave(request, id_number=0):
         form = TempSaveForm(request.POST, request.FILES)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Приймання на тимчасове зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Приймання на тимчасове зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             project.reason = cd['reason']
             project.save()
@@ -72,7 +68,7 @@ def TempRet(request, id_number=0):
         form = TempRetForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Повернення з тимчасового зберiгання',
+            act = Activity(time_stamp=dt.now(), aim = project, type='Повернення з тимчасового зберiгання',
                            actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             for (k, v) in cd.items():
@@ -107,10 +103,13 @@ def GetProject(request):
 @login_required(login_url='/admin/')
 def ApproveProject(request, offset):
     if Activity.objects.get(id=int(offset)).approval == False:
-        Activity.objects.get(id=int(offset)).approve()
-        return HttpResponse('Успішно затверджено<br><a href="/">На головну</a>')
+        return HttpResponse('Вже відхилено раніше<br><a href="/activities">Назад</a>')
+    elif Activity.objects.get(id=int(offset)).approval == True:
+        return HttpResponse('Вже затверджено ранiше<br><a href="/activities">Назад</a>')
     else:
-        return HttpResponse('Вже затверджено ранiше<br><a href="/">На головну</a>')
+        Activity.objects.get(id=int(offset)).approve()
+        return HttpResponse('Успішно затверджено<br><a href="/activities">Назад</a>')
+
 
 
 def get_attrib_assigns(act_type, project, attribute):
@@ -180,7 +179,7 @@ def AddOnPS(request, id_number):
         form = PersistentSaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Приймання на постійне зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Приймання на постійне зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -247,7 +246,7 @@ def ActivityPage(request, id_number):
 
 @permission_required('mainapp.see_all_obj', login_url='/admin')
 def ObjectList(request):
-    qs = Object.objects.all()
+    qs = list(Object.objects.all())
     add = request.user.has_perm('mainapp.add_new_obj')
     change = request.user.has_perm('mainapp.change_obj')
     remove = request.user.has_perm('mainapp.remove_oobj')
@@ -283,16 +282,10 @@ def logout(request):
     return HttpResponseRedirect("/")
 
 
-class ObjectUpdate(UpdateView):
+class ObjectDelete(DeleteView):
     model = Object
-    form_class = ObjectEditForm
-    template_name_suffix = '_update_form'
+    template_name_suffix = '_delete_form'
 
-
-class ObjectCreate(CreateView):
-    model = Object
-    form_class = ObjectCreateForm
-    template_name_suffix = '_create_form'
 
 @login_required(login_url='/admin/')
 def PrepareInventory(request):
@@ -321,7 +314,7 @@ def AddOnInventorySave(request, id_number):
         form = InventorySaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Інвентарний облік', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Інвентарний облік', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -376,7 +369,7 @@ def AddOnSpecInventorySave(request, id_number):
         form = SpecInventorySaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Спеціальний інвентарний облік', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Спеціальний інвентарний облік', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -432,7 +425,7 @@ def Passport(request, id_number):
         form = PassportForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Науково-уніфікований паспорт', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Науково-уніфікований паспорт', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -500,7 +493,7 @@ def FromPSToTS(request, id_number):
         form = FromPStoTSForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Видача предметів з Постійного зберігання на Тимчасове зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Видача предметів з Постійного зберігання на Тимчасове зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -551,7 +544,7 @@ def FromTSToPS(request, id_number):
         form = FromTStoPSForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Повернення творів з Тимчасового зберігання на Постійне зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Повернення творів з Тимчасового зберігання на Постійне зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -609,7 +602,7 @@ def SendOnPS(request, id_number):
         form = SendOnPSForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Передача на постійне зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Передача на постійне зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -661,7 +654,7 @@ def WritingOff(request, id_number):
         form = WritingOffForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), type='Списання (втрата тощо)', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Списання', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -694,15 +687,27 @@ class MyPDFView(View):
         except:
             return HttpResponse('Не існує об\'єкта с таким номером')
         act = Activity.objects.filter(type='Науково-уніфікований паспорт', approval=True).order_by('-time_stamp')
-        act = [a for a in act if a.aim().pk == project.pk]
+        act = [a for a in act if a.aim == project]
         if not act:
             return HttpResponse('У даного об\'єкта паспорт не заповнений')
         else:
             act = act[0]
         queryset = act.attributeassignment_set.all()
+        a = Activity.objects.all().order_by('time_stamp')[0]
         context = {}
         for query in queryset:
             context[query.attr_name] = query.attr_value
+        context['date_appear'] = a.time_stamp
+        q = context['material']
+        try:
+            context['create_person'] = act.actor.get_full_name()
+            context['create_group'] = act.actor.groups.values_list('name', flat=True)[0]
+            context['charge_person'] = context['mat_person_in_charge'][:-1].split(' (')[0]
+            context['charge_group'] = context['mat_person_in_charge'][:-1].split(' (')[1]
+        except:
+            pass
+        context['date'] = dt.now()
+        context['material'] = q[1:-1].replace('u\'', '').replace('\'', '').decode('unicode-escape')
         response = PDFTemplateResponse(request=request,
                                        template=self.template,
                                        filename="passport.pdf",

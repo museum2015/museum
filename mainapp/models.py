@@ -3,11 +3,13 @@ import datetime
 import os
 from django import forms
 from django.db import models
+from django.db.models import Q
 from django.forms import fields, MultiValueField, CharField, ChoiceField, MultiWidget, TextInput, Select, ModelForm, SelectMultiple
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.utils.html import mark_safe
+from django.utils.html import mark_safe, escape, format_html
 from django.core.exceptions import ValidationError
+from django.views.generic.edit import DeleteView
 import lxml.etree as et
 from bootstrap3_datetime.widgets import DateTimePicker
 # Create your models here. test
@@ -44,7 +46,7 @@ LANGUAGE_CHOICES = get_choice(ROOT, 0, 'languages')
 
 TECHNIQUE_CHOICES = (('', ''), ('Техніка 1', 'Техніка 1'),)
 WAY_OF_FOUND_CHOICES = (('', ''), ('Розкопки', 'Розкопки'),)
-AIMS = (('', ''),)
+AIMS = get_choice(ROOT, 0, 'purpose')
 PLACE = (('', ''), ('На місці', 'На місці'), ('За межами фондосховища', 'За межами фондосховища'),
          ('За межами музею', 'За межами музею'))
 MARKS_ON_OBJECT = (('', ''), ('Написи', 'Написи'), ('Печатки', 'Печатки'), ('Клейма', 'Клейма'),)
@@ -437,54 +439,62 @@ class Object(models.Model):
                        ('remove_obj', 'видалення'),
         )
     collection = models.CharField(max_length=200, default='', null=True)  #
-    is_fragment = models.BooleanField(default=False)
-    name = models.CharField(max_length=200, default='', null=True)  #
-    amount = models.IntegerField(default=0, null=True)  #
-    size = models.CharField(max_length=40, default='', null=True)  #
-    _class = models.CharField(max_length=200, default='', null=True)  ##
-    type = models.CharField(max_length=200, default='', null=True)  ##
-    material = models.CharField(max_length=200, default='', null=True)  #
-    technique = models.CharField(max_length=200, default='', null=True)  #
-    description = models.TextField(max_length=1000, default='', null=True)  #
-    identifier = models.CharField(max_length=50, default='', null=True)
+    is_fragment = models.BooleanField(default=False, blank=True)
+    name = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    amount = models.IntegerField(default=0, null=True, blank=True)  #
+    size = models.CharField(max_length=40, default='', null=True, blank=True)  #
+    _class = models.CharField(max_length=200, default='', null=True, blank=True)  ##
+    type = models.CharField(max_length=200, default='', null=True, blank=True)  ##
+    material = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    technique = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    description = models.TextField(max_length=1000, default='', null=True, blank=True)  #
+    identifier = models.CharField(max_length=50, default='', null=True, blank=True)
     image = models.ImageField(default='default.jpg', null=True, upload_to='images/')
-    #image_type = models.CharField(max_length=50, default='', null=True)
-    author = models.CharField(max_length=100, default='', null=True)  #
-    price = models.CharField(max_length=50, default='', null=True)  #
-    date_creation = models.CharField(max_length=50, default='', null=True)
-    place_of_creation = models.CharField(max_length=50, default='', null=True)
-    date_detection = models.CharField(max_length=50, default='', null=True)
-    place_detection = models.CharField(max_length=50, default='', null=True)
-    date_existence = models.CharField(max_length=50, default='', null=True)
-    place_existence = models.CharField(max_length=50, default='', null=True)
-    mark_on_object = models.CharField(max_length=200, default='', null=True)  ##
-    note = models.CharField(max_length=200, default='', null=True)  #
-    condition = models.CharField(max_length=100, default='', null=True)  #
-    condition_descr = models.CharField(max_length=2000, null=True)
-    transport_possibility = models.BooleanField(default=False)  ##
-    recomm_for_restauration = models.CharField(max_length=100, default='', null=True)  ##
-    restauration_notes = models.CharField(max_length=200, default='', null=True)  ##
-    memorial_subject = models.CharField(max_length=200, default='', null=True)
-    storage = models.CharField(max_length=200, default='', null=True)  #
-    place_appellation = models.CharField(max_length=200, default='', null=True)  ##
-    is_there = models.CharField(max_length=200, default='', null=True)  ##
-    bibliography = models.CharField(max_length=1000, default='', null=True)
+    #image_type = models.CharField(max_length=50, default='', null=True, blank=True)
+    author = models.CharField(max_length=100, default='', null=True, blank=True)  #
+    price = models.CharField(max_length=50, default='', null=True, blank=True)  #
+    date_creation = models.CharField(max_length=50, default='', null=True, blank=True)
+    place_of_creation = models.CharField(max_length=50, default='', null=True, blank=True)
+    date_detection = models.CharField(max_length=50, default='', null=True, blank=True)
+    place_detection = models.CharField(max_length=50, default='', null=True, blank=True)
+    date_existence = models.CharField(max_length=50, default='', null=True, blank=True)
+    place_existence = models.CharField(max_length=50, default='', null=True, blank=True)
+    mark_on_object = models.CharField(max_length=200, default='', null=True, blank=True)  ##
+    note = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    condition = models.CharField(max_length=100, default='', null=True, blank=True)  #
+    condition_descr = models.CharField(max_length=2000, null=True, blank=True)
+    transport_possibility = models.BooleanField(default=False, blank=True)  ##
+    recomm_for_restauration = models.CharField(max_length=100, default='', null=True, blank=True)  ##
+    restauration_notes = models.CharField(max_length=200, default='', null=True, blank=True)  ##
+    memorial_subject = models.CharField(max_length=200, default='', null=True, blank=True)
+    storage = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    place_appellation = models.CharField(max_length=200, default='', null=True, blank=True)  ##
+    is_there = models.CharField(max_length=200, default='', null=True, blank=True)  ##
+    bibliography = models.CharField(max_length=1000, default='', null=True, blank=True)
     #documented_in = models.CharField(max_length=200)
     #documented_type = models.CharField(max_length=50)
-    way_of_found = models.CharField(max_length=200, default='', null=True)  #
-    link_on_doc = models.CharField(max_length=200, default='', null=True)
+    way_of_found = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    link_on_doc = models.CharField(max_length=200, default='', null=True, blank=True)
     #doc_type = models.CharField(max_length=50)
-    side_1 = models.CharField(max_length=200, default='', null=True)  #
-    side_2 = models.CharField(max_length=200, default='', null=True)  #
-    term_back = models.DateField(default='2000-01-01', null=True)  #
-    aim_of_receiving_gen = models.CharField(max_length=200, default='', null=True)  #
-    #aim_of_receiving = models.CharField(max_length=1000, default='', null=True)
-    circumst_write_off = models.CharField(max_length=200, default='', null=True)  ##
+    side_1 = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    side_2 = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    term_back = models.DateField(default='2000-01-01', null=True, blank=True)  #
+    aim_of_receiving_gen = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    #aim_of_receiving = models.CharField(max_length=1000, default='', null=True, blank=True)
+    circumst_write_off = models.CharField(max_length=200, default='', null=True, blank=True)  ##
     reason = models.FileField(default='default.txt', null=True, upload_to='docs/')  #
-    #source = models.CharField(max_length=200, default='', null=True)  #
+    #source = models.CharField(max_length=200, default='', null=True, blank=True)  #
+    stat = models.CharField(max_length=200, default='Пустий об’єкт', null=False, blank=True)
+
 
     def __unicode__(self):
-        return self.name.split(' ')[0]
+        try:
+            return self.name.split(' ')[0]
+        except:
+            return self.name
+
+    def activity_set(self):
+        return Activity.objects.filter(aim=self)
 
     def status(self):
         if not self.attributeassignment_set.filter(approval=True):
@@ -496,6 +506,40 @@ class Object(models.Model):
             status = str(self.attributeassignment_set.filter(approval=True)[i].event_initiator)
         return status
 
+    @property
+    def empty(self):
+        return 'Пустий'.decode('utf-8') in self.stat
+
+    @property
+    def passport(self):
+        if self.activity_set.filter(approval=True, type='Науково-уніфікований паспорт'): return True
+        else: return False
+
+    @property
+    def io(self):
+        if self.activity_set.filter(approval=True, type='Інвентарний облік'): return True
+        else: return False
+
+    @property
+    def scio(self):
+        if self.activity_set.filter(approval=True, type='Спеціальний інвентарний облік'): return True
+        else: return False
+
+    @property
+    def ts(self):
+        if 'тимчасовому зберіганні'.decode('utf-8') in self.stat: return True
+        return False
+
+    @property
+    def ps(self):
+        return 'постійне зберігання'.decode('utf-8') in self.stat
+
+    @property
+    def wo(self):
+        return 'Cписаний'.decode('utf-8') in self.stat
+    @property
+    def ret(self):
+        return 'Повернений'.decode('utf-8') in self.stat
 
 class Activity(models.Model):
     class Meta:
@@ -504,7 +548,8 @@ class Activity(models.Model):
     time_stamp = models.DateTimeField(default='2000-02-12 00:00')
     type = models.CharField(max_length=50)
     actor = models.ForeignKey(Custom.myUser)
-    approval = models.BooleanField(default=False)
+    approval = models.NullBooleanField(default=None, null=True)
+    aim = models.ForeignKey(Object, null=True)
 
     def __unicode__(self):
         try:
@@ -516,10 +561,23 @@ class Activity(models.Model):
         for attrib in self.attributeassignment_set.all():
             attrib.approve()
         self.approval = True
+        if self.type == 'Приймання на тимчасове зберігання'.decode('utf-8') or \
+           self.type == 'Видача предметів з Постійного зберігання на Тимчасове зберігання'.decode('utf-8'):
+            self.aim.stat = format_html('На тимчасовому зберіганні (<a href="/activity/{0}">подія</a>)', self.pk)
+        if self.type == 'Приймання на постійне зберігання'.decode('utf-8') or \
+           self.type == 'Повернення творів з Тимчасового зберігання на Постійне зберігання'.decode('utf-8') or \
+           self.type == 'Передача на постійне зберігання'.decode('utf-8'):
+            self.aim.stat = format_html('На постійному зберіганні (<a href="/activity/{0}">подія</a>)', self.pk)
+        if self.type == 'Списання'.decode('utf-8'):
+            self.aim.stat = format_html('Cписаний (<a href="/activity/{0}">подія</a>)', self.pk)
+        if self.type == 'Повернення з тимчасового зберiгання'.decode('utf-8'):
+            self.aim.stat = format_html('Повернений з тимчасового зберiгання (<a href="/activity/{0}">подія</a>)', self.pk)
         self.save()
+        self.aim.save()
 
-    def aim(self):
-        return self.attributeassignment_set.get(attr_name = 'material').aim
+
+    def reject(self):
+        self.approval = False
 
     def set(self):
         return self.attributeassignment_set.all()
@@ -545,6 +603,7 @@ class AttributeAssignment(models.Model):
         self.aim.save()
         self.approval = True
         self.actual = True
+        self.event_initiator.aim = self.aim
         for query in self.aim.attributeassignment_set.filter(attr_name=self.attr_name, aim=self.aim):
             query.actual = False
             query.save()
@@ -729,7 +788,7 @@ class InventorySaveForm(forms.Form):
     material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
     size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
     mark_on_object = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Позначки на предметі', placeholder1='')
-    _class = forms.CharField(max_length=200, label='Класифікація', required=True)
+    classify = forms.CharField(max_length=200, label='Класифікація', required=True)
     typology = forms.CharField(max_length=200, label='Типологія', required=True)
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     bibliography = forms.CharField(max_length=200, label='Бібліографія', required=True)
@@ -859,7 +918,7 @@ class PassportForm(forms.Form):
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
     way_of_found = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження (закупка, замовлення, дарунок, передача)', required=True)
     link_on_doc = forms.CharField(max_length=200, label='Документи', required=True)
-    _class = forms.CharField(max_length=200, label='Класифікація', required=True)
+    classify = forms.CharField(max_length=200, label='Класифікація', required=True)
     typology = forms.CharField(max_length=200, label='Типологія', required=True)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
     size = Custom.MultiChoiceTextChoiceField(label='Розміри (см/мм)')
@@ -887,7 +946,7 @@ class PassportForm(forms.Form):
     existence_check = forms.CharField(max_length=100, label='Звіряння наявності (документ, дата)', required=True)
     bibliography = forms.CharField(max_length=200, label='Бібліографія', required=True)
     archive_materials = forms.CharField(max_length=200, label='Архівні матеріали', required=True)
-    person_in_charge = forms.ModelMultipleChoiceField(queryset=Custom.myUser.objects.all(), widget=SelectMultiple(), label='Відповідальні особи')
+    mat_person_in_charge = forms.ModelChoiceField(queryset=Custom.myUser.objects.all(), label='Відповідальна особа')
 
 
 class PreparePStoTSForm(forms.Form):
@@ -1066,16 +1125,6 @@ class WritingOffForm(forms.Form):
 class ObjectEditForm(ModelForm):
     class Meta:
         model = Object
-    #material = Custom.MultiMaterialField()
-    #size = Custom.MultiMaterialField(number=3)
-
-
-class ObjectCreateForm(ModelForm):
-    class Meta:
-        model = Object
-    #material = Custom.MultiMaterialField()
-    #size = Custom.MultiMaterialField(number=3)
-
 
 class AutForm(forms.Form):
     username = forms.CharField(max_length=20, label='Логiн:')

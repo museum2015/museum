@@ -136,7 +136,9 @@
 
     </type_document>
     <purpose>
-
+        <choice>посмотреть</choice>
+        <choice>потрогать</choice>
+        <choice>понюхать</choice>
     </purpose>
     <assay>
         <gold label="Золото">
