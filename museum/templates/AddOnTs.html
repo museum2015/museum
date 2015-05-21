@@ -109,7 +109,11 @@
                 {{ form.as_p }}
                 {% csrf_token %}
                 <button onclick="al()" class="btn btn-success btn-block">
-                <span class="glyphicon glyphicon-star"></span>  Submit
+                <span class="glyphicon glyphicon-star"></span>
+                    {% if label %}
+                    {{  label }}
+                    {% else %} Submit
+                    {% endif %}
                 </button>
             </form>
              <script type="text/javascript">
@@ -134,6 +138,7 @@
                         document.getElementById(size0).removeAttribute("style");
                         document.getElementById(size1).removeAttribute("style");
                         document.getElementById(size2).removeAttribute("style");
+                        $("<br/>").insertBefore("#"+size0);
                     }
                  }
 
@@ -147,6 +152,7 @@
                         document.getElementById(metal1).removeAttribute("style");
                         document.getElementById(metal2).removeAttribute("style");
                         document.getElementById(metal3).removeAttribute("style");
+                        $("<br/>").insertBefore("#"+metal0);
                     }
                  }
 
@@ -160,6 +166,7 @@
                         document.getElementById(stones1).removeAttribute("style");
                         document.getElementById(stones2).removeAttribute("style");
                         document.getElementById(stones3).removeAttribute("style");
+                        $("<br/>").insertBefore("#"+stones0);
                     }
                  }
             </script>

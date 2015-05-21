@@ -50,11 +50,12 @@ def TempSave(request, id_number=0):
             return render(request, 'AddOnTs.html', {'form': form})
     else:
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'date_creation': project.date_creation, 'place_of_creation': project.place_of_creation,
                 'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
                 'size': project.size, 'condition': project.condition, 'condition_descr': project.condition_descr, 'description': project.description,
-                'price': project.price}
+                'price': project.price, 'note': project.note}
         form = TempSaveForm(initial=data)
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Прийняти об’єкт на ТЗ'})
 
 @csrf_protect
 @login_required(login_url='/admin/')
@@ -87,15 +88,15 @@ def TempRet(request, id_number=0):
     else:
         reason = str(get_attrib_assigns('Приймання на тимчасове зберігання', project, 'reason'))
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                 'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
-                 'size': project.size, 'description': project.description, 'condition': project.condition,
-                 'condition_descr': project.condition_descr, 'date_creation': project.date_creation,
-                 'place_of_creation': project.place_of_creation, 'term_back': project.term_back,
-                 'reason': reason, 'side_1': project.side_1, 'side_2': project.side_2,
-                 'price': project.price, 'note': project.note, 'way_of_found': project.way_of_found,
-                 'transport_possibility': project.transport_possibility, 'collection': project.collection}
+                'date_creation': project.date_creation, 'place_of_creation': project.place_of_creation,
+                'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
+                'size': project.size, 'description': project.description, 'condition': project.condition,
+                'condition_descr': project.condition_descr, 'term_back': project.term_back,
+                'reason': reason, 'side_1': project.side_1, 'side_2': project.side_2,
+                'price': project.price, 'note': project.note
+                }
         form = TempRetForm(initial=data)
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Повернути об’єкт з ТЗ'})
 
 @permission_required('mainapp.only_personal_activity', login_url='/admin')
 def GetProject(request):
@@ -195,15 +196,15 @@ def AddOnPS(request, id_number):
     else:
         source = get_attrib_assigns('Приймання на тимчасове зберігання', project, 'source')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'date_creation': project.date_creation, 'place_of_creation': project.place_of_creation,
                 'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
-                'size': project.size, 'description': project.description, 'can_transport': project.transport_possibility,
+                'size': project.size, 'description': project.description,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
-                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
-                'place_of_creation': project.place_of_creation, 'source': source,
+                'source': source, 'note': project.note,
                 'price': project.price,  'way_of_found': project.way_of_found,
-                'transport_possibility': project.transport_possibility, 'fond': project.collection}
+                }
         form = PersistentSaveForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form, 'label': 'Прийняти об’єкт на ПЗ'})
 
 @login_required(login_url='/admin/')
 def PrepareRet(request):
@@ -216,7 +217,7 @@ def PrepareRet(request):
             return HttpResponseRedirect('/')
     else:
         form = PrepareRetForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Повернути об’єкт з ТЗ'})
 
 @login_required(login_url='/admin/')
 def PreparePS(request):
@@ -229,7 +230,7 @@ def PreparePS(request):
             return HttpResponseRedirect('/')
     else:
         form = PreparePSForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Прийняти об’єкт на ПЗ'})
 
 @login_required(login_url='/admin/')
 def ActivityPage(request, id_number):
@@ -305,7 +306,7 @@ def PrepareInventory(request):
             return HttpResponseRedirect('/')
     else:
         form = PrepareInventoryForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Взяти об’єкт на інвентарний облік'})
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -338,16 +339,17 @@ def AddOnInventorySave(request, id_number):
         old_registered_marks = get_attrib_assigns('Приймання на постійне зберігання', project, 'old_registered_marks')
         ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
-                'size': project.size, 'description': project.description,
+                'author': project.author, 'date_creation': project.date_creation,
+                'place_of_creation': project.place_of_creation, 'technique': project.technique,
+                'material': project.material.decode('unicode-escape').split(', '),
+                'size': project.size, 'description': project.description, 'transport_possibility': project.transport_possibility,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
-                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
-                'place_of_creation': project.place_of_creation, 'note': project.note, 'source': source,
+                'recomm_for_restauration': project.recomm_for_restauration, 'note': project.note, 'source': source,
                 'price': project.price,  'way_of_found': project.way_of_found, 'PS_code': ps_code,
                 'link_on_doc': project.link_on_doc, 'old_registered_marks': old_registered_marks,
-                'transport_possibility': project.transport_possibility, 'fond': project.collection}
+                'collection': project.collection}
         form = InventorySaveForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form, 'label': 'Взяти об’єкт на інвентарний облік'})
 
 @login_required(login_url='/admin/')
 def PrepareSpecInventory(request):
@@ -360,7 +362,7 @@ def PrepareSpecInventory(request):
             return HttpResponseRedirect('/')
     else:
         form = PrepareSpecInventoryForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Взяти об’єкт на спеціальний інвентарний облік'})
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -391,19 +393,19 @@ def AddOnSpecInventorySave(request, id_number):
     else:
 
         ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
-        inventory_number = get_attrib_assigns('Інвентарний облік' or 'Приймання на постійне зберігання', project, 'inventory_number')
-        mat_person_in_charge = get_attrib_assigns('Інвентарний облік', project, 'mat_person_in_charge')
+        inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
+        mat_person_in_charge = get_attrib_assigns('Інвентарний облік' or 'Приймання на постійне зберігання', project, 'mat_person_in_charge')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
-                'author': project.author, 'size': project.size, 'description': project.description,
+                'author': project.author, 'date_creation': project.date_creation,
+                'place_of_creation': project.place_of_creation,
+                'size': project.size, 'description': project.description,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
-                'recomm_for_restauration': project.recomm_for_restauration, 'date_creation': project.date_creation,
-                'place_of_creation': project.place_of_creation, 'note': project.note,
+                'recomm_for_restauration': project.recomm_for_restauration, 'note': project.note,
                 'price': project.price, 'PS_code': ps_code, 'inventory_number': inventory_number,
                 'link_on_doc': project.link_on_doc, 'mat_person_in_charge': mat_person_in_charge,
-                'storage':project.storage
-               }
+                'storage': project.storage}
         form = SpecInventorySaveForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form, 'label': 'Взяти об’єкт на спеціальний інвентарний облік'})
 
 @login_required(login_url='/admin/')
 def PreparePassport(request):
@@ -416,7 +418,7 @@ def PreparePassport(request):
             return HttpResponseRedirect('/')
     else:
         form = PreparePassportForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Створити науково-уніфікований паспорт об’єкта'})
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -449,23 +451,23 @@ def Passport(request, id_number):
         ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
         inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
         spec_inventory_numb = get_attrib_assigns('Спеціальний інвентарний облік', project, 'spec_inventory_numb')
-        #old_inventory_numbers = get_old_attributes(project, 'inventory_number')
-        date_place_creation = ', '.join([project.date_creation, project.place_of_creation])
-        date_place_detection = ', '.join([project.date_detection, project.place_detection])
-        date_place_existence = ', '.join([project.date_existence, project.place_existence])
+        old_inventory_numbers = get_attrib_assigns('Інвентарний облік' or 'Приймання на постійне зберігання',project, 'old_registered_marks')
+        date_place_creation = ' '.join([project.date_creation, project.place_of_creation])
+        date_place_detection = ' '.join([project.date_detection, project.place_detection])
+        date_place_existence = ' '.join([project.date_existence, project.place_existence])
         source = get_attrib_assigns('Приймання на постійне зберігання', project, 'source')
-        classification = get_attrib_assigns('Інвентарний облік', project, 'classification')
+        _class = get_attrib_assigns('Інвентарний облік', project, '_class')
         typology = get_attrib_assigns('Інвентарний облік', project, 'typology')
         metals = get_attrib_assigns('Спеціальний інвентарний облік', project, 'metals')
         stones = get_attrib_assigns('Спеціальний інвентарний облік', project, 'stones')
-        bibliography = get_attrib_assigns('Інвентарний облік', project, 'bibliography   ')
+        bibliography = get_attrib_assigns('Інвентарний облік', project, 'bibliography')
         data = {'collection': collection, 'PS_code': ps_code, 'inventory_number': inventory_number,
-                'spec_inventory_numb': spec_inventory_numb, #'old_inventory_numbers': old_inventory_numbers,
+                'spec_inventory_numb': spec_inventory_numb, 'old_inventory_numbers': old_inventory_numbers,
                 'identifier': project.identifier, 'storage': project.storage,
                 'name': project.name, 'author': project.author, 'date_place_creation': date_place_creation,
                 'date_place_detection': date_place_detection, 'date_place_existence': date_place_existence,
                 'source': source, 'way_of_found': project.way_of_found, 'link_on_doc': project.link_on_doc,
-                'classification': classification, 'typology': typology, 'amount': project.amount,
+                '_class': _class, 'typology': typology, 'amount': project.amount,
                 'size': project.size, 'material': project.material.decode('unicode-escape').split(', '), 'technique': project.technique,
                 'metals': metals, 'stones': stones, 'description': project.description,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
@@ -473,7 +475,7 @@ def Passport(request, id_number):
                 'transport_possibility': project.transport_possibility, 'price': project.price,
                 'bibliography': bibliography}
         form = PassportForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form, 'label': 'Створити науково-уніфікований паспорт об’єкта'})
 
 @login_required(login_url='/admin/')
 def PreparePSToTS(request):
@@ -486,7 +488,7 @@ def PreparePSToTS(request):
             return HttpResponseRedirect('/')
     else:
         form = PreparePStoTSForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ПЗ на ТЗ'})
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -516,14 +518,14 @@ def FromPSToTS(request, id_number):
         ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
         inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'date_creation': project.date_creation, 'place_of_creation': project.place_of_creation,
                 'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
                 'size': project.size, 'description': project.description, 'note': project.note,
                 'condition': project.condition, 'condition_descr': project.condition_descr,
-                'date_creation': project.date_creation, 'place_of_creation': project.place_of_creation,
                 'PS_code': ps_code, 'inventory_number': inventory_number,
                 }
         form = FromPStoTSForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ПЗ на ТЗ'})
 
 @login_required(login_url='/admin/')
 def PrepareTSToPS(request):
@@ -536,7 +538,7 @@ def PrepareTSToPS(request):
             return HttpResponseRedirect('/')
     else:
         form = PrepareTStoPSForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ТЗ на ПЗ'})
 
 
 @login_required(login_url='/admin/')
@@ -572,17 +574,17 @@ def FromTSToPS(request, id_number):
         side_2_person_in_charge = get_attrib_assigns('Видача предметів з Постійного зберігання на Тимчасове зберігання', project, 'side_2_person_in_charge')
         reason = get_attrib_assigns('Видача предметів з Постійного зберігання на Тимчасове зберігання', project, 'reason')
         data = {'name': project.name, 'is_fragment': project.is_fragment, 'amount': project.amount,
+                'date_creation': project.date_creation, 'place_of_creation': project.place_of_creation,
                 'author': project.author, 'technique': project.technique, 'material': project.material.decode('unicode-escape').split(', '),
                 'size': project.size, 'description': project.description, 'note': project.note,
                 'condition': project.condition, 'condition_descr': project.condition_descr, 'side_1': project.side_1,
                 'side_2': project.side_2, 'side_1_person_in_charge': side_1_person_in_charge,
-                'side_1_fond_saver': side_1_fond_saver, 'side_2_person_in_charge':side_2_person_in_charge,
-                'date_creation': project.date_creation, 'place_of_creation': project.place_of_creation,
+                'side_1_fond_saver': side_1_fond_saver, 'side_2_person_in_charge': side_2_person_in_charge,
                 'PS_code': ps_code, 'inventory_number': inventory_number, 'reason': reason,
                 'term_back': project.term_back, 'insurable_value': insurable_value,
                 }
         form = FromTStoPSForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ТЗ на ПЗ'})
 
 @login_required(login_url='/admin/')
 def PrepareSendOnPS(request):
@@ -595,7 +597,7 @@ def PrepareSendOnPS(request):
             return HttpResponseRedirect('/')
     else:
         form = PrepareSendOnPSForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Передати об’єкт на ПЗ'})
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -634,7 +636,7 @@ def SendOnPS(request, id_number):
                 'TS_code': ts_code,
                 }
         form = SendOnPSForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form, 'label': 'Передати об’єкт на ПЗ'})
 
 @login_required(login_url='/admin/')
 def PrepareWritingOff(request):
@@ -647,7 +649,7 @@ def PrepareWritingOff(request):
             return HttpResponseRedirect('/')
     else:
         form = PrepareWritingOffForm()
-        return render(request, 'AddOnTs.html', {'form': form})
+        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Списати об’єкт'})
 
 @login_required(login_url='/admin/')
 @csrf_protect
@@ -683,7 +685,7 @@ def WritingOff(request, id_number):
                 'spec_inventory_numb': spec_inventory_numb, 'TS_code': ts_code,
                 }
         form = WritingOffForm(initial=data)
-    return render(request, 'AddOnTs.html', {'form': form})
+    return render(request, 'AddOnTs.html', {'form': form, 'label': 'Списати об’єкт'})
 
 class MyPDFView(View):
     template = 'asshole.html'
