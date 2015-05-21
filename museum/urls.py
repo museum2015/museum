@@ -39,4 +39,5 @@ urlpatterns = patterns('',
     url(r'^staff/writing_off/$', views.PrepareWritingOff),
     url(r'^staff/writing_off/(?P<id_number>[0-9]+)/$', views.WritingOff),
     url(r'^pdf/(?P<id_number>[0-9]+)/', views.MyPDFView.as_view()),
+    url(r'^xml/$', views.EditXML),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

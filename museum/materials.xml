@@ -1,230 +1,886 @@
+<?xml version="1.0" ?>
 <data>
-    <languages>
-        <choice>Английский</choice>
-        <choice>Русский</choice>
-        <choice>Українська</choice>
-    </languages>
-    <type_name>
-        <choice>авторська</choice>
-        <choice>альтернативна</choice>
-        <choice>народна</choice>
-    </type_name>
-    <type_description>
-        <choice>загальний</choice>
-        <choice>історія побутування</choice>
-        <choice>обставини створення</choice>
-    </type_description>
-    <promitka>
-        <choice>офіційна</choice>
-        <choice>неофіційна примітка користувача</choice>
-    </promitka>
-    <type_class>
-        <choice>речові</choice>
-        <choice>письмові</choice>
-        <choice>образотворчі</choice>
-        <choice>фото</choice>
-    </type_class>
-    <type>
-        <choice>посуд</choice>
-            <посуд>
-                <choice>миска</choice>
-                    <миска>
-                        <choice>кружка</choice>
-                    </миска>
-            </посуд>
+  
+  
+    
+  
+  <languages label="мова">
+    
+    
+        
+    
+    <choice>Английский</choice>
+    
+    
+        
+    
+    <choice>Русский</choice>
+    
+    
+        
+    
+    <choice>Українська</choice>
+    
+    
+    
+  
+  </languages>
+  
+  
+    
+  
+  <type_name label="тип назви">
+    
+    
+        
+    
+    <choice>авторська</choice>
+    
+    
+        
+    
+    <choice>альтернативна</choice>
+    
+    
+        
+    
+    <choice>народна</choice>
+    
+    
+    
+  
+  </type_name>
+  
+  
+    
+  
+  <type_description label="тип опису">
+    
+    
+        
+    
+    <choice>загальний</choice>
+    
+    
+        
+    
+    <choice>історія побутування</choice>
+    
+    
+        
+    
+    <choice>обставини створення</choice>
+    
+    
+    
+  
+  </type_description>
+  
+  
+    
+  
+  <promitka label="тип помiтки">
+    
+    
+        
+    
+    <choice>офіційна</choice>
+    
+    
+        
+    
+    <choice>неофіційна примітка користувача</choice>
+    
+    
+    
+  
+  </promitka>
+  
+  
+    
+  
+  <type_class label="клас">
+    
+    
+        
+    
+    <choice>речові</choice>
+    
+    
+        
+    
+    <choice>письмові</choice>
+    
+    
+        
+    
+    <choice>образотворчі</choice>
+    
+    
+        
+    
+    <choice>фото</choice>
+    
+    
+    
+  
+  </type_class>
+  
+  
+    
+  
+  <materials label="Матерiали">
+    
+    
+        
+    
+    <precious label="Дорогоцінні">
+      
+      
+            
+      
+      <one label="Метал">
+        
+        
+                
+        
+        <choice>Золото</choice>
+        
+        
+                
+        
+        <choice>Срібло</choice>
+        
+        
+            
+        
+        <choice>test</choice>
+        
+      
+        <choice>besttest</choice>
+      </one>
+      
+      
+            
+      
+      <two label="Каміння">
+        
+        
+                
+        
+        <choice>Діамант</choice>
+        
+        
+                
+        
+        <choice>Сапфір</choice>
+        
+        
+            
+      
+      </two>
+      
+      
+        
+    
+    </precious>
+    
+    
+        
+    
+    <semi-precious label="Напівдорогоцінні">
+      
+      
+            
+      
+      <one label="Метал">
+        
+        
+                
+        
+        <choice>Золото</choice>
+        
+        
+                
+        
+        <choice>Срібло</choice>
+        
+        
+            
+      
+      </one>
+      
+      
+            
+      
+      <two label="Каміння">
+        
+        
+                
+        
+        <choice>Діамант</choice>
+        
+        
+                
+        
+        <choice>Сапфір</choice>
+        
+        
+            
+      
+      </two>
+      
+      
+        
+    
+    </semi-precious>
+    
+    
+        
+    
+    <non-precious label="Недорогоцінні">
+      
+      
+            
+      
+      <one label="Метал">
+        
+        
+                
+        
+        <choice>Золото</choice>
+        
+        
+                
+        
+        <choice>Срібло</choice>
+        
+        
+            
+      
+      </one>
+      
+      
+            
+      
+      <two label="Каміння">
+        
+        
+                
+        
+        <choice>Діамант</choice>
+        
+        
+                
+        
+        <choice>Сапфір</choice>
+        
+        
+            
+      
+      </two>
+      
+      
+        
+    
+    </non-precious>
+    
+    
+    
+  
+  </materials>
+  
+  
+    
+  
+  <equipment label="технiка">
+    
+    
+        
+    
+    <choice>гаптування</choice>
+    
+    
+        
+    
+    <choice>ліплення</choice>
+    
+    
+        
+    
+    <choice>гончарне коло</choice>
+    
+    
+        
+    
+    <choice>ангоб</choice>
+    
+    
+    
+  
+  </equipment>
+  
+  
+    
+  
+  <type_image label="тип зображення">
+    
+    
+        
+    
+    <choice>основне зображення</choice>
+    
+    
+        
+    
+    <choice>аверс</choice>
+    
+    
+        
+    
+    <choice>реверс</choice>
+    
+    
+    
+  
+  </type_image>
+  
+  
+    
+  
+  <type_price label="тип вартості">
+    
+    
+        
+    
+    <choice>страхова</choice>
+    
+    
+        
+    
+    <choice>оціночна</choice>
+    
+    
+        
+    
+    <choice>закупівлі</choice>
+    
+    
+    
+  
+  </type_price>
+  
+  
+    
+  
+  <status label="стан збереження">
+    
+    
+        
+    
+    <choice>без пошкоджень</choice>
+    
+    
+        
+    
+    <choice>задовільний</choice>
+    
+    
+        
+    
+    <choice>незадовільний</choice>
+    
+    
+    
+  
+  </status>
+  
+  
+    
+  
+  <recommendation label="Рекомендації щодо реставрації">
+    
+    
+        
+    
+    <choice>термінова реставрація</choice>
+    
+    
+        
+    
+    <choice>консервація</choice>
+    
+    
+    
+  
+  </recommendation>
+  
+  
+    
+  
+  <role label="Роль особи">
+    
+    
+        
+    
+    <choice>автор/виробник</choice>
+    
+    
+        
+    
+    <choice>власник</choice>
+    
+    
+    
+  
+  </role>
+  
+  
+    
+  
+  <way_the_getting label="спосіб надходження">
+    
+    
+        
+    
+    <choice>закупка</choice>
+    
+    
+        
+    
+    <choice>дарунок</choice>
+    
+    
+    
+  
+  </way_the_getting>
+  
+  
+    
+  
+  <purpose label="нужно поправить">
+    
+    
+        
+    
+    <choice>посмотреть</choice>
+    
+    
+        
+    
+    <choice>потрогать</choice>
+    
+    
+        
+    
+    <choice>понюхать</choice>
+    
+    
+    
+  
+  </purpose>
+  
+  
+    
+  
+  <assay label="проба">
+    
+    
+        
+    
+    <gold label="Золото">
+      
+      
+            
+      
+      <choice>999</choice>
+      
+      
+            
+      
+      <choice>958</choice>
+      
+      
+            
+      
+      <choice>750</choice>
+      
+      
+            
+      
+      <choice>585</choice>
+      
+      
+            
+      
+      <choice>500</choice>
+      
+      
+            
+      
+      <choice>375</choice>
+      
+      
+        
+    
+    </gold>
+    
+    
+        
+    
+    <silver label="Срібло">
+      
+      
+            
+      
+      <choice>960</choice>
+      
+      
+            
+      
+      <choice>925</choice>
+      
+      
+            
+      
+      <choice>875</choice>
+      
+      
+            
+      
+      <choice>830</choice>
+      
+      
+            
+      
+      <choice>800</choice>
+      
+      
+        
+    
+    </silver>
+    
+    
+        
+    
+    <platinum label="Платина">
+      
+      
+            
+      
+      <choice>950</choice>
+      
+      
+            
+      
+      <choice>900</choice>
+      
+      
+        
+    
+    </platinum>
+    
+    
+        
+    
+    <palladium label="Палладій">
+      
+      
+            
+      
+      <choice>850</choice>
+      
+      
+            
+      
+      <choice>500</choice>
+      
+      
+        
+    
+    </palladium>
+    
+    
+    
+  
+  </assay>
+  
+  
+    
+  
+  <dimension label="вимiрювання">
+    
+    
+        
+    
+    <type label="вид вимiрювання">
+      
+      
+            
+      
+      <choice>Валюта</choice>
+      
+      
+            
+      
+      <choice>Довжина</choice>
+      
+      
+            
+      
+      <choice>Діаметр</choice>
+      
+      
+            
+      
+      <choice>Вага</choice>
+      
+      
+            
+      
+      <choice>Щільність</choice>
+      
+      
+            
+      
+      <choice>Освітленість</choice>
+      
+      
+            
+      
+      <choice>Вміст речовини</choice>
+      
+      
+            
+      
+      <choice>Висота</choice>
+      
+      
+            
+      
+      <choice>Ширина</choice>
+      
+      
+            
+      
+      <choice>Інші дані ...</choice>
+      
+      
+        
+    
     </type>
-    <materials>
-        <precious label="Дорогоцінні">
-            <one label="Метал">
-                <choice>Золото</choice>
-                <choice>Срібло</choice>
-            </one>
-            <two label="Каміння">
-                <choice>Діамант</choice>
-                <choice>Сапфір</choice>
-            </two>
-        </precious>
-        <semi-precious label="Напівдорогоцінні">
-            <one label="Метал">
-                <choice>Золото</choice>
-                <choice>Срібло</choice>
-            </one>
-            <two label="Каміння">
-                <choice>Діамант</choice>
-                <choice>Сапфір</choice>
-            </two>
-        </semi-precious>
-        <non-precious label="Недорогоцінні">
-            <one label="Метал">
-                <choice>Золото</choice>
-                <choice>Срібло</choice>
-            </one>
-            <two label="Каміння">
-                <choice>Діамант</choice>
-                <choice>Сапфір</choice>
-            </two>
-        </non-precious>
-    </materials>
-    <equipment>
-        <choice>гаптування</choice>
-        <choice>ліплення</choice>
-        <choice>гончарне коло</choice>
-        <choice>ангоб</choice>
-    </equipment>
-    <fund>
-        <choice>група зберігання</choice>
-            <група_зберігання>
-                <choice>кераміка</choice>
-                <choice>графіка</choice>
-                <choice>фото та негативи</choice>
-            </група_зберігання>
-        <choice>фонд</choice>
-            <фонд>
-                <choice>фонд Б.М. Лятошинського</choice>
-            </фонд>
-        <choice>колекція</choice>
-            <колекція>
-                <choice>«Княжа гора», археологічні дослідження, 1956–1961</choice>
-            </колекція>
-    </fund>
-    <type_number>
-        <choice>первинний облік</choice>
-            <первинний_облік>
-                <choice>книга надходжень основного фонду</choice>
-                    <книга_надходжень_основного_фонду>
-                        <choice>том книги</choice>
-                    </книга_надходжень_основного_фонду>
-            </первинний_облік>
-    </type_number>
-    <type_image>
-        <choice>основне зображення</choice>
-        <choice>аверс</choice>
-        <choice>реверс</choice>
-    </type_image>
-    <type_price>
-        <choice>страхова</choice>
-        <choice>оціночна</choice>
-        <choice>закупівлі</choice>
-    </type_price>
-    <status>
-        <choice>без пошкоджень</choice>
-        <choice>задовільний</choice>
-        <choice>незадовільний</choice>
-    </status>
-    <recommendation>
-        <choice>термінова реставрація</choice>
-        <choice>консервація</choice>
-    </recommendation>
-    <role>
-        <choice>автор/виробник</choice>
-        <choice>власник</choice>
-    </role>
-    <topography>
-        <choice>фондосховище 1</choice>
-            <фондосховище_1>
-                <choice>шафа 1</choice>
-                    <шафа_1>
-                        <choice> полиця 3</choice>
-                    </шафа_1>
-            </фондосховище_1>
-    </topography>
-    <way_the_getting>
-        <choice>закупка</choice>
-        <choice>дарунок</choice>
-    </way_the_getting>
-    <type_document>
-
-    </type_document>
-    <purpose>
-        <choice>посмотреть</choice>
-        <choice>потрогать</choice>
-        <choice>понюхать</choice>
-    </purpose>
-    <assay>
-        <gold label="Золото">
-            <choice>999</choice>
-            <choice>958</choice>
-            <choice>750</choice>
-            <choice>585</choice>
-            <choice>500</choice>
-            <choice>375</choice>
-        </gold>
-        <silver label="Срібло">
-            <choice>960</choice>
-            <choice>925</choice>
-            <choice>875</choice>
-            <choice>830</choice>
-            <choice>800</choice>
-        </silver>
-        <platinum label="Платина">
-            <choice>950</choice>
-            <choice>900</choice>
-        </platinum>
-        <palladium label="Палладій">
-            <choice>850</choice>
-            <choice>500</choice>
-        </palladium>
-    </assay>
-    <dimension>
-        <type>
-            <choice>Валюта</choice>
-            <choice>Довжина</choice>
-            <choice>Діаметр</choice>
-            <choice>Вага</choice>
-            <choice>Щільність</choice>
-            <choice>Освітленість</choice>
-            <choice>Вміст речовини</choice>
-            <choice>Висота</choice>
-            <choice>Ширина</choice>
-            <choice>Інші дані ...</choice>
-        </type>
-        <measurement_unit>
-            <weight label="Вага">
-                <choice>фунтів</choice>
-                <choice>г</choice>
-                <choice>кг</choice>
-                <choice>карат</choice>
-            </weight>
-            <length label="Довжина">
-                <choice>Фунт</choice>
-                <choice>см</choice>
-                <choice>мм</choice>
-                <choice>м</choice>
-                <choice>дм</choice>
-                <choice>км</choice>
-                <choice>миля</choice>
-            </length>
-            <density label="Щільність">
-                <choice>г/см^2</choice>
-            </density>
-            <illumination label="Освітленість">
-                <choice>люменів ISO</choice>
-            </illumination>
-            <percentage label="Вміст">
-                <choice>%</choice>
-            </percentage>
-            <others label="Інші">
-                <choice>років</choice>
-            </others>
-        </measurement_unit>
-    </dimension>
-    <department>
-        <choice>Держбуд України</choice>
-    </department>
-    <section>
-        <choice>Науково -фондовий</choice>
-    </section>
-    <issue>
-        <choice>Образотворчого і декоративно-прикладного мистецтва</choice>
-    </issue>
-    <museum>
-        <choice>краєзнавчий музей</choice>
-    </museum>
-    <weight>
+    
+    
+        
+    
+    <measurement_unit label="одиницi вимырювання">
+      
+      
+            
+      
+      <weight label="Вага">
+        
+        
+                
+        
         <choice>фунтів</choice>
+        
+        
+                
+        
         <choice>г</choice>
+        
+        
+                
+        
         <choice>кг</choice>
+        
+        
+                
+        
         <choice>карат</choice>
-    </weight>
+        
+        
+            
+      
+      </weight>
+      
+      
+            
+      
+      <length label="Довжина">
+        
+        
+                
+        
+        <choice>Фунт</choice>
+        
+        
+                
+        
+        <choice>см</choice>
+        
+        
+                
+        
+        <choice>мм</choice>
+        
+        
+                
+        
+        <choice>м</choice>
+        
+        
+                
+        
+        <choice>дм</choice>
+        
+        
+                
+        
+        <choice>км</choice>
+        
+        
+                
+        
+        <choice>миля</choice>
+        
+        
+            
+      
+      </length>
+      
+      
+            
+      
+      <density label="Щільність">
+        
+        
+                
+        
+        <choice>г/см^2</choice>
+        
+        
+            
+      
+      </density>
+      
+      
+            
+      
+      <illumination label="Освітленість">
+        
+        
+                
+        
+        <choice>люменів ISO</choice>
+        
+        
+            
+      
+      </illumination>
+      
+      
+            
+      
+      <percentage label="Вміст">
+        
+        
+                
+        
+        <choice>%</choice>
+        
+        
+            
+      
+      </percentage>
+      
+      
+            
+      
+      <others label="Інші">
+        
+        
+                
+        
+        <choice>років</choice>
+        
+        
+            
+      
+      </others>
+      
+      
+        
+    
+    </measurement_unit>
+    
+    
+    
+  
+  </dimension>
+  
+  
+    
+  
+  <department label="департмаент">
+    
+    
+        
+    
+    <choice>Держбуд України</choice>
+    
+    
+    
+  
+  </department>
+  
+  
+    
+  
+  <section label="фонд збереження">
+    
+    
+        
+    
+    <choice>Науково -фондовий</choice>
+    
+    
+    
+  
+  </section>
+  
+  
+    
+  
+  <issue label="музей сбереження">
+    
+    
+        
+    
+    <choice>Образотворчого і декоративно-прикладного мистецтва</choice>
+    
+    
+    
+  
+  </issue>
+  
+  
+    
+  
+  <museum label="тип музею">
+    
+    
+        
+    
+    <choice>краєзнавчий музей</choice>
+    
+    
+    
+  
+  </museum>
+  
+  
+
 
 </data>

@@ -11,10 +11,16 @@ from django.utils.html import mark_safe, escape, format_html
 from django.core.exceptions import ValidationError
 from django.views.generic.edit import DeleteView
 import lxml.etree as et
+from xml.dom import minidom
+from xml.etree import ElementTree
 from bootstrap3_datetime.widgets import DateTimePicker
 # Create your models here. test
 
 ROOT = et.parse('museum/materials.xml').getroot()
+def show(elem):
+    rough_string = ElementTree.tostring(elem, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent="  ")
 
 
 def validate_all_choices(value):
@@ -1130,8 +1136,25 @@ class WritingOffForm(forms.Form):
 class ObjectEditForm(ModelForm):
     class Meta:
         model = Object
+        fields = '__all__'
 
 class AutForm(forms.Form):
     username = forms.CharField(max_length=20, label='Логiн:')
     password = forms.CharField(widget=forms.PasswordInput, max_length=30, label='Пароль:')
 
+def get_xml(root, prefix, value, level=0):
+    choice = ()
+    for s in root:
+        if s.getchildren():
+            choice += get_xml(s, prefix+s.attrib['label']+', ', value+s.tag+',', level+1)
+        else:
+            choice = ((value[:-1], prefix[:-2]),)
+            break
+    if not level:
+        return (('', ''),) + choice
+    else:
+        return choice
+
+class XMLForm(forms.Form):
+    choicefield = forms.CharField(label='Куда добавить', required=True, widget=Select(choices=get_xml(ROOT, '', '', 0)))
+    charfield = forms.CharField(label='Че добавить', required=True)

@@ -5,7 +5,7 @@ from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, 
     PersistentSaveForm, ObjectEditForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
     InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
     PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm, get_choice, PreparePassportForm,\
-    PassportForm
+    PassportForm, XMLForm
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.utils.html import escape
@@ -14,6 +14,9 @@ from django.contrib import auth
 from django.views.generic.base import View
 from wkhtmltopdf.views import PDFTemplateResponse
 from django.views.generic.edit import DeleteView
+import lxml.etree as et
+from xml.dom import minidom
+from xml.etree import ElementTree
 
 
 # Create your views here.
@@ -723,3 +726,29 @@ class MyPDFView(View):
                                        context=context,
                                        )
         return response
+
+def show(elem):
+    rough_string = ElementTree.tostring(elem, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent="  ")
+
+def EditXML(request):
+    ROOT = et.parse('museum/materials.xml').getroot()
+    if request.method == 'POST':
+        form = XMLForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            root = ROOT
+            for a in data['choicefield'].split(','):
+                root = root.find(a)
+            temp = et.SubElement(root, 'choice')
+            temp.text = str(data['charfield'])
+            f = open('museum/materials.xml', 'w')
+            f.write(show(ROOT).encode('utf-8', 'ignore'))
+            f.close()
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'AddOnTs.html', {'form': form})
+    else:
+        form = XMLForm()
+    return render(request, "AddOnTs.html", {'form': form})
