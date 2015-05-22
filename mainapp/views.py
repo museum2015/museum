@@ -7,7 +7,7 @@ from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, 
     WritingOffForm, SendOnPSForm,\
     PassportForm, XMLForm, recalc, ROOT
 from django.views.decorators.csrf import csrf_protect
-from datetime import datetime as dtW
+from datetime import datetime as dt
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import auth
 from django.views.generic.base import View
@@ -18,7 +18,7 @@ import lxml.etree as et
 
 # Create your views here.
 @csrf_protect
-@login_required(login_url='/admin/')
+@login_required
 def TempSave(request, id_number=0):
     try:
         project = Object.objects.get(id=int(id_number))
@@ -54,7 +54,7 @@ def TempSave(request, id_number=0):
         return render(request, 'AddOnTs.html', {'form': form, 'label': 'Прийняти об’єкт на ТЗ'})
 
 @csrf_protect
-@login_required(login_url='/admin/')
+@login_required
 def TempRet(request, id_number=0):
     try:
         project = Object.objects.get(id=int(id_number))
@@ -101,7 +101,7 @@ def GetProject(request):
         act_list = Activity.objects.all().order_by('time_stamp').reverse()
     return render(request, 'projects.html', {'acts': act_list})
 
-@login_required(login_url='/admin/')
+@login_required
 def ApproveProject(request, offset):
     if Activity.objects.get(id=int(offset)).approval == False:
         return HttpResponse('Вже відхилено раніше<br><a href="/activities">Назад</a>')
@@ -111,7 +111,7 @@ def ApproveProject(request, offset):
         Activity.objects.get(id=int(offset)).approve()
         return HttpResponse('Успішно затверджено<br><a href="/activities">Назад</a>')
 
-@login_required(login_url='/admin/')
+@login_required
 def RejectProject(request, offset):
     if Activity.objects.get(id=int(offset)).approval == False:
         return HttpResponse('Вже відхилено раніше<br><a href="/activities">Назад</a>')
@@ -172,7 +172,7 @@ def get_old_attributes(project, attribute):
         old_attributes.join(',').join(str(i))
     return old_attributes
 
-@login_required(login_url='/admin/')
+@login_required
 @csrf_protect
 def AddOnPS(request, id_number):
     try:
@@ -211,33 +211,7 @@ def AddOnPS(request, id_number):
         form = PersistentSaveForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Прийняти об’єкт на ПЗ'})
 
-@login_required(login_url='/admin/')
-def PrepareRet(request):
-    if request.method == 'POST':
-        form = PrepareRetForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            return HttpResponseRedirect('/staff/return/' + cd['obj'])
-        else:
-            return HttpResponseRedirect('/')
-    else:
-        form = PrepareRetForm()
-        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Повернути об’єкт з ТЗ'})
-
-@login_required(login_url='/admin/')
-def PreparePS(request):
-    if request.method == 'POST':
-        form = PreparePSForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            return HttpResponseRedirect(cd['obj'])
-        else:
-            return HttpResponseRedirect('/')
-    else:
-        form = PreparePSForm()
-        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Прийняти об’єкт на ПЗ'})
-
-@login_required(login_url='/admin/')
+@login_required 
 def ActivityPage(request, id_number):
     if Activity.objects.filter(id=int(id_number)).exists():
         act = Activity.objects.get(id=int(id_number))
@@ -296,20 +270,7 @@ class ObjectDelete(DeleteView):
     template_name_suffix = '_delete_form'
 
 
-@login_required(login_url='/admin/')
-def PrepareInventory(request):
-    if request.method == 'POST':
-        form = PrepareInventoryForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            return HttpResponseRedirect(cd['obj'])
-        else:
-            return HttpResponseRedirect('/')
-    else:
-        form = PrepareInventoryForm()
-        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Взяти об’єкт на інвентарний облік'})
-
-@login_required(login_url='/admin/')
+@login_required 
 @csrf_protect
 def AddOnInventorySave(request, id_number):
     try:
@@ -352,20 +313,8 @@ def AddOnInventorySave(request, id_number):
         form = InventorySaveForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Взяти об’єкт на інвентарний облік'})
 
-@login_required(login_url='/admin/')
-def PrepareSpecInventory(request):
-    if request.method == 'POST':
-        form = PrepareSpecInventoryForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            return HttpResponseRedirect(cd['obj'])
-        else:
-            return HttpResponseRedirect('/')
-    else:
-        form = PrepareSpecInventoryForm()
-        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Взяти об’єкт на спеціальний інвентарний облік'})
 
-@login_required(login_url='/admin/')
+@login_required 
 @csrf_protect
 def AddOnSpecInventorySave(request, id_number):
     try:
@@ -408,18 +357,6 @@ def AddOnSpecInventorySave(request, id_number):
         form = SpecInventorySaveForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Взяти об’єкт на спеціальний інвентарний облік'})
 
-@login_required
-def PreparePassport(request):
-    if request.method == 'POST':
-        form = PreparePassportForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            return HttpResponseRedirect(cd['obj'])
-        else:
-            return HttpResponseRedirect('/')
-    else:
-        form = PreparePassportForm()
-        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Створити науково-уніфікований паспорт об’єкта'})
 
 @login_required
 @csrf_protect
@@ -478,18 +415,6 @@ def Passport(request, id_number):
         form = PassportForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Створити науково-уніфікований паспорт об’єкта'})
 
-@login_required
-def PreparePSToTS(request):
-    if request.method == 'POST':
-        form = PreparePStoTSForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            return HttpResponseRedirect(cd['obj'])
-        else:
-            return HttpResponseRedirect('/')
-    else:
-        form = PreparePStoTSForm()
-        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ПЗ на ТЗ'})
 
 @login_required
 @csrf_protect
@@ -527,19 +452,6 @@ def FromPSToTS(request, id_number):
                 }
         form = FromPStoTSForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ПЗ на ТЗ'})
-
-@login_required
-def PrepareTSToPS(request):
-    if request.method == 'POST':
-        form = PrepareTStoPSForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            return HttpResponseRedirect(cd['obj'])
-        else:
-            return HttpResponseRedirect('/')
-    else:
-        form = PrepareTStoPSForm()
-        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ТЗ на ПЗ'})
 
 
 @login_required
@@ -587,18 +499,6 @@ def FromTSToPS(request, id_number):
         form = FromTStoPSForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ТЗ на ПЗ'})
 
-@login_required
-def PrepareSendOnPS(request):
-    if request.method == 'POST':
-        form = PrepareSendOnPSForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            return HttpResponseRedirect(cd['obj'])
-        else:
-            return HttpResponseRedirect('/')
-    else:
-        form = PrepareSendOnPSForm()
-        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Передати об’єкт на ПЗ'})
 
 @login_required
 @csrf_protect
@@ -639,18 +539,6 @@ def SendOnPS(request, id_number):
         form = SendOnPSForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Передати об’єкт на ПЗ'})
 
-@login_required
-def PrepareWritingOff(request):
-    if request.method == 'POST':
-        form = PrepareWritingOffForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            return HttpResponseRedirect(cd['obj'])
-        else:
-            return HttpResponseRedirect('/')
-    else:
-        form = PrepareWritingOffForm()
-        return render(request, 'AddOnTs.html', {'form': form, 'label': 'Списати об’єкт'})
 
 @login_required
 @csrf_protect

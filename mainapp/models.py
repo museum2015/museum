@@ -63,11 +63,6 @@ def recalc():
     MEAS_CHOICES = get_choice(ROOT, 0,'dimension', 'measurement_unit')
 
 
-def updatechoices():
-    WEIGHT_CHOICES = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
-    MATERIAL_CHOICES = get_choice(ROOT, 0, 'materials')
-    LANGUAGE_CHOICES = get_choice(ROOT, 0, 'languages')
-
 TECHNIQUE_CHOICES = (('', ''), ('Техніка 1', 'Техніка 1'),)
 WAY_OF_FOUND_CHOICES = (('', ''), ('Розкопки', 'Розкопки'),)
 AIMS = get_choice(ROOT, 0, 'purpose')
