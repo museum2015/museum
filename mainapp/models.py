@@ -63,11 +63,6 @@ def recalc():
     MEAS_CHOICES = get_choice(ROOT, 0,'dimension', 'measurement_unit')
 
 
-def updatechoices():
-    WEIGHT_CHOICES = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
-    MATERIAL_CHOICES = get_choice(ROOT, 0, 'materials')
-    LANGUAGE_CHOICES = get_choice(ROOT, 0, 'languages')
-
 TECHNIQUE_CHOICES = (('', ''), ('Техніка 1', 'Техніка 1'),)
 WAY_OF_FOUND_CHOICES = (('', ''), ('Розкопки', 'Розкопки'),)
 AIMS = get_choice(ROOT, 0, 'purpose')
@@ -575,6 +570,9 @@ class Activity(models.Model):
             self.aim.stat = format_html('Cписаний (<a href="/activity/{0}">подія</a>)', self.pk)
         if self.type == 'Повернення з тимчасового зберiгання'.decode('utf-8'):
             self.aim.stat = format_html('Повернений з тимчасового зберiгання (<a href="/activity/{0}">подія</a>)', self.pk)
+        if self.type == 'Науково-уніфікований паспорт'.decode('utf-8') or self.type == 'Інвентарний облік'.decode('utf-8'):
+            if self.aim.empty:
+                self.aim.stat = 'Щойно заповнений'
         self.save()
         self.aim.save()
 

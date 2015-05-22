@@ -143,7 +143,7 @@
     <div class="actions">
         <figure class="img izo tri">
             <figure>
-                {% if request.user.is_staff %}
+                {% if user.is_staff %}
                 <i onclick='del()' title='Видалити' class='disabled button7 fa fa-close fa-3x'></i>
                 {% endif %}
                 <i onclick='print()' title='Роздрукувати паспорт' class='disabled button15 fa fa-print fa-3x'></i>
@@ -318,6 +318,9 @@
         var passport = function() {
             if (!($(".button12").hasClass('disabled'))) {
                 var t = $(".highlight td:first-child").text();
+                if (!t) {
+                    t = 0;
+                }
                 var link = "/staff/passport/" + t;
                 window.location.href = link;
             }
