@@ -213,7 +213,7 @@ class Custom:
 
         def compress(self, values):
             if values:
-                return values[0] + ':' + values[1] + ':' + values[2]
+                return values[0] + ' : ' + values[1] + ' ' + values[2]
             else:
                 return ''
 
@@ -230,8 +230,11 @@ class Custom:
 
         def decompress(self, value):
             if value:
-                res = value.split(':')
-                return res
+                a = value.split(' : ')[0]
+                b = value.split(' : ')[1]
+                c = b.split(' ')[1]
+                b = b.split(' ')[0]
+                return [a, b, c]
             else:
                 return [None, None, None]
 
@@ -625,7 +628,7 @@ class TempSaveForm(forms.Form):
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
     material = forms.CharField(label = 'Матеріали', required=False, widget=SelectMultiple(choices=MATERIAL_CHOICES))
-    size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
@@ -671,7 +674,7 @@ class TempRetForm(forms.Form):
     author = forms.CharField(label='Автор', required=True) #
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     material = forms.CharField(label='Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
-    size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
@@ -733,7 +736,7 @@ class PersistentSaveForm(forms.Form):
     author = forms.CharField(max_length=200, label='Автор', required=True) #
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
-    size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     transport_possibility = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
@@ -791,7 +794,7 @@ class InventorySaveForm(forms.Form):
     place_existence = forms.CharField(max_length=200, label='Місце побутування', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
-    size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
     mark_on_object = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Позначки на предметі', placeholder1='')
     classify = forms.CharField(max_length=200, label='Класифікація', required=True)
     typology = forms.CharField(max_length=200, label='Типологія', required=True)
@@ -860,7 +863,7 @@ class SpecInventorySaveForm(forms.Form):
     #amount_prec_stone0 = forms.CharField(label='Кількість дорогоцінного каміння')
     #weight_prec_stone = Custom.TextChoiceField(choices=WEIGHT_CHOICES,
     #                                           label='Маса дорогоцінного металу в чистоті', placeholder1='')
-    size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
     description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
@@ -926,7 +929,7 @@ class PassportForm(forms.Form):
     classify = forms.CharField(max_length=200, label='Класифікація', required=True)
     typology = forms.CharField(max_length=200, label='Типологія', required=True)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
-    size = Custom.MultiChoiceTextChoiceField(label='Розміри (см/мм)', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Виміри (см/мм)', required=True)
     material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     metals = Custom.MultiChoiceChoiceTextChoiceField(label='Дорогоцінні метали')
@@ -981,7 +984,7 @@ class FromPStoTSForm(forms.Form):
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
-    size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
@@ -1030,7 +1033,7 @@ class FromTStoPSForm(forms.Form):
     author = forms.CharField(max_length=200, label='Автор', required=True)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
-    size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
@@ -1077,7 +1080,7 @@ class SendOnPSForm(forms.Form):
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
-    size = Custom.MultiChoiceTextChoiceField(label='Розміри', required=True)
+    size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
@@ -1151,4 +1154,4 @@ def get_xml(root, prefix, value, level=0):
 
 class XMLForm(forms.Form):
     choicefield = forms.CharField(label='Куда добавить', required=True, widget=Select(choices=get_xml(ROOT, '', '', 0)))
-    charfield = forms.CharField(label='Че добавить', required=True)
+    charfield = forms.CharField(label='Что добавить', required=True)

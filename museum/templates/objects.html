@@ -93,7 +93,7 @@
         {% for a in objects %}
         {% if not a.empty %}
         <tr class='{% if a.scio %} scio {% endif %} {% if a.passport %} passport {% endif %} {% if a.io %} io {% endif %} {% if a.ts %} ts {% endif %} {% if a.ps %} ps {% endif %} {% if a.wo %} wo {% endif %} {% if a.ret %} ret {% endif %}'>
-            <td>{{ a.id }}</td><td>{{ a }}</td><td>{{ a.stat }}</td>
+            <td align="center">{{ a.id }}</td><td align="center">{{ a }}</td><td align="center">{{ a.stat }}</td>
         </tr>
         {% endif %}
         {% endfor %}
@@ -143,7 +143,7 @@
     <div class="actions">
      <figure class="img izo tri">
             <figure>
-                {% if remove %}
+                {% if request.user.is_staff %}
                     <i onclick='del()' title='Видалити' class='disabled button7 fa fa-close fa-3x'></i>
                 {% endif %}
             </figure>
