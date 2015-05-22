@@ -23,6 +23,9 @@
             right: 2%;
             top: 25%;
         }
+        .disabled {
+            color: gray;
+        }
 
     </style>
 </head>
@@ -42,15 +45,15 @@
         </thead>
         <tbody>
             {% for a in acts %}
-            <tr id="{{ a.id }}"><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"Y/m/d H:i:s" }}</td><td>{{ a.actor }}</td><td>{% if a.approval %} Так {% elif a.approval == False %} Ні {% else %} Очікується {% endif %}</td></tr>
+            <tr class="{% if a.approval %} t {% elif a.approval == False %} f {% else %} u {% endif %}" id="{{ a.id }}"><td>{{ a.id }}</td><td>{{ a.aim }}</td><td><a href="/activity/{{ a.id }}">{{ a.type }}</a></td><td>{{ a.time_stamp | date:"Y/m/d H:i:s" }}</td><td>{{ a.actor }}</td><td>{% if a.approval %} Так {% elif a.approval == False %} Ні {% else %} Очікується {% endif %}</td></tr>
             {% endfor %}
         </tbody>
     </table>
     </div>
 </div>
 <div class="menu">
-    <i onclick='approve()' title='Затвердити' class='button0 fa fa-check fa-4x'></i>
-    <i onclick='reject()' title='Відхилити' class='button1 fa fa-close fa-4x'></i>
+    <i onclick='approve()' title='Затвердити' class='disabled button0 fa fa-check fa-4x'></i>
+    <i onclick='reject()' title='Відхилити' class='disabled button1 fa fa-close fa-4x'></i>
 </div>
 <script type="text/javascript">
         {% for a in acts %}
@@ -69,10 +72,14 @@
 
             /* Get current row */
             var row = $(this);
-
+            $(".button0").addClass('disabled');
+            $(".button1").addClass('disabled');
+            if (row.hasClass('u')) {
+                $(".button0").removeClass('disabled');
+                $(".button1").removeClass('disabled');
+            }
             rows.removeClass('highlight');
             row.addClass('highlight');
-
         });
 
         var approve = function() {

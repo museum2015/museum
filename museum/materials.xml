@@ -131,8 +131,8 @@
             <choice>Вміст речовини</choice>
             <choice>Висота</choice>
             <choice>Ширина</choice>
-            <choice>Інші дані ...</choice>
-        </type>
+            <choice>Твердість</choice>
+        <choice>Qj</choice><choice>ppp</choice></type>
         <measurement_unit label="одиницi вимырювання">
             <weight label="Вага">
                 <choice>фунтів</choice>

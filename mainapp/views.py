@@ -5,7 +5,7 @@ from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, 
     PersistentSaveForm, ObjectEditForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
     InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
     PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm, get_choice, PreparePassportForm,\
-    PassportForm, XMLForm, updatechoices
+    PassportForm, XMLForm, ROOT, recalc
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.utils.html import escape
@@ -248,7 +248,9 @@ def ActivityPage(request, id_number):
         return HttpResponse('Подія не існує.<br>Спробуйте інший id.')
 
     attrs = act.attributeassignment_set.all()
-
+    for k in attrs:
+        if k.attr_name == 'material':
+            k.attr_value = k.attr_value.decode('unicode-escape')
     return render(request, 'attribute_assign.html', {'attrs': attrs,
                                                      'act': act})
 
@@ -275,7 +277,7 @@ def aut(request):
                 user = auth.authenticate(username=username, password=password)
                 if user is not None and user.is_active:
                     auth.login(request, user)
-                    return HttpResponseRedirect("")
+                return HttpResponseRedirect("")
             else:
                 return render(request, 'index.html', {'form': form})
         else:
@@ -726,7 +728,7 @@ class MyPDFView(View):
         return response
 
 def EditXML(request):
-    ROOT = et.parse('museum/materials.xml').getroot()
+    global ROOT
     if request.method == 'POST':
         form = XMLForm(request.POST)
         if form.is_valid():
@@ -735,12 +737,12 @@ def EditXML(request):
             for a in data['choicefield'].split(','):
                 root = root.find(a)
             temp = et.SubElement(root, 'choice')
-            temp.text = str(data['charfield'])
+            temp.text = unicode(data['charfield'])
             f = open('museum/materials.xml', 'w')
             temp = et.tostring(ROOT, pretty_print=True, encoding='utf-8', xml_declaration=True)
             f.write(temp)
             f.close()
-
+            recalc()
             return HttpResponseRedirect('/')
         else:
             return render(request, 'AddOnTs.html', {'form': form})
