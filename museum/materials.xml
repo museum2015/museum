@@ -4,7 +4,7 @@
         <choice>Английский</choice>
         <choice>Русский</choice>
         <choice>Українська</choice>
-    <choice>bestt</choice><choice>bestt</choice></languages>
+    </languages>
     <type_name label="тип назви">
         <choice>авторська</choice>
         <choice>альтернативна</choice>
@@ -132,7 +132,7 @@
             <choice>Висота</choice>
             <choice>Ширина</choice>
             <choice>Твердість</choice>
-        <choice>Qj</choice><choice>ppp</choice></type>
+        </type>
         <measurement_unit label="одиницi вимырювання">
             <weight label="Вага">
                 <choice>фунтів</choice>

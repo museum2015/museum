@@ -507,16 +507,6 @@ class Object(models.Model):
     def activity_set(self):
         return Activity.objects.filter(aim=self)
 
-    def status(self):
-        if not self.attributeassignment_set.filter(approval=True):
-            status = 'Пустий об’єкт'
-        else:
-            i = self.attributeassignment_set.filter(approval=True).count()-1
-            while str(self.attributeassignment_set.filter(approval=True)[i].event_initiator) == 'Editing':
-                i -= 1
-            status = str(self.attributeassignment_set.filter(approval=True)[i].event_initiator)
-        return status
-
     @property
     def empty(self):
         return 'Пустий'.decode('utf-8') in self.stat
@@ -548,6 +538,7 @@ class Object(models.Model):
     @property
     def wo(self):
         return 'Cписаний'.decode('utf-8') in self.stat
+
     @property
     def ret(self):
         return 'Повернений'.decode('utf-8') in self.stat
@@ -659,6 +650,16 @@ class TempSaveForm(forms.Form):
             raise ValidationError('Обязательное поле')
         return self.cleaned_data['material']
 
+    def __init__(self, *args, **kwargs):
+        super(TempSaveForm, self).__init__(*args, **kwargs)
+        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
+        self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['aim_of_receiving_gen'] = forms.ChoiceField(choices=AIMS, label='Мета приймання на ТЗ', required=True)
+        self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
+        self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
 
 class InitialTempSaveForm(forms.Form):
     obj = forms.ModelChoiceField(queryset=Object.objects.all())
@@ -693,37 +694,6 @@ class TempRetForm(forms.Form):
     side_2 = forms.CharField(max_length=100, label='Сторона 2 (акт повернення з ТЗ)', required=True)
     return_mark = forms.ChoiceField(choices=choices, required=True, label='Позначка про повернення предмета або переведення до музейного зібрання (ПЗ) у книзі ТЗ')
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True) #
-
-
-class PrepareRetForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(PrepareRetForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() == 'Приймання на тимчасове зберігання'\
-                    and project.status() != 'Списання (втрата тощо)'\
-                    and project.status() != 'Пустий об’єкт':
-                objlist.append(project)
-        objects = [(o.id, o.__unicode__()) for o in objlist]
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
-
-
-class PreparePSForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(PreparePSForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() != 'Пустий об’єкт' and project.status() != 'Приймання на постійне зберігання'\
-                    and project.status() != 'Списання (втрата тощо)'\
-                    and project.status() != 'Передача на постійне зберігання'\
-                    and project.status() != 'Повернення творів з Тимчасового зберігання на Постійне зберігання'\
-                    and project.status() != 'Видача предметів з Постійного зберігання на Тимчасове зберігання':
-                objlist.append(project)
-        objects = [(0, 'Новий об’єкт')]
-        for o in objlist:
-            objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
-
 
 class PersistentSaveForm(forms.Form):
     error_css_class = 'error'
@@ -762,22 +732,6 @@ class PersistentSaveForm(forms.Form):
     old_registered_marks = forms.CharField(max_length=200, label='Старі облікові позначення', required=True)
     inventory_number = forms.CharField(max_length=200, label='Інвентарний номер', required=True)
     spec_inventory_numb = forms.CharField(max_length=200, label='Спеціальний інвентарний номер', required=True)
-
-
-class PrepareInventoryForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(PrepareInventoryForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() != 'Пустий об’єкт'\
-                    and project.status() != 'Списання (втрата тощо)'\
-                    and project.status() != 'Інвентарний облік':
-                objlist.append(project)
-        objects = [(0, 'Новий об’єкт')]
-        for o in objlist:
-            objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
-
 
 class InventorySaveForm(forms.Form):
     error_css_class = 'error'
@@ -822,23 +776,6 @@ class InventorySaveForm(forms.Form):
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
     old_registered_marks = forms.CharField(max_length=200, label='Старі облікові позначення', required=True)
 
-
-class PrepareSpecInventoryForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(PrepareSpecInventoryForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() == 'Інвентарний облік' or project.status() == 'Приймання на постійне зберігання'\
-                    and project.status() != 'Пустий об’єкт'\
-                    and project.status() != 'Списання (втрата тощо)'\
-                    and project.status() != 'Спеціальний інвентарний облік':
-                objlist.append(project)
-        objects = [(0, 'Новий об’єкт')]
-        for o in objlist:
-            objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
-
-
 class SpecInventorySaveForm(forms.Form):
     error_css_class = 'error'
     choices = (
@@ -881,24 +818,6 @@ class SpecInventorySaveForm(forms.Form):
     link_on_doc = forms.CharField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=True)
     mat_person_in_charge = forms.ModelChoiceField(queryset=Custom.myUser.objects.all(), label='Матеріально-відповідальна особа', required=True)
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
-
-
-class PreparePassportForm(forms.Form):
-    error_css_class = 'error'
-
-    def __init__(self, *args, **kwargs):
-        super(PreparePassportForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() != 'Пустий об’єкт'\
-                    and project.status() != 'Науково-уніфікований паспорт'\
-                    and project.status() != 'Списання (втрата тощо)':
-                objlist.append(project)
-        objects = [(0, 'Новий об’єкт')]
-        for o in objlist:
-            objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
-
 
 class PassportForm(forms.Form):
     error_css_class = 'error'
@@ -960,24 +879,6 @@ class PassportForm(forms.Form):
     archive_materials = forms.CharField(max_length=200, label='Архівні матеріали', required=True)
     mat_person_in_charge = forms.ModelChoiceField(queryset=Custom.myUser.objects.all(), label='Відповідальна особа')
 
-
-class PreparePStoTSForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(PreparePStoTSForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() == 'Приймання на постійне зберігання'\
-                    and project.status() != 'Списання (втрата тощо)'\
-                    and project.status() != 'Передача на постійне зберігання'\
-                    and project.status() != 'Видача предметів з Постійного зберігання на Тимчасове зберігання'\
-                    and project.status() != 'Пустий об’єкт':
-                objlist.append(project)
-        objects = []
-        for o in objlist:
-            objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
-
-
 class FromPStoTSForm(forms.Form):
     error_css_class = 'error'
     name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
@@ -1010,22 +911,6 @@ class FromPStoTSForm(forms.Form):
     inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
     TS_code = forms.CharField(max_length=100, label='Шифр та номер ТЗ (актуальний)', required=True)
     is_there = forms.ChoiceField(choices=PLACE[2:4], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
-
-
-class PrepareTStoPSForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(PrepareTStoPSForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() == 'Видача предметів з Постійного зберігання на Тимчасове зберігання'\
-                    and project.status() != 'Списання (втрата тощо)'\
-                    and project.status() != 'Пустий об’єкт':
-                objlist.append(project)
-        objects = []
-        for o in objlist:
-            objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
-
 
 class FromTStoPSForm(forms.Form):
     error_css_class = 'error'
@@ -1060,23 +945,6 @@ class FromTStoPSForm(forms.Form):
     is_there = forms.ChoiceField(choices=PLACE[1:2], label='Фізичне місце збереження (топографія) – позначка про повернення у фонди', required=True)
 
 
-class PrepareSendOnPSForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(PrepareSendOnPSForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() != 'Приймання на постійне зберігання' \
-                    and project.status() != 'Повернення творів з Тимчасового зберігання на Постійне зберігання'\
-                    and project.status() != 'Пустий об’єкт'\
-                    and project.status() != 'Передача на постійне зберігання'\
-                    and project.status() != 'Списання (втрата тощо)':
-                objlist.append(project)
-        objects = []
-        for o in objlist:
-            objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
-
-
 class SendOnPSForm(forms.Form):
     error_css_class = 'error'
     name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
@@ -1101,19 +969,6 @@ class SendOnPSForm(forms.Form):
     spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер', required=True)
     TS_code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
     is_there = forms.ChoiceField(choices=PLACE[2:4], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
-
-
-class PrepareWritingOffForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(PrepareWritingOffForm, self).__init__(*args, **kwargs)
-        objlist = []
-        for project in Object.objects.all():
-            if project.status() != 'Пустий об’єкт' and project.status() != 'Списання (втрата тощо)' :
-                objlist.append(project)
-        objects = []
-        for o in objlist:
-            objects.append((o.id, o.__unicode__()))
-        self.fields['obj'] = forms.ChoiceField(choices=objects, label='Виберiть об’єкт')
 
 
 class WritingOffForm(forms.Form):

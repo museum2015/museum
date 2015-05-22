@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render, HttpResponse, HttpResponseRedirect, redirect
+from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
-from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, InitialTempSaveForm, TempRetForm, \
-    PersistentSaveForm, ObjectEditForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
-    InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
-    PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm, get_choice, PreparePassportForm,\
-    PassportForm, XMLForm, ROOT, recalc
+from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment,  TempRetForm, \
+    PersistentSaveForm, AutForm, \
+    InventorySaveForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm,\
+    WritingOffForm, SendOnPSForm,\
+    PassportForm, XMLForm, recalc, ROOT
 from django.views.decorators.csrf import csrf_protect
-from datetime import datetime as dt
-from django.utils.html import escape
+from datetime import datetime as dtW
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import auth
 from django.views.generic.base import View
@@ -409,7 +408,7 @@ def AddOnSpecInventorySave(request, id_number):
         form = SpecInventorySaveForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Взяти об’єкт на спеціальний інвентарний облік'})
 
-@login_required(login_url='/admin/')
+@login_required
 def PreparePassport(request):
     if request.method == 'POST':
         form = PreparePassportForm(request.POST)
@@ -422,7 +421,7 @@ def PreparePassport(request):
         form = PreparePassportForm()
         return render(request, 'AddOnTs.html', {'form': form, 'label': 'Створити науково-уніфікований паспорт об’єкта'})
 
-@login_required(login_url='/admin/')
+@login_required
 @csrf_protect
 def Passport(request, id_number):
     try:
@@ -479,7 +478,7 @@ def Passport(request, id_number):
         form = PassportForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Створити науково-уніфікований паспорт об’єкта'})
 
-@login_required(login_url='/admin/')
+@login_required
 def PreparePSToTS(request):
     if request.method == 'POST':
         form = PreparePStoTSForm(request.POST)
@@ -492,7 +491,7 @@ def PreparePSToTS(request):
         form = PreparePStoTSForm()
         return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ПЗ на ТЗ'})
 
-@login_required(login_url='/admin/')
+@login_required
 @csrf_protect
 def FromPSToTS(request, id_number):
     try:
@@ -529,7 +528,7 @@ def FromPSToTS(request, id_number):
         form = FromPStoTSForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ПЗ на ТЗ'})
 
-@login_required(login_url='/admin/')
+@login_required
 def PrepareTSToPS(request):
     if request.method == 'POST':
         form = PrepareTStoPSForm(request.POST)
@@ -543,7 +542,7 @@ def PrepareTSToPS(request):
         return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ТЗ на ПЗ'})
 
 
-@login_required(login_url='/admin/')
+@login_required
 @csrf_protect
 def FromTSToPS(request, id_number):
     try:
@@ -588,7 +587,7 @@ def FromTSToPS(request, id_number):
         form = FromTStoPSForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Видати об’єкт з ТЗ на ПЗ'})
 
-@login_required(login_url='/admin/')
+@login_required
 def PrepareSendOnPS(request):
     if request.method == 'POST':
         form = PrepareSendOnPSForm(request.POST)
@@ -601,7 +600,7 @@ def PrepareSendOnPS(request):
         form = PrepareSendOnPSForm()
         return render(request, 'AddOnTs.html', {'form': form, 'label': 'Передати об’єкт на ПЗ'})
 
-@login_required(login_url='/admin/')
+@login_required
 @csrf_protect
 def SendOnPS(request, id_number):
     try:
@@ -640,7 +639,7 @@ def SendOnPS(request, id_number):
         form = SendOnPSForm(initial=data)
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Передати об’єкт на ПЗ'})
 
-@login_required(login_url='/admin/')
+@login_required
 def PrepareWritingOff(request):
     if request.method == 'POST':
         form = PrepareWritingOffForm(request.POST)
@@ -653,7 +652,7 @@ def PrepareWritingOff(request):
         form = PrepareWritingOffForm()
         return render(request, 'AddOnTs.html', {'form': form, 'label': 'Списати об’єкт'})
 
-@login_required(login_url='/admin/')
+@login_required
 @csrf_protect
 def WritingOff(request, id_number):
     try:
