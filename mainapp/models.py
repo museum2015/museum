@@ -39,9 +39,29 @@ def get_choice(root, level=0, *args):
     else:
         return choice
 
+PREC_ST_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'two')
+MES_UNIT_WEIGHT = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
 WEIGHT_CHOICES = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
 MATERIAL_CHOICES = get_choice(ROOT, 0, 'materials')
 LANGUAGE_CHOICES = get_choice(ROOT, 0, 'languages')
+ASSAY_CHOICES = get_choice(ROOT, 0, 'assay')
+PREC_MAT_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'one')
+TYPE_CHOICES = get_choice(ROOT, 0, 'dimension', 'type')
+MEAS_CHOICES = get_choice(ROOT, 0,'dimension', 'measurement_unit')
+
+def recalc():
+    global ROOT, PREC_ST_CHOICES, MES_UNIT_WEIGHT, WEIGHT_CHOICES, MATERIAL_CHOICES, LANGUAGE_CHOICES, ASSAY_CHOICES, PREC_MAT_CHOICES, TYPE_CHOICES, MEAS_CHOICES
+    ROOT = et.parse('museum/materials.xml').getroot()
+    PREC_ST_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'two')
+    MES_UNIT_WEIGHT = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
+    WEIGHT_CHOICES = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
+    MATERIAL_CHOICES = get_choice(ROOT, 0, 'materials')
+    LANGUAGE_CHOICES = get_choice(ROOT, 0, 'languages')
+    ASSAY_CHOICES = get_choice(ROOT, 0, 'assay')
+    PREC_MAT_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'one')
+    TYPE_CHOICES = get_choice(ROOT, 0, 'dimension', 'type')
+    MEAS_CHOICES = get_choice(ROOT, 0,'dimension', 'measurement_unit')
+
 
 
 TECHNIQUE_CHOICES = (('', ''), ('Техніка 1', 'Техніка 1'),)
@@ -286,13 +306,10 @@ class Custom:
             return u''.join(rendered_widgets)
 
     class MultiChoiceTextTextChoiceWidget(MultiWidget):
-        PREC_ST_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'two')
-        MES_UNIT_WEIGHT = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
-
         def __init__(self, number):
-            widgets = [Custom.ChoiceTextTextChoiceWidget(placeholder1='Кількість', placeholder2='Загальна маса', choices1=self.PREC_ST_CHOICES, choices2=self.MES_UNIT_WEIGHT, invisible=False)]
+            widgets = [Custom.ChoiceTextTextChoiceWidget(placeholder1='Кількість', placeholder2='Загальна маса', choices1=PREC_ST_CHOICES, choices2=MES_UNIT_WEIGHT, invisible=False)]
             for i in range(number-1):
-                widgets.append(Custom.ChoiceTextTextChoiceWidget(placeholder1='', choices1=self.PREC_ST_CHOICES, choices2=self.MES_UNIT_WEIGHT, attrs={'style': 'display:none;'}))
+                widgets.append(Custom.ChoiceTextTextChoiceWidget(placeholder1='', choices1=PREC_ST_CHOICES, choices2=MES_UNIT_WEIGHT, attrs={'style': 'display:none;'}))
             super(Custom.MultiChoiceTextTextChoiceWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -305,13 +322,10 @@ class Custom:
             return '<br/>' + ''.join(rendered_widgets)
 
     class MultiChoiceTextTextChoiceField(MultiValueField):
-        PREC_ST_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'two')
-        MES_UNIT_WEIGHT = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
-
         def __init__(self, number=10, *args, **kwargs):
-            list_fields = [Custom.ChoiceTextTextChoiceField(choices1=self.PREC_ST_CHOICES, choices2=self.MES_UNIT_WEIGHT, placeholder1='Кількість', placeholder2='2')]
+            list_fields = [Custom.ChoiceTextTextChoiceField(choices1=PREC_ST_CHOICES, choices2=MES_UNIT_WEIGHT, placeholder1='Кількість', placeholder2='2')]
             for i in range(number-1):
-                list_fields.append(Custom.ChoiceTextTextChoiceField(choices1=self.PREC_ST_CHOICES, choices2=self.MES_UNIT_WEIGHT, placeholder1='', placeholder2=''))
+                list_fields.append(Custom.ChoiceTextTextChoiceField(choices1=PREC_ST_CHOICES, choices2=MES_UNIT_WEIGHT, placeholder1='', placeholder2=''))
             super(Custom.MultiChoiceTextTextChoiceField, self).__init__(list_fields,
                                                                         widget=Custom.MultiChoiceTextTextChoiceWidget(number),
                                                                         *args,
@@ -362,14 +376,10 @@ class Custom:
             return u''.join(rendered_widgets)
 
     class MultiChoiceChoiceTextChoiceWidget(MultiWidget):
-        PREC_MAT_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'one')
-        MES_UNIT_WEIGHT = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
-        ASSAY_CHOICES = get_choice(ROOT, 0, 'assay')
-
         def __init__(self, number):
-            widgets = [Custom.ChoiceChoiceTextChoiceWidget(choices1=self.PREC_MAT_CHOICES,choices3=self.MES_UNIT_WEIGHT, invisible=False)]
+            widgets = [Custom.ChoiceChoiceTextChoiceWidget(choices1=PREC_MAT_CHOICES,choices3=MES_UNIT_WEIGHT, invisible=False)]
             for i in range(number-1):
-                widgets.append(Custom.ChoiceChoiceTextChoiceWidget(choices1=self.PREC_MAT_CHOICES, choices3=self.MES_UNIT_WEIGHT, invisible=True))
+                widgets.append(Custom.ChoiceChoiceTextChoiceWidget(choices1=PREC_MAT_CHOICES, choices3=MES_UNIT_WEIGHT, invisible=True))
             super(Custom.MultiChoiceChoiceTextChoiceWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -382,14 +392,10 @@ class Custom:
             return '<br/>' + ''.join(rendered_widgets)
 
     class MultiChoiceChoiceTextChoiceField(MultiValueField):
-        PREC_MAT_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'one')
-        MES_UNIT_WEIGHT = get_choice(ROOT, 0, 'dimension', 'measurement_unit', 'weight')
-        ASSAY_CHOICES = get_choice(ROOT, 0, 'assay')
-
         def __init__(self, number=10, *args, **kwargs):
-            list_fields = [Custom.ChoiceChoiceTextChoiceField(choices1=self.PREC_MAT_CHOICES, choices3=self.MES_UNIT_WEIGHT)]
+            list_fields = [Custom.ChoiceChoiceTextChoiceField(choices1=PREC_MAT_CHOICES, choices3=MES_UNIT_WEIGHT)]
             for i in range(number-1):
-                list_fields.append(Custom.ChoiceChoiceTextChoiceField(choices1=self.PREC_MAT_CHOICES, choices3=self.MES_UNIT_WEIGHT))
+                list_fields.append(Custom.ChoiceChoiceTextChoiceField(choices1=PREC_MAT_CHOICES, choices3=MES_UNIT_WEIGHT))
             super(Custom.MultiChoiceChoiceTextChoiceField, self).__init__(list_fields,
                                                                           widget=Custom.MultiChoiceChoiceTextChoiceWidget(number),
                                                                           *args,
@@ -400,13 +406,10 @@ class Custom:
             return ', '.join(values)
 
     class MultiChoiceTextChoiceWidget(MultiWidget):
-        TYPE_CHOICES = get_choice(ROOT, 0, 'dimension', 'type')
-        MEAS_CHOICES = get_choice(ROOT, 0,'dimension', 'measurement_unit')
-
         def __init__(self, number):
-            widgets = [Custom.ChoiceTextChoiceWidget(placeholder1='0,2', choices1=self.TYPE_CHOICES, choices2 = self.MEAS_CHOICES, invisible=False)]
+            widgets = [Custom.ChoiceTextChoiceWidget(placeholder1='0,2', choices1=TYPE_CHOICES, choices2 = MEAS_CHOICES, invisible=False)]
             for i in range(number-1):
-                widgets.append(Custom.ChoiceTextChoiceWidget(placeholder1='', choices1=self.TYPE_CHOICES, choices2 = self.MEAS_CHOICES, attrs={'style': 'display:none;'}))
+                widgets.append(Custom.ChoiceTextChoiceWidget(placeholder1='', choices1=TYPE_CHOICES, choices2 = MEAS_CHOICES, attrs={'style': 'display:none;'}))
             super(Custom.MultiChoiceTextChoiceWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -419,13 +422,10 @@ class Custom:
             return '<br/>' + ''.join(rendered_widgets)
 
     class MultiChoiceTextChoiceField(MultiValueField):
-        TYPE_CHOICES = get_choice(ROOT, 0, 'dimension', 'type')
-        MEAS_CHOICES = get_choice(ROOT, 0,'dimension', 'measurement_unit')
-
         def __init__(self, number=10, *args, **kwargs):
-            list_fields = [Custom.ChoiceTextChoiceField(choices1=self.TYPE_CHOICES, choices2 = self.MEAS_CHOICES, placeholder1='0.2')]
+            list_fields = [Custom.ChoiceTextChoiceField(choices1=TYPE_CHOICES, choices2 = MEAS_CHOICES, placeholder1='0.2')]
             for i in range(number-1):
-                list_fields.append(Custom.ChoiceTextChoiceField(choices1=self.TYPE_CHOICES, choices2=self.MEAS_CHOICES, placeholder1=''))
+                list_fields.append(Custom.ChoiceTextChoiceField(choices1=TYPE_CHOICES, choices2=MEAS_CHOICES, placeholder1=''))
             super(Custom.MultiChoiceTextChoiceField, self).__init__(list_fields,
                                                                     widget=Custom.MultiChoiceTextChoiceWidget(number),
                                                                     *args,

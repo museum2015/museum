@@ -141,11 +141,12 @@
         </figure>
     </div>
     <div class="actions">
-     <figure class="img izo tri">
+        <figure class="img izo tri">
             <figure>
                 {% if request.user.is_staff %}
-                    <i onclick='del()' title='Видалити' class='disabled button7 fa fa-close fa-3x'></i>
+                <i onclick='del()' title='Видалити' class='disabled button7 fa fa-close fa-3x'></i>
                 {% endif %}
+                <i onclick='print()' title='Роздрукувати паспорт' class='disabled button15 fa fa-print fa-3x'></i>
             </figure>
             <figcaption>Дії з об'єктами</figcaption>
         </figure>
@@ -204,7 +205,10 @@
                 $(".button5").addClass("disabled");
                 $(".button6").addClass("disabled");
             }
-
+            $(".button15").addClass("disabled");
+            if (row.hasClass("passport")) {
+                $(".button15").removeClass("disabled");
+            }
         });
 
         $(document).ready(function() {
@@ -265,7 +269,7 @@
         var del = function() {
             if (!($(".button7").hasClass('disabled'))) {
                 var t = $(".highlight td:first-child").text();
-                var link = "/staff/writing_off/" + t;
+                var link = "/staff/delete/" + t;
                 window.location.href = link;
             }
         };
@@ -318,6 +322,13 @@
                 window.location.href = link;
             }
         };
+        var print = function() {
+            if (!($(".button15").hasClass('disabled'))) {
+                var t = $(".highlight td:first-child").text();
+                var link = "/pdf/" + t;
+                window.location.href = link;
+            }
+        }
 
 </script>
 </body>

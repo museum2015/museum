@@ -5,7 +5,7 @@ from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment, 
     PersistentSaveForm, ObjectEditForm, PrepareRetForm, PreparePSForm, AutForm, PrepareInventoryForm,\
     InventorySaveForm, PreparePStoTSForm, PrepareSpecInventoryForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm, PrepareTStoPSForm,\
     PrepareWritingOffForm, PrepareSendOnPSForm, WritingOffForm, SendOnPSForm, get_choice, PreparePassportForm,\
-    PassportForm, XMLForm
+    PassportForm, XMLForm, ROOT, recalc
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.utils.html import escape
@@ -728,7 +728,7 @@ class MyPDFView(View):
         return response
 
 def EditXML(request):
-    ROOT = et.parse('museum/materials.xml').getroot()
+    global ROOT
     if request.method == 'POST':
         form = XMLForm(request.POST)
         if form.is_valid():
@@ -737,12 +737,12 @@ def EditXML(request):
             for a in data['choicefield'].split(','):
                 root = root.find(a)
             temp = et.SubElement(root, 'choice')
-            temp.text = str(data['charfield'])
+            temp.text = unicode(data['charfield'])
             f = open('museum/materials.xml', 'w')
             temp = et.tostring(ROOT, pretty_print=True, encoding='utf-8', xml_declaration=True)
             f.write(temp)
             f.close()
-
+            recalc()
             return HttpResponseRedirect('/')
         else:
             return render(request, 'AddOnTs.html', {'form': form})
