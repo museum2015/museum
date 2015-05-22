@@ -570,6 +570,9 @@ class Activity(models.Model):
             self.aim.stat = format_html('Cписаний (<a href="/activity/{0}">подія</a>)', self.pk)
         if self.type == 'Повернення з тимчасового зберiгання'.decode('utf-8'):
             self.aim.stat = format_html('Повернений з тимчасового зберiгання (<a href="/activity/{0}">подія</a>)', self.pk)
+        if self.type == 'Науково-уніфікований паспорт'.decode('utf-8') or self.type == 'Інвентарний облік'.decode('utf-8'):
+            if self.aim.empty:
+                self.aim.stat = 'Щойно заповнений'
         self.save()
         self.aim.save()
 

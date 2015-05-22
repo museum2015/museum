@@ -234,6 +234,7 @@ def ObjectList(request):
     change = request.user.has_perm('mainapp.change_obj')
     remove = request.user.has_perm('mainapp.remove_oobj')
     return render(request, 'objects.html', {'objects': qs,
+                                            'user': request.user,
                                             'add': add,
                                             'change': change,
                                             'remove': remove})
@@ -268,6 +269,7 @@ def logout(request):
 class ObjectDelete(DeleteView):
     model = Object
     template_name_suffix = '_delete_form'
+    success_url = '/objects'
 
 
 @login_required 
@@ -372,9 +374,9 @@ def Passport(request, id_number):
         form = PassportForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
+            project.save()
             act = Activity(time_stamp=dt.now(), aim = project, type='Науково-уніфікований паспорт', actor=Custom.myUser.objects.get(username=request.user.username))
             act.save()
-            project.save()
             for (k, v) in cd.items():
                 if k=='material':
                     v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
@@ -605,7 +607,7 @@ class MyPDFView(View):
         except:
             pass
         context['date'] = dt.now()
-        context['material'] = q[1:-1].replace('u\'', '').replace('\'', '').decode('unicode-escape')
+        context['material'] = q[1:].replace('u\'', '').replace('\'', '').decode('unicode-escape')
         response = PDFTemplateResponse(request=request,
                                        template=self.template,
                                        filename="passport.pdf",
