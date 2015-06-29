@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
-from models import TempSaveForm, Object, Custom, Activity, AttributeAssignment,  TempRetForm, \
-    PersistentSaveForm, AutForm, \
-    InventorySaveForm, SpecInventorySaveForm, FromPStoTSForm, FromTStoPSForm,\
-    WritingOffForm, SendOnPSForm,\
-    PassportForm, XMLForm, recalc, ROOT
+from models import *
+from forms import *
 from django.views.decorators.csrf import csrf_protect
 from datetime import datetime as dt
 from django.contrib.auth.decorators import login_required, permission_required
@@ -31,7 +28,7 @@ def TempSave(request, id_number=0):
         form = TempSaveForm(request.POST, request.FILES)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), aim=project, type='Приймання на тимчасове зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim=project, type='Приймання на тимчасове зберігання', actor=myUser.objects.get(username=request.user.username))
             act.save()
             project.reason = cd['reason']
             project.save()
@@ -70,13 +67,13 @@ def TempRet(request, id_number=0):
         if form.is_valid():
             cd = form.cleaned_data
             act = Activity(time_stamp=dt.now(), aim = project, type='Повернення з тимчасового зберiгання',
-                           actor=Custom.myUser.objects.get(username=request.user.username))
+                           actor=myUser.objects.get(username=request.user.username))
             act.save()
             for (k, v) in cd.items():
                 if k=='material':
-                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', '')) #костыль который фиксит особенность джанго возвращения списков
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
-                                                  event_initiator=act, aim=project)
+                                                  event_initiator=act, aim=project) #cоздаем объект "назначение аттрибута"
                 attr_assign.save()
             return HttpResponseRedirect('/')
         else:
@@ -90,12 +87,17 @@ def TempRet(request, id_number=0):
                 'condition_descr': project.condition_descr, 'term_back': project.term_back,
                 'reason': reason, 'side_1': project.side_1, 'side_2': project.side_2,
                 'price': project.price, 'note': project.note
-                }
+                } #начальное заполнение формы
         form = TempRetForm(initial=data)
         return render(request, 'AddOnTs.html', {'form': form, 'label': 'Повернути об’єкт з ТЗ'})
 
 @permission_required('mainapp.only_personal_activity', login_url='/admin')
 def GetProject(request):
+    """
+    Cписок всех событий
+    :param request:
+    :return:
+    """
     act_list = Activity.objects.filter(actor=request.user).order_by('time_stamp').reverse()
     if request.user.has_perm('mainapp.all_activity'):
         act_list = Activity.objects.all().order_by('time_stamp').reverse()
@@ -103,6 +105,12 @@ def GetProject(request):
 
 @login_required
 def ApproveProject(request, offset):
+    """
+    Подтвердить событие
+    :param request:
+    :param offset:
+    :return:
+    """
     if Activity.objects.get(id=int(offset)).approval == False:
         return HttpResponse('Вже відхилено раніше<br><a href="/activities">Назад</a>')
     elif Activity.objects.get(id=int(offset)).approval == True:
@@ -113,6 +121,12 @@ def ApproveProject(request, offset):
 
 @login_required
 def RejectProject(request, offset):
+    """
+    Отклонить событие
+    :param request:
+    :param offset:
+    :return:
+    """
     if Activity.objects.get(id=int(offset)).approval == False:
         return HttpResponse('Вже відхилено раніше<br><a href="/activities">Назад</a>')
     else:
@@ -121,6 +135,13 @@ def RejectProject(request, offset):
 
 
 def get_attrib_assigns(act_type, project, attribute):
+    """
+    Функция для получения аттрибутов из событий, не из объектов
+    :param act_type:
+    :param project:
+    :param attribute:
+    :return:
+    """
     act = Activity.objects.filter(type=act_type, approval=True)
     a = []
     for i in act:
@@ -134,47 +155,15 @@ def get_attrib_assigns(act_type, project, attribute):
     except IndexError:
         return ''
 
-def get_all_attrib_assigns(act_type, project, attribute):
-    act = Activity.objects.filter(type=act_type, approval=True)
-    a = []
-    for i in act:
-            b = AttributeAssignment.objects.filter(event_initiator=i, aim=project, attr_name=attribute, actual=True)
-            if not b:
-                continue
-            else:
-                a.append(b)
-    i = 0
-    c = []
-    while i < len(a):
-        c.append(a[0][i].attr_value)
-    try:
-        return c
-    except IndexError:
-        return ''
-
-
-def appendlists(list_from, list_to):
-    for i in list_from:
-        list_to.append(i)
-    return list_to
-
-
-def get_old_attributes(project, attribute):
-    ps = get_all_attrib_assigns('Приймання на постійне зберігання', project, attribute)
-    inv = get_all_attrib_assigns('Інвентарний облік', project, attribute)
-    spec_inv = get_all_attrib_assigns('Спеціальний інвентарний облік', project, attribute)
-    res = []
-    appendlists(ps, res)
-    appendlists(inv, res)
-    appendlists(spec_inv, res)
-    old_attributes = ''
-    for i in res:
-        old_attributes.join(',').join(str(i))
-    return old_attributes
-
 @login_required
 @csrf_protect
 def AddOnPS(request, id_number):
+    """
+    Добавления объекта на постоянное хранение
+    :param request:
+    :param id_number:
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
@@ -186,7 +175,7 @@ def AddOnPS(request, id_number):
         form = PersistentSaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), aim = project, type='Приймання на постійне зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Приймання на постійне зберігання', actor=myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -213,6 +202,12 @@ def AddOnPS(request, id_number):
 
 @login_required 
 def ActivityPage(request, id_number):
+    """
+
+    :param request:
+    :param id_number:
+    :return:
+    """
     if Activity.objects.filter(id=int(id_number)).exists():
         act = Activity.objects.get(id=int(id_number))
         if not (act.actor == request.user or request.user.has_perm('mainapp.all_activity')):
@@ -286,7 +281,7 @@ def AddOnInventorySave(request, id_number):
         form = InventorySaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), aim = project, type='Інвентарний облік', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Інвентарний облік', actor=myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -330,7 +325,7 @@ def AddOnSpecInventorySave(request, id_number):
         form = SpecInventorySaveForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), aim = project, type='Спеціальний інвентарний облік', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Спеціальний інвентарний облік', actor=myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -375,7 +370,7 @@ def Passport(request, id_number):
         if form.is_valid():
             cd = form.cleaned_data
             project.save()
-            act = Activity(time_stamp=dt.now(), aim = project, type='Науково-уніфікований паспорт', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Науково-уніфікований паспорт', actor=myUser.objects.get(username=request.user.username))
             act.save()
             for (k, v) in cd.items():
                 if k=='material':
@@ -430,7 +425,7 @@ def FromPSToTS(request, id_number):
         form = FromPStoTSForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), aim = project, type='Видача предметів з Постійного зберігання на Тимчасове зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Видача предметів з Постійного зберігання на Тимчасове зберігання', actor=myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -468,7 +463,7 @@ def FromTSToPS(request, id_number):
         form = FromTStoPSForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), aim = project, type='Повернення творів з Тимчасового зберігання на Постійне зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Повернення творів з Тимчасового зберігання на Постійне зберігання', actor=myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -514,7 +509,7 @@ def SendOnPS(request, id_number):
         form = SendOnPSForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), aim = project, type='Передача на постійне зберігання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Передача на постійне зберігання', actor=myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
@@ -554,7 +549,7 @@ def WritingOff(request, id_number):
         form = WritingOffForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            act = Activity(time_stamp=dt.now(), aim = project, type='Списання', actor=Custom.myUser.objects.get(username=request.user.username))
+            act = Activity(time_stamp=dt.now(), aim = project, type='Списання', actor=myUser.objects.get(username=request.user.username))
             act.save()
             project.save()
             for (k, v) in cd.items():
