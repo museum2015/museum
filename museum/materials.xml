@@ -175,4 +175,10 @@
     <museum label="тип музею">
         <choice>краєзнавчий музей</choice>
     </museum>
+    <classify label="класифікація">
+        <choice>клас</choice>
+    </classify>
+    <typology label="класифікація">
+        <choice>тип</choice>
+    </typology>
 </data>
