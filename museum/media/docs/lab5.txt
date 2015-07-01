@@ -1,0 +1,28 @@
+﻿Вариант №6
+1. ps
+2. ps -axl
+3. много вариантов. один из них:
+   bash
+   ps
+   kill -9 PID
+4. jobs
+5. find / -name "*.c" -print > file 2> /dev/null &
+6. kill -stop PID
+   jobs
+   [1]+  Остановлено  sudo find / -name "*.c" -print > file 2> /dev/null
+   kill -cont PID
+   jobs
+   [1]+  Выполняется  find / -name "*.c" -print > file 2> /dev/null &
+   fg
+   ^Z
+   bg
+   nice -n 5 find / -name "*.c" -print > file 2> /dev/null &
+7. ps -N -U root -u root u
+8. много вариантов. один из них:
+   at now + 1 min
+   at> cal 2002 > /dev/pts/1
+   at> <EOT>
+9. sudo vi /etc/crontab
+   30 12 * * *  kirill  cd ~ && rm *.bak *.tmp
+   :wq!
+

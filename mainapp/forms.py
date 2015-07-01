@@ -51,6 +51,11 @@ ASSAY_CHOICES = get_choice(ROOT, 0, 'assay')
 PREC_MAT_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'one')
 TYPE_CHOICES = get_choice(ROOT, 0, 'dimension', 'type')
 MEAS_CHOICES = get_choice(ROOT, 0,'dimension', 'measurement_unit')
+TYPE_NAME_CHOICES = get_choice(ROOT, 0, 'type_name')
+TYPE_MARK_CHOICES = get_choice(ROOT, 0, 'type_mark')
+TYPE_DESCRIPTION = get_choice(ROOT, 0, 'type_description')
+TYPE_PROMITKA = get_choice(ROOT, 0, 'promitka')
+TYPE_DOCUMENT = get_choice(ROOT, 0, 'document_type')
 
 def recalc():
     """
@@ -69,7 +74,6 @@ def recalc():
     PREC_MAT_CHOICES = get_choice(ROOT, 0, 'materials', 'precious', 'one')
     TYPE_CHOICES = get_choice(ROOT, 0, 'dimension', 'type')
     MEAS_CHOICES = get_choice(ROOT, 0,'dimension', 'measurement_unit')
-
 
 TECHNIQUE_CHOICES = (('', ''), ('Техніка 1', 'Техніка 1'),)
 WAY_OF_FOUND_CHOICES = (('', ''), ('Розкопки', 'Розкопки'),)
@@ -141,9 +145,10 @@ class Custom:
                 return ''
 
     class TextAreaChoiceWidget(MultiWidget):
-        def __init__(self, choices, placeholder1='', size1=10):
+        def __init__(self, choices1, choices2, placeholder1='', size1=10):
             widgets = [forms.Textarea(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1, 'style': "margin: 0px; height: 252px; width: 550px;"}),
-                       Select(choices=choices)]
+                       Select(choices=choices1),
+                       Select(choices=choices2)]
             super(Custom.TextAreaChoiceWidget, self).__init__(widgets)
 
         def decompress(self, value):
@@ -151,7 +156,7 @@ class Custom:
                 res = value.split(' ')
                 return [x.strip("()") for x in res]
             else:
-                return [None, None]
+                return [None, None, None]
 
         def format_output(self, rendered_widgets):
             dd = '<br>'
@@ -159,17 +164,21 @@ class Custom:
             return dd+res
 
     class TextAreaChoiceField(MultiValueField):
-            def __init__(self, choices, placeholder1, size1=10, *args, **kwargs):
+            def __init__(self, choices1, choices2, placeholder1, size1=10, *args, **kwargs):
                 list_fields = [fields.CharField(max_length=3000),
-                               fields.ChoiceField(choices=choices)]
+                               fields.ChoiceField(choices=choices1),
+                               fields.ChoiceField(choices=choices2)]
                 super(Custom.TextAreaChoiceField, self).__init__(list_fields,
-                                                                 widget=Custom.TextAreaChoiceWidget(choices=choices, size1=size1, placeholder1=placeholder1),
+                                                                 widget=Custom.TextAreaChoiceWidget(choices1=choices1,
+                                                                                                    choices2=choices2,
+                                                                                                    size1=size1,
+                                                                                                    placeholder1=placeholder1),
                                                                  *args,
                                                                  **kwargs)
 
             def compress(self, values):
                 if values:
-                    return values[0] + ' (' + values[1] + ')'
+                    return values[0] + ' (' + values[1] + ')' + ' (' + values[2] + ')'
                 else:
                     return ''
 
@@ -247,6 +256,43 @@ class Custom:
 
         def format_output(self, rendered_widgets):
             return u''.join(rendered_widgets)
+
+    class TextChoiceChoiceWidget(MultiWidget):
+        def __init__(self, choices1, choices2, placeholder1='', size1=10):
+            widgets = [TextInput(attrs={'size': size1, 'max_length': 30, 'placeholder': placeholder1}),
+                       Select(choices=choices1),
+                       Select(choices=choices2)]
+            super(Custom.TextChoiceChoiceWidget, self).__init__(widgets)
+
+        def decompress(self, value):
+            if value:
+                res = value.split(' ')
+                return [x.strip("()") for x in res]
+            else:
+                return [None, None, None]
+
+        def format_output(self, rendered_widgets):
+            dd = '<br>'
+            res = u''.join(rendered_widgets)
+            return dd+res
+
+    class TextChoiceChoiceField(MultiValueField):
+        def __init__(self, choices1, choices2, placeholder1, size1=10, *args, **kwargs):
+            list_fields = [fields.CharField(max_length=30),
+                           fields.ChoiceField(choices=choices1),
+                           fields.ChoiceField(choices=choices2)]
+            super(Custom.TextChoiceChoiceField, self).__init__(list_fields, widget=Custom.TextChoiceChoiceWidget(choices1=choices1,
+                                                                                                                 choices2=choices2,
+                                                                                                                 size1=size1,
+                                                                                                                 placeholder1=placeholder1),
+                                                               *args,
+                                                               **kwargs)
+
+        def compress(self, values):
+            if values:
+                return values[0] + ' (' + values[1] + ')' + ' (' + values[2] + ')'
+            else:
+                return ''
 
     class ChoiceTextTextChoiceField(MultiValueField):
         def __init__(self, choices1, choices2, placeholder1, placeholder2):
@@ -422,10 +468,11 @@ class Custom:
             values = [x for x in values if x]
             return '; '.join(values)
 
+
 class TempSaveForm(forms.Form):
     #Принятие на временное хранение
     error_css_class = 'error'
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=1000, label='Кількість', required=True, min_value=0)
     date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
@@ -437,8 +484,8 @@ class TempSaveForm(forms.Form):
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
-    description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
-    note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+    description = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+    note = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     price = forms.CharField(max_length=200, label='Вартість', required=True)
     side_1 = forms.CharField(max_length=200, label='Сторона 1 (акт приймання на ТЗ)', required=True)
     side_2 = forms.CharField(max_length=200, label='Сторона 2 (акт приймання на ТЗ)', required=True)
@@ -462,11 +509,11 @@ class TempSaveForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(TempSaveForm, self).__init__(*args, **kwargs)
-        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
         self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
         self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
-        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
         self.fields['aim_of_receiving_gen'] = forms.ChoiceField(choices=AIMS, label='Мета приймання на ТЗ', required=True)
         self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
         self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
@@ -485,7 +532,7 @@ class TempRetForm(forms.Form):
         ('returned', 'Повернутий з тимчасового збереження'),
         ('add on PS', 'Поставити об’єкт на постійне збереження ')
     )
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(max_value=None, label='Кількість', required=True, min_value=0)
     date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
@@ -497,12 +544,12 @@ class TempRetForm(forms.Form):
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
-    description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+    description = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     price = forms.CharField(max_length=200, label='Вартість', required=True)
     term_back = forms.DateField(label='Дата повернення', widget=DateTimePicker(options={"format": "YYYY-MM-DD",
                                                                                         "pickTime": False},
                                                                                attrs={'width': '300px'}))
-    note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+    note = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     reason = forms.CharField(label='Підстава', required=True)
     side_1 = forms.CharField(max_length=100, label='Сторона 1 (акт повернення з ТЗ)', required=True)
     side_2 = forms.CharField(max_length=100, label='Сторона 2 (акт повернення з ТЗ)', required=True)
@@ -511,11 +558,11 @@ class TempRetForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(TempRetForm, self).__init__(*args, **kwargs)
-        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
         self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
         self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
-        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
         self.fields['aim_of_receiving_gen'] = forms.ChoiceField(choices=AIMS, label='Мета приймання на ТЗ', required=True)
         self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
         self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
@@ -531,7 +578,7 @@ class PersistentSaveForm(forms.Form):
         ('conservation', 'Консервація'),
         ('preventive', 'Профілактичний огляд')
     )
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
     date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
@@ -540,18 +587,18 @@ class PersistentSaveForm(forms.Form):
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
     size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
-    description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+    description = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     transport_possibility = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
     recomm_for_restauration = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     price = forms.CharField(max_length=40, label='Вартість', required=True)
-    note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+    note = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     PS_code = forms.CharField(max_length=200, label='Шифр ПЗ (номер за книгою ПЗ)', required=True)
     way_of_found = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
-    link_on_doc = forms.CharField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False) #
+    link_on_doc = Custom.TextChoiceField(choices=TYPE_DOCUMENT, placeholder1='', label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False) #
     side_1 = forms.CharField(max_length=200, label='Сторона 1 (акт ПЗ)', required=True)
     side_2 = forms.CharField(max_length=209, label='Сторона 2 (акт ПЗ)', required=True)
     collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
@@ -564,16 +611,17 @@ class PersistentSaveForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(PersistentSaveForm, self).__init__(*args, **kwargs)
-        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
         self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
         self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
         self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
-        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
         self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
         self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
         self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
         self.fields['storage'] = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
+        self.fields['link_on_doc'] = Custom.TextChoiceField(choices=TYPE_DOCUMENT, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False, placeholder1='')
 
 
 class InventorySaveForm(forms.Form):
@@ -584,7 +632,7 @@ class InventorySaveForm(forms.Form):
         ('conservation', 'Консервація'),
         ('preventive', 'Профілактичний огляд')
     )
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
     author = forms.CharField(max_length=200, label='Автор', required=True)
@@ -597,10 +645,10 @@ class InventorySaveForm(forms.Form):
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     material = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
     size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
-    mark_on_object = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Позначки на предметі', placeholder1='')
+    mark_on_object = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_MARK_CHOICES, label='Позначки на предметі', placeholder1='')
     classify = forms.CharField(max_length=200, label='Класифікація', required=True)
     typology = forms.CharField(max_length=200, label='Типологія', required=True)
-    description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+    description = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     bibliography = forms.CharField(max_length=200, label='Бібліографія', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
@@ -608,12 +656,12 @@ class InventorySaveForm(forms.Form):
     transport_possibility = forms.BooleanField(label='Можливість транспортування (так, ні)', required=True)
     recomm_for_restauration = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     price = forms.CharField(max_length=40, label='Вартість', required=True)
-    note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+    note = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     inventory_number = forms.CharField(max_length=100, label='Інвентарний номер', required=True)
     PS_code = forms.CharField(max_length=200, label='Шифр ПЗ (номер за книгою ПЗ)', required=True)
     way_of_found = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
-    link_on_doc = forms.CharField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=True)
+    link_on_doc = Custom.TextChoiceField(choices=TYPE_DOCUMENT, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False, placeholder1='')
     spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер', required=False)
     collection = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
     mat_person_in_charge = forms.ModelChoiceField(queryset=myUser.objects.all(), label='Матеріально-відповідальна особа', required=True)
@@ -622,19 +670,20 @@ class InventorySaveForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(InventorySaveForm, self).__init__(*args, **kwargs)
-        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
         self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
         self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
         self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
-        self.fields['mark_on_object'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Позначки на предметі', placeholder1='')
+        self.fields['mark_on_object'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_MARK_CHOICES, label='Позначки на предметі', placeholder1='')
         self.fields['typology'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'typology'), label='Типологія', required=True)
         self.fields['classify'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'classify'), label='Класифікація', required=True)
-        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
         self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
         self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
         self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
         self.fields['storage'] = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
+        self.fields['link_on_doc'] = Custom.TextChoiceField(choices=TYPE_DOCUMENT, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False, placeholder1='')
 
 
 class SpecInventorySaveForm(forms.Form):
@@ -645,7 +694,7 @@ class SpecInventorySaveForm(forms.Form):
         ('conservation', 'Консервація'),
         ('preventive', 'Профілактичний огляд')
     )
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
     author = forms.CharField(max_length=200, label='Автор', required=True)
@@ -667,29 +716,31 @@ class SpecInventorySaveForm(forms.Form):
     #weight_prec_stone = Custom.TextChoiceField(choices=WEIGHT_CHOICES,
     #                                           label='Маса дорогоцінного металу в чистоті', placeholder1='')
     size = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
-    description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+    description = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     recomm_for_restauration = forms.ChoiceField(choices=choices, required=True, label='Рекомендації щодо реставрації')
     price = forms.CharField(max_length=40, label='Вартість', required=True)
-    note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+    note = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер', required=True)
     PS_code = forms.CharField(max_length=200, label='Шифр і номер за книгою надходжень (ПЗ)', required=True)
     inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
-    link_on_doc = forms.CharField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=True)
+    link_on_doc = Custom.TextChoiceField(choices=TYPE_DOCUMENT, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False, placeholder1='')
     mat_person_in_charge = forms.ModelChoiceField(queryset=myUser.objects.all(), label='Матеріально-відповідальна особа', required=True)
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
 
     def __init__(self, *args, **kwargs):
         super(SpecInventorySaveForm, self).__init__(*args, **kwargs)
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
         self.fields['storage'] = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
         self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
         self.fields['metals'] = Custom.MultiChoiceChoiceTextChoiceField(label='Дорогоцінні метали')
         self.fields['stones'] = Custom.MultiChoiceTextTextChoiceField(label='Дорогоцінне каміння')
-        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
         self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['link_on_doc'] = Custom.TextChoiceField(choices=TYPE_DOCUMENT, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=False, placeholder1='')
 
 
 class PassportForm(forms.Form):
@@ -715,14 +766,14 @@ class PassportForm(forms.Form):
     negative = forms.CharField(label='Негатив (номер)', max_length=50, required=True)
     image = forms.ImageField(label='Фото', required=False)
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     author = forms.CharField(max_length=200, label='Автор або виробник', required=True)
     date_place_creation = forms.CharField(max_length=200, label='Час і місце створення (виготовлення)', required=True)
     date_place_detection = forms.CharField(max_length=200, label='Час і місце виявлення', required=True)
     date_place_existence = forms.CharField(max_length=200, label='Час і місце побутування', required=True)
     source = forms.CharField(max_length=200, label='Джерело надходження', required=True)
     way_of_found = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження (закупка, замовлення, дарунок, передача)', required=True)
-    link_on_doc = forms.CharField(max_length=200, label='Документи', required=True)
+    link_on_doc = Custom.TextChoiceField(choices=TYPE_DOCUMENT, label='Документи', required=False, placeholder1='')
     classify = forms.CharField(max_length=200, label='Класифікація', required=True)
     typology = forms.CharField(max_length=200, label='Типологія', required=True)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
@@ -731,7 +782,7 @@ class PassportForm(forms.Form):
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
     metals = Custom.MultiChoiceChoiceTextChoiceField(label='Дорогоцінні метали')
     stones = Custom.MultiChoiceTextTextChoiceField(label='Дорогоцінне каміння')
-    description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+    description = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     person_or_actions = forms.CharField(max_length=2000, label='Особи чи події, пов’язані з предметом', required=True,
                                         widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
     memorial_subject = forms.CharField(max_length=200, label='Зв’язок з іншими пам’ятками (історичний, мистецтвознавчий, культурологічний аспект)', required=True)
@@ -761,24 +812,24 @@ class PassportForm(forms.Form):
         self.fields['section'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'section'), label='Відділ', required=True)
         self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
         self.fields['storage'] = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
-        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
         self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
         self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
         self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
         self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
         self.fields['metals'] = Custom.MultiChoiceChoiceTextChoiceField(label='Дорогоцінні метали')
         self.fields['stones'] = Custom.MultiChoiceTextTextChoiceField(label='Дорогоцінне каміння')
-        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
         self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
         self.fields['typology'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'typology'), label='Типологія', required=True)
         self.fields['classify'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'classify'), label='Класифікація', required=True)
+        self.fields['link_on_doc'] = Custom.TextChoiceField(choices=TYPE_DOCUMENT, label='Документи', required=False, placeholder1='')
 
 
 class FromPStoTSForm(forms.Form):
     # ПЗ -> ТЗ
     error_css_class = 'error'
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
     date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
@@ -790,9 +841,9 @@ class FromPStoTSForm(forms.Form):
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
-    description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+    description = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     insurable_value = forms.CharField(max_length=30, label='Страхова вартість', required=True)
-    note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+    note = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     side_1 = forms.CharField(max_length=200, label='Сторона 1 юридична особа', required=True)
     side_1_person_in_charge = forms.CharField(max_length=200, label='Сторона 1 головний зберігач (матеріально-відповідальна особа)', required=True)
     side_1_fond_saver = forms.CharField(max_length=200, label='Сторона 1 зберігач фонду', required=True)
@@ -811,19 +862,19 @@ class FromPStoTSForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(FromPStoTSForm, self).__init__(*args, **kwargs)
-        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
         self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
         self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
         self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
         self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
-        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
 
 
 class FromTStoPSForm(forms.Form):
     #ТЗ -> ПЗ
     error_css_class = 'error'
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
     date_creation = forms.CharField(max_length=20, label='Дата створення предмета', required=True)
@@ -835,9 +886,9 @@ class FromTStoPSForm(forms.Form):
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
-    description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+    description = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
     insurable_value = forms.CharField(max_length=30, label='Страхова вартість', required=True)
-    note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+    note = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     side_1 = forms.CharField(max_length=200, label='Сторона 1 юридична особа', required=True)
     side_1_person_in_charge = forms.CharField(max_length=200, label='Сторона 1 головний зберігач (матеріально-відповідальна особа)', required=True)
     side_1_fond_saver = forms.CharField(max_length=200, label='Сторона 1 зберігач фонду', required=True)
@@ -855,19 +906,19 @@ class FromTStoPSForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(FromTStoPSForm, self).__init__(*args, **kwargs)
-        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
         self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
         self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
         self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
         self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
-        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
 
 
 class SendOnPSForm(forms.Form):
     #Передача на постоянное хранение
     error_css_class = 'error'
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
     technique = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=True)
@@ -876,8 +927,8 @@ class SendOnPSForm(forms.Form):
     condition = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
     condition_descr = forms.CharField(max_length=2000, label='Опис стану збереженості', required=True,
                                       widget=forms.widgets.Textarea(attrs={'style': "margin: 0px; height: 252px; width: 550px;"}))
-    description = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
-    note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+    description = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+    note = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     side_1 = forms.CharField(max_length=200, label='Сторона 1 юридична особа', required=True)
     side_1_person_in_charge = forms.CharField(max_length=200, label='Сторона 1 головний зберігач', required=True)
     side_1_fond_saver = forms.CharField(max_length=200, label='Сторона 1 зберігач фонду', required=True)
@@ -892,27 +943,27 @@ class SendOnPSForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(SendOnPSForm, self).__init__(*args, **kwargs)
-        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
         self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
         self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
         self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
         self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
-        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices1=TYPE_DESCRIPTION, choices2=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
 
 
 class WritingOffForm(forms.Form):
     #Cписание
     error_css_class = 'error'
-    name = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+    name = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
     is_fragment = forms.BooleanField(label='Фрагмент(не повний)?', required=False)
     amount = forms.IntegerField(label='Кількість', required=True, min_value=0)
-    note = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+    note = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
     main_saver = forms.ModelChoiceField(queryset=myUser.objects.all(), label='Головний зберігач', required=True)
     fond_saver = forms.ModelChoiceField(queryset=myUser.objects.all(), label='Зберігач фонду', required=True)
     reason = forms.CharField(label='Причина', max_length=400, required=True)
     circumstance = forms.CharField(label='Обставини ', max_length=400, required=True)
-    link_on_doc = forms.CharField(max_length=200, label='Посилання на документи: акти звірення, погодження Міністерства культури тощо', required=False)
+    link_on_doc = Custom.TextChoiceField(choices=TYPE_DOCUMENT, label='Посилання на документи: акти звірення, погодження Міністерства культури тощо', required=False, placeholder1='')
     PS_code = forms.CharField(max_length=200, label='Шифр та номер за книгою надходжень (ПЗ)', required=True)
     inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
     spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер', required=True)
@@ -921,9 +972,9 @@ class WritingOffForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(WritingOffForm, self).__init__(*args, **kwargs)
-        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
-        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
-
+        self.fields['name'] = Custom.TextChoiceChoiceField(choices2=LANGUAGE_CHOICES, choices1=TYPE_NAME_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices1=TYPE_PROMITKA, choices2=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['link_on_doc'] = Custom.TextChoiceField(choices=TYPE_DOCUMENT, label='Посилання на документи: акти звірення, погодження Міністерства культури тощо', required=False, placeholder1='')
 
 class ObjectEditForm(ModelForm):
     #Редактирование объекта

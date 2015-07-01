@@ -19,12 +19,20 @@
         <choice>офіційна</choice>
         <choice>неофіційна примітка користувача</choice>
     </promitka>
+    <type_mark label="тип позначки">
+        <choice>знак</choice>
+        <choice>текст</choice>
+    </type_mark>
     <type_class label="клас">
         <choice>речові</choice>
         <choice>письмові</choice>
         <choice>образотворчі</choice>
         <choice>фото</choice>
     </type_class>
+    <document_type label="тип документу">
+        <choice>протокол</choice>
+        <choice>акт</choice>
+    </document_type>
     <materials label="Матерiали">
         <precious label="Дорогоцінні">
             <one label="Метал">
