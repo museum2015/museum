@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-__author__ = 'denis'
 from django import forms
 from models import Object, AttributeAssignment, Activity, myUser
 from django.forms import fields, MultiValueField, MultiWidget, \
@@ -472,9 +470,13 @@ class TempSaveForm(forms.Form):
         self.fields['aim_of_receiving_gen'] = forms.ChoiceField(choices=AIMS, label='Мета приймання на ТЗ', required=True)
         self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
         self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
+        self.fields['material'] = forms.CharField(label = 'Матеріали', required=False, widget=SelectMultiple(choices=MATERIAL_CHOICES))
+        self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
+
 
 class InitialTempSaveForm(forms.Form):
     obj = forms.ModelChoiceField(queryset=Object.objects.all())
+
 
 class TempRetForm(forms.Form):
     #Возврат с временного хранения
@@ -506,6 +508,20 @@ class TempRetForm(forms.Form):
     side_2 = forms.CharField(max_length=100, label='Сторона 2 (акт повернення з ТЗ)', required=True)
     return_mark = forms.ChoiceField(choices=choices, required=True, label='Позначка про повернення предмета або переведення до музейного зібрання (ПЗ) у книзі ТЗ')
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True) #
+
+    def __init__(self, *args, **kwargs):
+        super(TempRetForm, self).__init__(*args, **kwargs)
+        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
+        self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['aim_of_receiving_gen'] = forms.ChoiceField(choices=AIMS, label='Мета приймання на ТЗ', required=True)
+        self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
+        self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
+        self.fields['material'] = forms.CharField(label = 'Матеріали', required=False, widget=SelectMultiple(choices=MATERIAL_CHOICES))
+        self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
+
 
 class PersistentSaveForm(forms.Form):
     #Принятие на постоянное хранение
@@ -545,6 +561,20 @@ class PersistentSaveForm(forms.Form):
     old_registered_marks = forms.CharField(max_length=200, label='Старі облікові позначення', required=True)
     inventory_number = forms.CharField(max_length=200, label='Інвентарний номер', required=True)
     spec_inventory_numb = forms.CharField(max_length=200, label='Спеціальний інвентарний номер', required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(PersistentSaveForm, self).__init__(*args, **kwargs)
+        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
+        self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
+        self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
+        self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
+        self.fields['storage'] = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
+
 
 class InventorySaveForm(forms.Form):
     #Инвентарный учет
@@ -590,6 +620,23 @@ class InventorySaveForm(forms.Form):
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
     old_registered_marks = forms.CharField(max_length=200, label='Старі облікові позначення', required=True)
 
+    def __init__(self, *args, **kwargs):
+        super(InventorySaveForm, self).__init__(*args, **kwargs)
+        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
+        self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
+        self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
+        self.fields['mark_on_object'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Позначки на предметі', placeholder1='')
+        self.fields['typology'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'typology'), label='Типологія', required=True)
+        self.fields['classify'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'classify'), label='Класифікація', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
+        self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
+        self.fields['storage'] = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
+
+
 class SpecInventorySaveForm(forms.Form):
     #Спец. инвентарный учет
     error_css_class = 'error'
@@ -633,6 +680,17 @@ class SpecInventorySaveForm(forms.Form):
     link_on_doc = forms.CharField(max_length=200, label='Посилання на документи (акт приймання, протокол ФЗК, договір тощо)', required=True)
     mat_person_in_charge = forms.ModelChoiceField(queryset=myUser.objects.all(), label='Матеріально-відповідальна особа', required=True)
     storage = forms.ChoiceField(choices=TOPOGRAPHY, label='Фізичне місце збереження (топографія)', required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(SpecInventorySaveForm, self).__init__(*args, **kwargs)
+        self.fields['storage'] = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
+        self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
+        self.fields['metals'] = Custom.MultiChoiceChoiceTextChoiceField(label='Дорогоцінні метали')
+        self.fields['stones'] = Custom.MultiChoiceTextTextChoiceField(label='Дорогоцінне каміння')
+        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+
 
 class PassportForm(forms.Form):
     #Пасспорт
@@ -695,6 +753,28 @@ class PassportForm(forms.Form):
     archive_materials = forms.CharField(max_length=200, label='Архівні матеріали', required=True)
     mat_person_in_charge = forms.ModelChoiceField(queryset=myUser.objects.all(), label='Відповідальна особа')
 
+    def __init__(self, *args, **kwargs):
+        super(PassportForm, self).__init__(*args, **kwargs)
+        self.fields['department'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'department'), label='Відомство', required=True)
+        self.fields['adm_submission'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'department'), label='Адміністративне підпорядкування', required=True)
+        self.fields['museum'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'museum'), label='Музей', required=True)
+        self.fields['section'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'section'), label='Відділ', required=True)
+        self.fields['collection'] = forms.ChoiceField(choices=COLLECTIONS, label='Фонд (колекція, відділ)', required=True)
+        self.fields['storage'] = forms.ChoiceField(choices=TOPOGRAPHY, label='Топографічний шифр', required=True)
+        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['way_of_found'] = forms.ChoiceField(choices=WAY_OF_FOUND_CHOICES, label='Спосіб надходження', required=True)
+        self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
+        self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
+        self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
+        self.fields['metals'] = Custom.MultiChoiceChoiceTextChoiceField(label='Дорогоцінні метали')
+        self.fields['stones'] = Custom.MultiChoiceTextTextChoiceField(label='Дорогоцінне каміння')
+        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+        self.fields['typology'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'typology'), label='Типологія', required=True)
+        self.fields['classify'] = forms.ChoiceField(choices=get_choice(ROOT, 0, 'classify'), label='Класифікація', required=True)
+
+
 class FromPStoTSForm(forms.Form):
     # ПЗ -> ТЗ
     error_css_class = 'error'
@@ -729,6 +809,17 @@ class FromPStoTSForm(forms.Form):
     TS_code = forms.CharField(max_length=100, label='Шифр та номер ТЗ (актуальний)', required=True)
     is_there = forms.ChoiceField(choices=PLACE[2:4], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
 
+    def __init__(self, *args, **kwargs):
+        super(FromPStoTSForm, self).__init__(*args, **kwargs)
+        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
+        self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
+        self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
+        self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+
+
 class FromTStoPSForm(forms.Form):
     #ТЗ -> ПЗ
     error_css_class = 'error'
@@ -762,6 +853,16 @@ class FromTStoPSForm(forms.Form):
     inventory_number = forms.CharField(max_length=100, label='Шифр і номер за Інвентарної книгою', required=True)
     is_there = forms.ChoiceField(choices=PLACE[1:2], label='Фізичне місце збереження (топографія) – позначка про повернення у фонди', required=True)
 
+    def __init__(self, *args, **kwargs):
+        super(FromTStoPSForm, self).__init__(*args, **kwargs)
+        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
+        self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
+        self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
+        self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+
 
 class SendOnPSForm(forms.Form):
     #Передача на постоянное хранение
@@ -789,6 +890,16 @@ class SendOnPSForm(forms.Form):
     TS_code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
     is_there = forms.ChoiceField(choices=PLACE[2:4], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
 
+    def __init__(self, *args, **kwargs):
+        super(SendOnPSForm, self).__init__(*args, **kwargs)
+        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['technique'] = forms.ChoiceField(choices=TECHNIQUE_CHOICES, label='Техніка', required=False)
+        self.fields['material'] = forms.CharField(label = 'Матеріали', required=True, widget=SelectMultiple(choices=MATERIAL_CHOICES))
+        self.fields['size'] = Custom.MultiChoiceTextChoiceField(label='Виміри', required=True)
+        self.fields['condition'] = forms.ChoiceField(choices=CONDITIONS, label='Стан збереженості (тип)', required=True)
+        self.fields['description'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', size1=2000, label='Опис предмета', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
+
 
 class WritingOffForm(forms.Form):
     #Cписание
@@ -807,6 +918,11 @@ class WritingOffForm(forms.Form):
     spec_inventory_numb = forms.CharField(max_length=100, label='Спеціальний інвентарний номер', required=True)
     TS_code = forms.CharField(max_length=50, label='Шифр ТЗ (номер за книгою ТЗ)', required=True)
     is_there = forms.ChoiceField(choices=PLACE[2:4], label='Фізичне місце збереження (топографія) – позначка про відсутність (за межами фондосховища, за межами музею)', required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(WritingOffForm, self).__init__(*args, **kwargs)
+        self.fields['name'] = Custom.TextChoiceField(choices=LANGUAGE_CHOICES, label='Назва', placeholder1='', required=True)
+        self.fields['note'] = Custom.TextAreaChoiceField(choices=LANGUAGE_CHOICES, placeholder1='', label='Примітка', required=True)
 
 
 class ObjectEditForm(ModelForm):
