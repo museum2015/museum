@@ -17,6 +17,12 @@ import lxml.etree as et
 @csrf_protect
 @login_required
 def TempSave(request, id_number=0):
+    """
+    Принять объект на временное хранение
+    :param request:
+    :param id_number: id объекта в системе
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
@@ -53,6 +59,12 @@ def TempSave(request, id_number=0):
 @csrf_protect
 @login_required
 def TempRet(request, id_number=0):
+    """
+    Вернуть объект с временного хранения
+    :param request:
+    :param id_number: id объекта в системе
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
@@ -94,7 +106,7 @@ def TempRet(request, id_number=0):
 @permission_required('mainapp.only_personal_activity', login_url='/admin')
 def GetProject(request):
     """
-    Cписок всех событий
+    Cписок всех объектов
     :param request:
     :return:
     """
@@ -159,7 +171,7 @@ def get_attrib_assigns(act_type, project, attribute):
 @csrf_protect
 def AddOnPS(request, id_number):
     """
-    Добавления объекта на постоянное хранение
+    Добавление объекта на постоянное хранение
     :param request:
     :param id_number:
     :return:
@@ -203,9 +215,9 @@ def AddOnPS(request, id_number):
 @login_required 
 def ActivityPage(request, id_number):
     """
-
+    Список аттрибутов для события
     :param request:
-    :param id_number:
+    :param id_number: id события
     :return:
     """
     if Activity.objects.filter(id=int(id_number)).exists():
@@ -224,6 +236,11 @@ def ActivityPage(request, id_number):
 
 @permission_required('mainapp.see_all_obj', login_url='/admin')
 def ObjectList(request):
+    """
+    Список всех объектов
+    :param request:
+    :return: в качестве контекста помимо информации об объектах передается информация о правах пользователя
+    """
     qs = list(Object.objects.all())
     add = request.user.has_perm('mainapp.add_new_obj')
     change = request.user.has_perm('mainapp.change_obj')
@@ -236,6 +253,11 @@ def ObjectList(request):
 
 
 def aut(request):
+    """
+    Авторизация
+    :param request:
+    :return:
+    """
     if not request.user.is_authenticated():
         if request.method == 'POST':
             form = AutForm(request.POST)
@@ -262,6 +284,9 @@ def logout(request):
 
 
 class ObjectDelete(DeleteView):
+    """
+    Удаление объекта
+    """
     model = Object
     template_name_suffix = '_delete_form'
     success_url = '/objects'
@@ -270,6 +295,12 @@ class ObjectDelete(DeleteView):
 @login_required 
 @csrf_protect
 def AddOnInventorySave(request, id_number):
+    """
+    Принятие на инвентарный учет
+    :param request:
+    :param id_number: id объекта
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
@@ -314,6 +345,12 @@ def AddOnInventorySave(request, id_number):
 @login_required 
 @csrf_protect
 def AddOnSpecInventorySave(request, id_number):
+    """
+    Принятие на специальный инвентарный учет
+    :param request:
+    :param id_number:
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
@@ -338,7 +375,6 @@ def AddOnSpecInventorySave(request, id_number):
         else:
             return render(request, 'AddOnTs.html', {'form': form, 'errors': form.errors})
     else:
-
         ps_code = get_attrib_assigns('Приймання на постійне зберігання', project, 'PS_code')
         inventory_number = get_attrib_assigns('Інвентарний облік', project, 'inventory_number')
         mat_person_in_charge = get_attrib_assigns('Інвентарний облік' or 'Приймання на постійне зберігання', project, 'mat_person_in_charge')
@@ -358,6 +394,12 @@ def AddOnSpecInventorySave(request, id_number):
 @login_required
 @csrf_protect
 def Passport(request, id_number):
+    """
+    Научно-унифицированый пасспорт
+    :param request:
+    :param id_number:
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
@@ -416,6 +458,12 @@ def Passport(request, id_number):
 @login_required
 @csrf_protect
 def FromPSToTS(request, id_number):
+    """
+    Передача с постоянного хранения на временное хранение
+    :param request:
+    :param id_number: id объекта
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
@@ -430,7 +478,7 @@ def FromPSToTS(request, id_number):
             project.save()
             for (k, v) in cd.items():
                 if k=='material':
-                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', '')) #лютый костыль
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -454,11 +502,16 @@ def FromPSToTS(request, id_number):
 @login_required
 @csrf_protect
 def FromTSToPS(request, id_number):
+    """
+    Передача с временного хранения на постоянное хранение
+    :param request:
+    :param id_number:
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
         return HttpResponse('Об’єкт не існує.<br>Спробуйте інший id.')
-
     if request.method == 'POST':
         form = FromTStoPSForm(request.POST)
         if form.is_valid():
@@ -468,7 +521,7 @@ def FromTSToPS(request, id_number):
             project.save()
             for (k, v) in cd.items():
                 if k=='material':
-                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', '')) #лютый, тяжело объясняемый костыль
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -500,6 +553,12 @@ def FromTSToPS(request, id_number):
 @login_required
 @csrf_protect
 def SendOnPS(request, id_number):
+    """
+    Передача на постоянное хранение
+    :param request:
+    :param id_number:
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
@@ -514,7 +573,7 @@ def SendOnPS(request, id_number):
             project.save()
             for (k, v) in cd.items():
                 if k=='material':
-                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', '')) #лютый, тяжело объясняемый костыль
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -540,6 +599,12 @@ def SendOnPS(request, id_number):
 @login_required
 @csrf_protect
 def WritingOff(request, id_number):
+    """
+    Списание объекта
+    :param request:
+    :param id_number:
+    :return:
+    """
     try:
         project = Object.objects.get(id=int(id_number))
     except ObjectDoesNotExist:
@@ -554,7 +619,7 @@ def WritingOff(request, id_number):
             project.save()
             for (k, v) in cd.items():
                 if k=='material':
-                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', ''))
+                    v = unicode(v[1:-1].replace('u\'', '').replace('\'', '')) #лютый, тяжело объясняемый костыль
                 attr_assign = AttributeAssignment(attr_name=k, attr_value=v, attr_label=form.fields[k].label,
                                                   event_initiator=act, aim=project)
                 attr_assign.save()
@@ -574,7 +639,8 @@ def WritingOff(request, id_number):
     return render(request, 'AddOnTs.html', {'form': form, 'label': 'Списати об’єкт'})
 
 class MyPDFView(View):
-    template = 'asshole.html'
+    #Вывод пасспорта на печать (генерация pdf)
+    template = 'pdf.html'
 
     def get(self, request, id_number):
         try:
@@ -612,6 +678,11 @@ class MyPDFView(View):
         return response
 
 def EditXML(request):
+    """
+    Добавление записей в ХML справочник
+    :param request:
+    :return:
+    """
     global ROOT
     if request.method == 'POST':
         form = XMLForm(request.POST)

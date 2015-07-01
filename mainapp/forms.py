@@ -20,11 +20,11 @@ def validate_all_choices(value):
 
 def get_choice(root, level=0, *args):
     """
-    Function that returns nested tuple from xml dictionary (for choice fields)
-    :param root: Always ROOT on call
-    :param level: Level of recursion, 0 on call
-    :param args: All labels of levels in trace up to level that you are looking for (examples in code)
-    :return: Tuple
+    Функция возвращающая многовложенный кортеж из xml справочника (для choice fields)
+    :param root: Всегда ROOT при вызове
+    :param level: Уровень рекурсии, вспомогательный параметр, 0 при вызове
+    :param args: Все названия уровней по пути к искомому поддереву (примеры в коде)
+    :return: многовложенный кортеж
     """
     choice = ()
     for a in args:
@@ -56,7 +56,8 @@ MEAS_CHOICES = get_choice(ROOT, 0,'dimension', 'measurement_unit')
 
 def recalc():
     """
-    function that recalculates constants (tuples for choicefields)
+    Функция пересчета констант (кортежей для choice fields)
+    Используется при добавлении новых элементов в справочник
     :return:
     """
     global ROOT, PREC_ST_CHOICES, MES_UNIT_WEIGHT, WEIGHT_CHOICES, MATERIAL_CHOICES, LANGUAGE_CHOICES, ASSAY_CHOICES, PREC_MAT_CHOICES, TYPE_CHOICES, MEAS_CHOICES
@@ -84,7 +85,7 @@ CONDITIONS = (('', ''), ('Без пошкоджень', 'Без пошкодже
               ('Незадовільний', 'Незадовільний'))
 
 class Custom:
-    #custom fields and widgets for our forms
+    #Кастомные поля и виджеты для этих полей (для форм)
     class MultiMaterialSelectWidget(MultiWidget):
         def __init__(self):
             widgets = [SelectMultiple(choices=MATERIAL_CHOICES)]
@@ -822,11 +823,11 @@ class AutForm(forms.Form):
 def get_xml(root, prefix, value, level=0):
     """
     Функция для парсинга всего xml файла
-    :param root: начальняа область с которой начинается парсинг пообластей
+    :param root: начальняа область с которой начинается парсинг подобластей
     :param prefix: Путь к конкретному положению root'a
     :param value: то что будет переданно серверу при выборе какого-либо варианта
     :param level: уровень рекурсии, 0 при вызове
-    :return: tuple, который передается в видже
+    :return: кортеж, который передается в виджет
     """
     choice = ()
     for s in root:
@@ -841,5 +842,5 @@ def get_xml(root, prefix, value, level=0):
         return choice
 
 class XMLForm(forms.Form):
-    choicefield = forms.CharField(label='Куда добавить', required=True, widget=Select(choices=get_xml(ROOT, '', '', 0)))
+    choicefield = forms.ChoiceField(label='Куда добавить', required=True, choices=get_xml(ROOT, '', '', 0))
     charfield = forms.CharField(label='Что добавить', required=True)

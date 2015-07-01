@@ -90,11 +90,6 @@
         <choice>закупка</choice>
         <choice>дарунок</choice>
     </way_the_getting>
-    <purpose label="нужно поправить">
-        <choice>посмотреть</choice>
-        <choice>потрогать</choice>
-        <choice>понюхать</choice>
-    </purpose>
     <assay label="проба">
         <gold label="Золото">
             <choice>999</choice>
@@ -132,6 +127,7 @@
             <choice>Висота</choice>
             <choice>Ширина</choice>
             <choice>Твердість</choice>
+            <choice>Глибина</choice>
         </type>
         <measurement_unit label="одиницi вимырювання">
             <weight label="Вага">
@@ -181,4 +177,7 @@
     <typology label="класифікація">
         <choice>тип</choice>
     </typology>
+    <purpose label="Підстава">
+        <choice>підстава 1</choice>
+    </purpose>
 </data>
